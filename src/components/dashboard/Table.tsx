@@ -22,14 +22,16 @@ export const TableComponent = (props: any) => {
             key: 'action',
             render: (name: string) => {
                 return (
-                    <Button size="middle" onClick={() => {
-                        router.push({
-                            pathname: "/task",
-                            query: { task_name: name }
-                        })
-                    }}>
-                        View jobs
-                    </Button>
+                    <span>
+                        <Button type="primary" size="middle" onClick={() => {
+                            router.push({
+                                pathname: "/task",
+                                query: { task_name: name }
+                            })
+                        }}>
+                            View jobs
+                            </Button>
+                    </span>
                 )
             },
             title: 'Action',

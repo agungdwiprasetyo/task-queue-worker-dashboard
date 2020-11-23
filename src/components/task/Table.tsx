@@ -1,5 +1,6 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React from 'react';
+import { Tag } from 'antd';
 
 export const TableComponent = (props: any) => {
     const columns: Array<ColumnProps<any>> = [
@@ -34,9 +35,35 @@ export const TableComponent = (props: any) => {
             title: 'Interval',
         },
         {
-            dataIndex: 'action',
-            key: 'action',
-            title: 'Action',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            title: 'Created At',
+        },
+        {
+            dataIndex: 'error',
+            key: 'error',
+            title: 'Error',
+        },
+        {
+            dataIndex: 'is_giveup',
+            key: 'is_giveup',
+            title: 'Status',
+            render: (is_giveup: boolean, row: any) => {
+                console.log(is_giveup)
+                if (is_giveup) {
+                    return (
+                        <Tag color='red'>Give Up</Tag>
+                    );
+                } else if (row?.error != "") {
+                    return (
+                        <Tag color='orange'>Retrying</Tag>
+                    );
+                } else {
+                    return (
+                        <Tag color='green'>Success</Tag>
+                    );
+                }
+            }
         },
     ];
 

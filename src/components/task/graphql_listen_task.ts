@@ -7,7 +7,7 @@ subscription ($taskName: String!) {
             page total_data
         }
         data {
-            id task_name args retries max_retry interval
+            id task_name args retries max_retry interval error is_giveup created_at
         }
     }
 }`;
