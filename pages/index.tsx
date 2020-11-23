@@ -1,8 +1,17 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
 import React from 'react';
+// import Link from 'next/link';
+import Table from '../src/components/dashboard/Table'
+import Dashboard from '../src/components/dashboard/Dashboard';
 
-const Index: NextPage = () => {
+const Index: NextPage = (props: any) => {
+  const { loading, error, data } = props;
+  const propsTable = {
+    data: data?.get_all_task,
+    // loadData: fetchData,
+    loading,
+  };
   return (
     <>
       <Head>
@@ -30,18 +39,25 @@ const Index: NextPage = () => {
               fillRule="nonzero"
             />
           </svg>
-          <div>Starter</div>
         </div>
 
-        <div className="features">
-          <div>
-            <h1>Features</h1>
-            <p>Don't take too long to get started! {process.env.REACT_APP_GRAPHQL_HOST}</p>
-          </div>
+        <div className="text-center">
+          <Table {...propsTable} />
         </div>
       </div>
     </>
   );
+};
+
+Index.getInitialProps = async ctx => {
+  try {
+    const { data, loading } = await Dashboard(ctx);
+    return { data, loading };
+  } catch (error) {
+    return {
+      error: 'Failed to fetch',
+    };
+  }
 };
 
 export default Index;
