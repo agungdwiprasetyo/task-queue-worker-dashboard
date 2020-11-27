@@ -7,6 +7,12 @@ import Table from '../src/components/dashboard/Table'
 import Dashboard from '../src/components/dashboard/Dashboard';
 
 const Index = () => {
+
+  const content = {
+    marginTop: '30px',
+    marginLeft: '50px',
+    marginRight: '50px',
+  };
   // const { loading, error, data } = props;
 
   const { data, loading } = Dashboard();
@@ -45,8 +51,10 @@ const Index = () => {
           </svg>
         </div>
 
-        <div className="text-center">
-          <Table {...propsTable} />
+        <div style={content}>
+          <div className="text-center mb-5">
+            <Table {...propsTable} />
+          </div>
         </div>
       </div>
     </>

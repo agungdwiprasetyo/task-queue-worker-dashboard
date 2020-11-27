@@ -3,7 +3,7 @@ import React from 'react';
 import Task from './interface';
 import { Button } from 'antd';
 import { useRouter } from 'next/router';
-import { Tag } from 'antd';
+import { Tag, Space } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
@@ -23,15 +23,23 @@ export const TableComponent = (props: any) => {
             dataIndex: 'total_jobs',
             key: 'total_jobs',
             title: 'Total Jobs',
+            render: (total_jobs: number) => {
+                return (
+                    <div><b>{total_jobs}</b></div>
+                );
+            }
+        },
+        {
+            dataIndex: 'total_jobs',
+            key: 'total_jobs',
             render: (total_jobs: number, row: any) => {
                 return (
-                    <div>
-                        <div><b>{total_jobs}</b></div>
-                        <div><Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag></div>
-                        <div><Tag icon={<CloseCircleOutlined />} color="red">Give Up: {row?.detail?.give_up}</Tag></div>
-                        <div><Tag icon={row?.detail.retrying != 0 ? (<SyncOutlined spin />) : ''} color="orange">Retrying: {row?.detail?.retrying}</Tag></div>
-                        <div><Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag></div>
-                    </div>
+                    <Space>
+                        <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
+                        <Tag icon={<CloseCircleOutlined />} color="red">Give Up: {row?.detail?.give_up}</Tag>
+                        <Tag icon={row?.detail.retrying != 0 ? (<SyncOutlined spin />) : ''} color="orange">Retrying: {row?.detail?.retrying}</Tag>
+                        <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
+                    </Space>
                 )
             },
         },
@@ -40,7 +48,7 @@ export const TableComponent = (props: any) => {
             key: 'action',
             render: (name: string) => {
                 return (
-                    <span>
+                    <Space>
                         <Button type="primary" size="middle" onClick={() => {
                             router.push({
                                 pathname: "/task",
@@ -49,10 +57,17 @@ export const TableComponent = (props: any) => {
                         }}>
                             View jobs
                             </Button>
-                    </span>
+                        <Button danger size="middle" onClick={() => {
+                            router.push({
+                                pathname: "/task",
+                                query: { task_name: name }
+                            })
+                        }}>
+                            Clear Jobs
+                            </Button>
+                    </Space>
                 )
             },
-            title: 'Action',
         },
 
     ];

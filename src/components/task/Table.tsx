@@ -1,14 +1,18 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React from 'react';
-import { Tag } from 'antd';
+import { Tag, Space, Button } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
     CloseCircleOutlined,
     ClockCircleOutlined,
 } from '@ant-design/icons';
+import { useMutation } from '@apollo/react-hooks';
+import RETRY_JOB from './graphql_retry_job';
 
 export const TableComponent = (props: any) => {
+    const [retryJob, { data }] = useMutation(RETRY_JOB);
+
     const columns: Array<ColumnProps<any>> = [
         {
             dataIndex: 'id',
@@ -54,11 +58,31 @@ export const TableComponent = (props: any) => {
             dataIndex: 'status',
             key: 'status',
             title: 'Status',
-            render: (status: string) => {
-                if (status == "Give Up") return (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
-                else if (status == "Retrying") return (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
-                else if (status == "Success") return (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
-                else if (status == "") return (<Tag icon={<ClockCircleOutlined />} color="default">Queueing</Tag>);
+            render: (status: string, row: any) => {
+                let tag: any;
+                if (status == "Give Up") tag = (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
+                else if (status == "Retrying") tag = (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
+                else if (status == "Success") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
+                else if (status == "") tag = (<Tag icon={<ClockCircleOutlined />} color="default">Queueing</Tag>);
+                return (
+                    <Space>
+                        {tag}
+                        {
+                            status == "Retrying" ?
+                                <Space>
+                                    <Button type="primary" size="small" disabled>Retry</Button>
+                                    <Button type="dashed" danger size="small">Stop</Button>
+                                </Space> :
+                                <Space>
+                                    <Button type="primary" size="small" onClick={() => {
+                                        retryJob({ variables: { jobId: row?.id } });
+                                    }}>Retry</Button>
+                                    <Button type="dashed" danger size="small" disabled>Stop</Button>
+                                </Space>
+
+                        }
+                    </Space>
+                );
             }
         },
     ];
