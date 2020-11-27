@@ -1,13 +1,13 @@
 import gql from 'graphql-tag';
 
 const SUBSCRIBE_TASK = gql`
-subscription ($taskName: String!) {
-    listen_task(task_name: $taskName) {
+subscription ($taskName: String!, $page: Int!, $limit: Int!) {
+    listen_task(task_name: $taskName, page: $page, limit: $limit) {
         meta{
-            page total_data
+            page limit total_pages total_records
         }
         data {
-            id task_name args retries max_retry interval error is_giveup created_at
+            id task_name args: arguments retries max_retry interval error status created_at trace_id
         }
     }
 }`;

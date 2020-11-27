@@ -1,14 +1,18 @@
-import { NextPage } from 'next';
+// import { NextPage } from 'next';
+import { withAuthSync } from '../src/utils/auth';
 import Head from 'next/head';
 import React from 'react';
 // import Link from 'next/link';
 import Table from '../src/components/dashboard/Table'
 import Dashboard from '../src/components/dashboard/Dashboard';
 
-const Index: NextPage = (props: any) => {
-  const { loading, error, data } = props;
+const Index = () => {
+  // const { loading, error, data } = props;
+
+  const { data, loading } = Dashboard();
+
   const propsTable = {
-    data: data?.get_all_task,
+    data: data?.subscribe_all_task,
     // loadData: fetchData,
     loading,
   };
@@ -49,15 +53,15 @@ const Index: NextPage = (props: any) => {
   );
 };
 
-Index.getInitialProps = async ctx => {
-  try {
-    const { data, loading } = await Dashboard(ctx);
-    return { data, loading };
-  } catch (error) {
-    return {
-      error: 'Failed to fetch',
-    };
-  }
-};
+// Index.getInitialProps = async ctx => {
+//   try {
+//     const { data, loading } = await Dashboard(ctx);
+//     return { data, loading };
+//   } catch (error) {
+//     return {
+//       error: 'Failed to fetch',
+//     };
+//   }
+// };
 
-export default Index;
+export default withAuthSync(Index);

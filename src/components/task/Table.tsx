@@ -1,6 +1,12 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React from 'react';
 import { Tag } from 'antd';
+import {
+    CheckCircleOutlined,
+    SyncOutlined,
+    CloseCircleOutlined,
+    ClockCircleOutlined,
+} from '@ant-design/icons';
 
 export const TableComponent = (props: any) => {
     const columns: Array<ColumnProps<any>> = [
@@ -30,11 +36,6 @@ export const TableComponent = (props: any) => {
             title: 'Max Retry',
         },
         {
-            dataIndex: 'interval',
-            key: 'interval',
-            title: 'Interval',
-        },
-        {
             dataIndex: 'created_at',
             key: 'created_at',
             title: 'Created At',
@@ -45,24 +46,19 @@ export const TableComponent = (props: any) => {
             title: 'Error',
         },
         {
-            dataIndex: 'is_giveup',
-            key: 'is_giveup',
+            dataIndex: 'trace_id',
+            key: 'trace_id',
+            title: 'Trace ID',
+        },
+        {
+            dataIndex: 'status',
+            key: 'status',
             title: 'Status',
-            render: (is_giveup: boolean, row: any) => {
-                console.log(is_giveup)
-                if (is_giveup) {
-                    return (
-                        <Tag color='red'>Give Up</Tag>
-                    );
-                } else if (row?.error != "") {
-                    return (
-                        <Tag color='orange'>Retrying</Tag>
-                    );
-                } else {
-                    return (
-                        <Tag color='green'>Success</Tag>
-                    );
-                }
+            render: (status: string) => {
+                if (status == "Give Up") return (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
+                else if (status == "Retrying") return (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
+                else if (status == "Success") return (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
+                else if (status == "") return (<Tag icon={<ClockCircleOutlined />} color="default">Queueing</Tag>);
             }
         },
     ];
@@ -83,10 +79,9 @@ export const TableComponent = (props: any) => {
         }
 
         props.loadData({
-            limit: pageSize,
-            orderBy,
+            task_name: props.task_name,
             page: current,
-            sortBy,
+            limit: pageSize,
         });
     };
 
@@ -99,6 +94,10 @@ export const TableComponent = (props: any) => {
                 dataSource={props.data}
                 loading={loading}
                 onChange={handleOnChange}
+                pagination={{
+                    current: props?.meta?.page,
+                    total: props?.meta?.total_records,
+                }}
                 scroll={{ x: 560 }}
             />
         </div>

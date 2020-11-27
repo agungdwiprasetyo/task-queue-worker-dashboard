@@ -1,18 +1,19 @@
-import TASK_LIST from './graphql_task_list'
+import { useSubscription } from '@apollo/react-hooks';
+import SUBSCRIBE_TASK from './graphql_subscribe_task';
+import { toast } from 'react-toastify';
 
-const Dashboard = async (ctx) => {
+const Dashboard = () => {
     try {
-        const { data, loading, error } = await ctx.apolloClient.query({
-            query: TASK_LIST,
-        });
+        const { data, loading, error } = useSubscription(SUBSCRIBE_TASK);
+
         if (error) {
-            return { error }
-        }
-        return { data, loading };
-    } catch (error) {
-        return {
-            error: 'Failed to fetch',
+            console.log(error);
         };
+        return { data, loading };
+    }
+    catch (error) {
+        console.log(error);
+        toast.error('Error');
     }
 };
 

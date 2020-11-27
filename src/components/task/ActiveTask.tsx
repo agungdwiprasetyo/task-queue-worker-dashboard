@@ -2,7 +2,7 @@ import { useSubscription } from '@apollo/react-hooks';
 import SUBSCRIBE_TASK from './graphql_listen_task';
 import { toast } from 'react-toastify';
 
-const ActiveTask = (taskName: string) => {
+const ActiveTask = (taskName: string, page: number, limit: number) => {
     try {
         if (!taskName || taskName == "") {
             toast.error("Invalid task name parameter");
@@ -10,7 +10,9 @@ const ActiveTask = (taskName: string) => {
         }
         const { data, loading, error } = useSubscription(SUBSCRIBE_TASK, {
             variables: {
-                "taskName": taskName
+                "taskName": taskName,
+                "page": page,
+                "limit": limit,
             }
         });
 
@@ -20,7 +22,8 @@ const ActiveTask = (taskName: string) => {
         return { data, loading };
     }
     catch (error) {
-        toast.error('Check your connection');
+        console.log(error);
+        toast.error('Error');
     }
 };
 
