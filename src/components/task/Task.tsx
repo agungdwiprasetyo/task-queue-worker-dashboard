@@ -1,7 +1,8 @@
+import React, { useState } from 'react';
 import TableComponent from './Table';
 import { useRouter } from 'next/router';
-import { RetryJobGraphQL, SubscribeTaskList } from './graphql';
-import { TableProps } from './interface';
+import { SubscribeTaskList } from './graphql';
+import { TableProps, ITaskListParam } from './interface';
 
 const TaskComponent = (props: any) => {
     const content = {
@@ -13,22 +14,23 @@ const TaskComponent = (props: any) => {
     const router = useRouter();
     const { task_name } = router.query;
 
-    const loadData = (params: any) => {
-        console.log("hahaha load data", params);
-        return SubscribeTaskList(task_name as string, params?.page, params?.limit);
-    }
+    const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
+        page: 1,
+        limit: 10,
+        taskName: task_name as string,
+    });
 
-    const { data, loading } = loadData({ page: 1, limit: 10 });
-    const { retryJob } = RetryJobGraphQL();
+
+    const { data, loading } = SubscribeTaskList(paramsTaskList);
 
     const propsTable: TableProps = {
         data: data?.listen_task?.data,
         meta: data?.listen_task?.meta,
-        loadData: loadData,
+        loadData: setParamsTaskList,
         loading: loading,
-        retryJob: retryJob,
         defaultSort: "desc",
         defaultOrder: "",
+        taskName: paramsTaskList.taskName,
     };
 
     return (

@@ -8,8 +8,10 @@ import {
     ClockCircleOutlined,
 } from '@ant-design/icons';
 import { TableProps } from './interface';
+import { RetryJobGraphQL } from './graphql';
 
 export const TableComponent = (props: TableProps) => {
+    const { retryJob } = RetryJobGraphQL();
 
     const columns: Array<ColumnProps<any>> = [
         {
@@ -73,7 +75,7 @@ export const TableComponent = (props: TableProps) => {
                                 </Space> :
                                 <Space>
                                     <Button type="primary" size="small" onClick={() => {
-                                        props.retryJob({ variables: { jobId: row?.id } });
+                                        retryJob({ variables: { jobId: row?.id } });
                                     }}>Retry</Button>
                                     <Button type="dashed" danger size="small" disabled>Stop</Button>
                                 </Space>
@@ -103,6 +105,7 @@ export const TableComponent = (props: TableProps) => {
         props.loadData({
             page: current,
             limit: pageSize,
+            taskName: props.taskName,
         });
     };
 

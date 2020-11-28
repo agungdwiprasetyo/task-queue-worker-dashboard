@@ -1,6 +1,7 @@
 import { useMutation, useSubscription } from '@apollo/react-hooks';
 import LISTEN_JOB_TASK from './graphql_listen_task';
-import RETRY_JOB from './graphql_retry_job'
+import RETRY_JOB from './graphql_retry_job';
+import { ITaskListParam } from '../interface';
 
 export const RetryJobGraphQL = () => {
     try {
@@ -12,16 +13,16 @@ export const RetryJobGraphQL = () => {
     }
 }
 
-export const SubscribeTaskList = (taskName: string, page: number, limit: number) => {
+export const SubscribeTaskList = (params: ITaskListParam) => {
     try {
-        if (!taskName || taskName == "") {
-            throw ("Invalid task name parameter");
+        if (!params.taskName || params.taskName == "") {
+            return {};
         }
         const { data, loading, error } = useSubscription(LISTEN_JOB_TASK, {
             variables: {
-                "taskName": taskName,
-                "page": page,
-                "limit": limit,
+                "taskName": params.taskName,
+                "page": params.page,
+                "limit": params.limit,
             }
         });
         if (error) {
