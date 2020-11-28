@@ -1,13 +1,8 @@
-
-export interface Task {
-    name: string
-    total_jobs: string
-}
-
 export interface TableProps {
-    cleanJob: any;
+    retryJob: any;
     loading: boolean;
     data: any;
+    meta: any;
     defaultSort: any;
     defaultOrder: any;
     loadData: any;

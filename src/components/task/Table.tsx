@@ -7,11 +7,9 @@ import {
     CloseCircleOutlined,
     ClockCircleOutlined,
 } from '@ant-design/icons';
-import { useMutation } from '@apollo/react-hooks';
-import RETRY_JOB from './graphql_retry_job';
+import { TableProps } from './interface';
 
-export const TableComponent = (props: any) => {
-    const [retryJob, { data }] = useMutation(RETRY_JOB);
+export const TableComponent = (props: TableProps) => {
 
     const columns: Array<ColumnProps<any>> = [
         {
@@ -68,14 +66,14 @@ export const TableComponent = (props: any) => {
                     <Space>
                         {tag}
                         {
-                            status == "Retrying" ?
+                            (status == "Retrying" || status == "") ?
                                 <Space>
                                     <Button type="primary" size="small" disabled>Retry</Button>
                                     <Button type="dashed" danger size="small">Stop</Button>
                                 </Space> :
                                 <Space>
                                     <Button type="primary" size="small" onClick={() => {
-                                        retryJob({ variables: { jobId: row?.id } });
+                                        props.retryJob({ variables: { jobId: row?.id } });
                                     }}>Retry</Button>
                                     <Button type="dashed" danger size="small" disabled>Stop</Button>
                                 </Space>
@@ -103,20 +101,17 @@ export const TableComponent = (props: any) => {
         }
 
         props.loadData({
-            task_name: props.task_name,
             page: current,
             limit: pageSize,
         });
     };
-
-    const loading: boolean = false;
 
     return (
         <div className="ic-table">
             <Table
                 columns={columns}
                 dataSource={props.data}
-                loading={loading}
+                loading={props.loading}
                 onChange={handleOnChange}
                 pagination={{
                     current: props?.meta?.page,

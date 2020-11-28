@@ -1,27 +1,9 @@
-// import { NextPage } from 'next';
 import { withAuthSync } from '../src/utils/auth';
 import Head from 'next/head';
 import React from 'react';
-// import Link from 'next/link';
-import Table from '../src/components/dashboard/Table'
-import Dashboard from '../src/components/dashboard/Dashboard';
+import DashboardComponent from '../src/components/dashboard/Dashboard';
 
-const Index = () => {
-
-  const content = {
-    marginTop: '30px',
-    marginLeft: '50px',
-    marginRight: '50px',
-  };
-  // const { loading, error, data } = props;
-
-  const { data, loading } = Dashboard();
-
-  const propsTable = {
-    data: data?.subscribe_all_task,
-    // loadData: fetchData,
-    loading,
-  };
+const Index = (props: any) => {
   return (
     <>
       <Head>
@@ -51,25 +33,11 @@ const Index = () => {
           </svg>
         </div>
 
-        <div style={content}>
-          <div className="text-center mb-5">
-            <Table {...propsTable} />
-          </div>
-        </div>
+        <DashboardComponent {...props} />
+
       </div>
     </>
   );
 };
-
-// Index.getInitialProps = async ctx => {
-//   try {
-//     const { data, loading } = await Dashboard(ctx);
-//     return { data, loading };
-//   } catch (error) {
-//     return {
-//       error: 'Failed to fetch',
-//     };
-//   }
-// };
 
 export default withAuthSync(Index);

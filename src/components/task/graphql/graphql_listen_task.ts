@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const SUBSCRIBE_TASK = gql`
+const LISTEN_JOB_TASK = gql`
 subscription ($taskName: String!, $page: Int!, $limit: Int!) {
     listen_task(task_name: $taskName, page: $page, limit: $limit) {
         meta{
@@ -12,4 +12,4 @@ subscription ($taskName: String!, $page: Int!, $limit: Int!) {
     }
 }`;
 
-export default SUBSCRIBE_TASK;
+export default LISTEN_JOB_TASK;

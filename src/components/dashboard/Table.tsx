@@ -1,6 +1,6 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React from 'react';
-import Task from './interface';
+import { Task, TableProps } from './interface';
 import { Button } from 'antd';
 import { useRouter } from 'next/router';
 import { Tag, Space } from 'antd';
@@ -11,7 +11,7 @@ import {
     ClockCircleOutlined,
 } from '@ant-design/icons';
 
-export const TableComponent = (props: any) => {
+export const TableComponent = (props: TableProps) => {
     const router = useRouter()
     const columns: Array<ColumnProps<Task>> = [
         {
@@ -58,10 +58,7 @@ export const TableComponent = (props: any) => {
                             View jobs
                             </Button>
                         <Button danger size="middle" onClick={() => {
-                            router.push({
-                                pathname: "/task",
-                                query: { task_name: name }
-                            })
+                            props.cleanJob({ variables: { taskName: name } });
                         }}>
                             Clear Jobs
                             </Button>
@@ -95,14 +92,12 @@ export const TableComponent = (props: any) => {
         });
     };
 
-    const loading: boolean = false;
-
     return (
         <div className="ic-table">
             <Table
                 columns={columns}
                 dataSource={props.data}
-                loading={loading}
+                loading={props.loading}
                 onChange={handleOnChange}
                 scroll={{ x: 560 }}
             />
