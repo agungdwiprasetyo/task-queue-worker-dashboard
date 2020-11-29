@@ -6,7 +6,7 @@ export interface TableProps {
     meta: any;
     defaultSort: any;
     defaultOrder: any;
-    taskName: string;
+    params: ITaskListParam;
     loadData: Dispatch<SetStateAction<ITaskListParam>>;
 }
 
@@ -14,4 +14,5 @@ export interface ITaskListParam {
     page: number;
     limit: number;
     taskName: string;
+    search: string;
 }

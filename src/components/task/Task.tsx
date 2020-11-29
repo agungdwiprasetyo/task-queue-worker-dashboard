@@ -3,14 +3,9 @@ import TableComponent from './Table';
 import { useRouter } from 'next/router';
 import { SubscribeTaskList } from './graphql';
 import { TableProps, ITaskListParam } from './interface';
+import { Row, Col } from 'antd';
 
 const TaskComponent = (props: any) => {
-    const content = {
-        marginTop: '30px',
-        marginLeft: '50px',
-        marginRight: '50px',
-    };
-
     const router = useRouter();
     const { task_name } = router.query;
 
@@ -18,8 +13,8 @@ const TaskComponent = (props: any) => {
         page: 1,
         limit: 10,
         taskName: task_name as string,
+        search: null
     });
-
 
     const { data, loading } = SubscribeTaskList(paramsTaskList);
 
@@ -30,22 +25,15 @@ const TaskComponent = (props: any) => {
         loading: loading,
         defaultSort: "desc",
         defaultOrder: "",
-        taskName: paramsTaskList.taskName,
+        params: paramsTaskList,
     };
 
     return (
-        <div style={content}>
-            <div className="text-center mb-5">
-                <div className="text-right">
-                    {/* <Button type="primary" size='large' onClick={() => {
-    
-              }}>
-                Clean Job
-              </Button> */}
-                </div>
+        <Row>
+            <Col span={24}>
                 <TableComponent {...propsTable} />
-            </div>
-        </div>
+            </Col>
+        </Row>
     );
 };
 

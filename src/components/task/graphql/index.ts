@@ -23,6 +23,7 @@ export const SubscribeTaskList = (params: ITaskListParam) => {
                 "taskName": params.taskName,
                 "page": params.page,
                 "limit": params.limit,
+                "search": params.search,
             }
         });
         if (error) {

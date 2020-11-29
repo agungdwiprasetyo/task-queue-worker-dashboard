@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const LISTEN_JOB_TASK = gql`
-subscription ($taskName: String!, $page: Int!, $limit: Int!) {
-    listen_task(task_name: $taskName, page: $page, limit: $limit) {
+subscription ($taskName: String!, $page: Int!, $limit: Int!, $search: String) {
+    listen_task(task_name: $taskName, page: $page, limit: $limit, search: $search) {
         meta{
             page limit total_pages total_records
         }
