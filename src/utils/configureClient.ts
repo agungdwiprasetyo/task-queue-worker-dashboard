@@ -17,7 +17,7 @@ let authToken = null;
 
 const httpLink = new HttpLink({
   fetch,
-  uri: process.env.IS_BUILD == 'true' ? '/graphql' : process.env.REACT_APP_GRAPHQL_HOST,
+  uri: process.env.REACT_APP_GRAPHQL_HOST || '/graphql',
 });
 
 const authMiddleware = new ApolloLink((operation, forward) => {
@@ -32,9 +32,15 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+const getWebsocketHost = () => {
+  let protocol = window.location.protocol;
+  protocol = protocol.replace(/http/gi, "ws");
+  return `${protocol}//${window.location.host}`;
+}
+
 const webSocketLink: any = process.browser
   ? new WebSocketLink({
-    uri: process.env.IS_BUILD == 'true' ? `ws://${window.location.host}/graphql` : process.env.REACT_APP_GRAPHQL_WS,
+    uri: process.env.REACT_APP_GRAPHQL_WS || `${getWebsocketHost()}/graphql`,
     options: {
       reconnect: true,
     },

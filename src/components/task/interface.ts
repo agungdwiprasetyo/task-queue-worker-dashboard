@@ -15,4 +15,5 @@ export interface ITaskListParam {
     limit: number;
     taskName: string;
     search: string;
+    status: string[];
 }

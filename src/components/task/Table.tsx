@@ -9,13 +9,14 @@ import {
     StopOutlined, SearchOutlined
 } from '@ant-design/icons';
 import { TableProps } from './interface';
-import { RetryJobGraphQL } from './graphql';
+import { RetryJobGraphQL, StopJobGraphQL } from './graphql';
 import Highlighter from 'react-highlight-words';
 
 const { Paragraph } = Typography;
 
 export const TableComponent = (props: TableProps) => {
     const { retryJob } = RetryJobGraphQL();
+    const { stopJob } = StopJobGraphQL();
 
     const getColumnSearchProps = dataIndex => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -29,7 +30,8 @@ export const TableComponent = (props: TableProps) => {
                             page: props?.meta?.page,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
-                            search: selectedKeys[0]
+                            search: selectedKeys[0],
+                            status: props.params.status,
                         });
                     }}
                     onSearch={value => {
@@ -38,7 +40,8 @@ export const TableComponent = (props: TableProps) => {
                             page: props?.meta?.page,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
-                            search: value
+                            search: value,
+                            status: props.params.status,
                         });
                     }}
                     style={{ width: 188, marginBottom: 8, display: 'block' }}
@@ -105,8 +108,8 @@ export const TableComponent = (props: TableProps) => {
             width: 150,
         },
         {
-            dataIndex: 'created_at',
-            key: 'created_at',
+            dataIndex: 'next_retry_at',
+            key: 'next_retry_at',
             title: 'Next Retry',
             width: 150,
         },
@@ -126,14 +129,22 @@ export const TableComponent = (props: TableProps) => {
             dataIndex: 'status',
             key: 'status',
             title: 'Status',
-            width: 100,
+            width: 120,
             fixed: 'right',
+            filters: [
+                { text: 'Success', value: 'SUCCESS' },
+                { text: 'Retrying', value: 'RETRYING' },
+                { text: 'Queueing', value: 'QUEUEING' },
+                { text: 'Failure', value: 'FAILURE' },
+                { text: 'Stopped', value: 'STOPPED' },
+            ],
             render: (status: string, row: any) => {
                 let tag: any;
-                if (status == "Give Up") tag = (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
-                else if (status == "Retrying") tag = (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
-                else if (status == "Success") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
-                else if (status == "") tag = (<Tag icon={<ClockCircleOutlined />} color="default">Queueing</Tag>);
+                if (status == "RETRYING") tag = (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
+                else if (status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
+                else if (status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{status}...</Tag>);
+                else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
+                else if (status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="red">{status} </Tag>);
                 return (
                     <Space>
                         {tag}
@@ -151,8 +162,10 @@ export const TableComponent = (props: TableProps) => {
                 return (
                     <Space direction="vertical">
                         {
-                            (status == "Retrying" || status == "") ?
-                                <Button icon={<StopOutlined />} type="primary" danger size="small">Stop</Button>
+                            (status == "RETRYING" || status == "QUEUEING") ?
+                                <Button icon={<StopOutlined />} type="primary" danger size="small" disabled={status == "RETRYING"} onClick={() => {
+                                    stopJob({ variables: { jobId: row?.id } })
+                                }}>Stop</Button>
                                 :
                                 <Button icon={<SyncOutlined />} type="primary" size="small" onClick={() => {
                                     retryJob({ variables: { jobId: row?.id } });
@@ -184,7 +197,8 @@ export const TableComponent = (props: TableProps) => {
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
-            search: null
+            search: null,
+            status: filters?.status || [],
         });
     };
 

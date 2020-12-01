@@ -1,6 +1,7 @@
 import { useMutation, useSubscription } from '@apollo/react-hooks';
 import LISTEN_JOB_TASK from './graphql_listen_task';
 import RETRY_JOB from './graphql_retry_job';
+import STOP_JOB from './graphql_stop_job';
 import { ITaskListParam } from '../interface';
 
 export const RetryJobGraphQL = () => {
@@ -24,6 +25,7 @@ export const SubscribeTaskList = (params: ITaskListParam) => {
                 "page": params.page,
                 "limit": params.limit,
                 "search": params.search,
+                "status": params.status,
             }
         });
         if (error) {
@@ -35,3 +37,13 @@ export const SubscribeTaskList = (params: ITaskListParam) => {
         console.log(error);
     }
 };
+
+export const StopJobGraphQL = () => {
+    try {
+        const [stopJob, { }] = useMutation(STOP_JOB);
+        return { stopJob };
+    }
+    catch (error) {
+        console.log(error);
+    }
+}

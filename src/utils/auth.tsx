@@ -1,25 +1,23 @@
 import * as React from 'react';
 import Router from 'next/router';
-// import nextCookie from 'next-cookies';
+import nextCookie from 'next-cookies';
 import { setTokenInRequest } from './configureClient';
 
 const getDisplayName = Component =>
   Component.displayName || Component.name || 'Component';
 
 export const auth = ctx => {
-  // const { token, userId } = nextCookie(ctx);
-  const token = "a";
-  const userId = "user";
+  const { token, userId } = nextCookie(ctx);
 
   if (ctx.req && !token) {
-    ctx.res.writeHead(302, { Location: '/' });
-    ctx.res.end();
-    return;
+    // ctx.res.writeHead(302, { Location: '/' });
+    // ctx.res.end();
+    // return;
   }
 
-  if (!token) {
-    Router.push('/');
-  }
+  // if (!token) {
+  //   Router.push('/');
+  // }
 
   return { token, userId };
 };

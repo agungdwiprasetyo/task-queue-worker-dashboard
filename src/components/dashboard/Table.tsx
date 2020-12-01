@@ -9,6 +9,7 @@ import {
     SyncOutlined,
     CloseCircleOutlined,
     ClockCircleOutlined,
+    StopOutlined
 } from '@ant-design/icons';
 
 export const TableComponent = (props: TableProps) => {
@@ -35,10 +36,11 @@ export const TableComponent = (props: TableProps) => {
             render: (total_jobs: number, row: any) => {
                 return (
                     <Space>
-                        <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
-                        <Tag icon={<CloseCircleOutlined />} color="red">Give Up: {row?.detail?.give_up}</Tag>
-                        <Tag icon={row?.detail.retrying != 0 ? (<SyncOutlined spin />) : ''} color="orange">Retrying: {row?.detail?.retrying}</Tag>
                         <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
+                        <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
+                        <Tag icon={<SyncOutlined spin={row?.detail.retrying != 0} />} color="orange">Retrying: {row?.detail?.retrying}</Tag>
+                        <Tag icon={<CloseCircleOutlined />} color="red">Failure: {row?.detail?.give_up}</Tag>
+                        <Tag icon={<StopOutlined />} color="red">Stopped: {row?.detail?.stopped}</Tag>
                     </Space>
                 )
             },
