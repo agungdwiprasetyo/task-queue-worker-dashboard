@@ -1,6 +1,6 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React from 'react';
-import { Tag, Space, Button, Input, Layout, Typography } from 'antd';
+import { Tag, Space, Button, Input, Modal, Typography } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
@@ -14,7 +14,7 @@ import Highlighter from 'react-highlight-words';
 
 const { Paragraph } = Typography;
 
-export const TableComponent = (props: TableProps) => {
+const TableComponent = (props: TableProps) => {
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
 
@@ -55,16 +55,25 @@ export const TableComponent = (props: TableProps) => {
                 : '',
         render: (args: string) => {
             return (
-                <Layout>
-                    <Paragraph copyable>
+                <Paragraph copyable={{ text: args }}>
+                    <pre onClick={() => Modal.info({
+                        title: 'Arguments:',
+                        content: (
+                            <Paragraph copyable={{ text: args }}><pre>{args}</pre></Paragraph>
+                        ),
+                        onOk() { },
+                        onCancel() { },
+                        maskClosable: true,
+                        width: 1000
+                    })}>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[props.params.search]}
                             autoEscape
-                            textToHighlight={args ? args.toString() : ''}
+                            textToHighlight={args.length > 100 ? `${args.slice(0, 100)} ...(more)` : args}
                         />
-                    </Paragraph>
-                </Layout>
+                    </pre>
+                </Paragraph>
             );
         },
     })
@@ -117,13 +126,29 @@ export const TableComponent = (props: TableProps) => {
             dataIndex: 'error',
             key: 'error',
             title: 'Error',
-            width: 100,
+            width: 120,
+            ellipsis: true,
+            render: (error: string) => {
+                if (!error) { return "" };
+                return (
+                    <Paragraph copyable={{ text: error }}>
+                        <pre onClick={() => Modal.info({
+                            title: 'Error:',
+                            content: (
+                                <Paragraph copyable={{ text: error }}><pre>{error}</pre></Paragraph>
+                            ),
+                            onOk() { },
+                            maskClosable: true,
+                        })}>{error.length > 30 ? `${error.slice(0, 30)} ...(more)` : error}</pre>
+                    </Paragraph>
+                );
+            }
         },
         {
             dataIndex: 'trace_id',
             key: 'trace_id',
             title: 'Trace ID',
-            width: 150,
+            width: 100,
         },
         {
             dataIndex: 'status',

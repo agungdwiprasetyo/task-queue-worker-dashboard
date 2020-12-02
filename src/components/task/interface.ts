@@ -10,6 +10,12 @@ export interface TableProps {
     loadData: Dispatch<SetStateAction<ITaskListParam>>;
 }
 
+export interface ModalProps {
+    taskName: string;
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
+}
+
 export interface ITaskListParam {
     page: number;
     limit: number;
