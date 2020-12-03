@@ -15,10 +15,7 @@ export const CleanJobGraphQL = () => {
 export const SubscribeTaskList = () => {
 	try {
 		const { data, loading, error } = useSubscription(SUBSCRIBE_TASK);
-		if (error) {
-			console.log(error);
-		};
-		return { data, loading };
+		return { data, loading, error };
 	}
 	catch (error) {
 		console.log(error);

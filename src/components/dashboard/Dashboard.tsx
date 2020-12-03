@@ -1,9 +1,20 @@
 import { SubscribeTaskList, CleanJobGraphQL } from './graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
+import { Modal } from 'antd';
 
 const DashboardComponent = (props: any) => {
-    const { data, loading } = SubscribeTaskList();
+    const { data, loading, error } = SubscribeTaskList();
+    if (error) {
+        Modal.error({
+            title: 'Error:',
+            content: (
+                <p>{error.message}</p>
+            ),
+            onOk() { },
+            maskClosable: true,
+        })
+    }
     const { cleanJob } = CleanJobGraphQL();
 
     const content = {

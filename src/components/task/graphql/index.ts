@@ -29,10 +29,7 @@ export const SubscribeTaskList = (params: ITaskListParam) => {
                 "status": params.status,
             }
         });
-        if (error) {
-            console.log(error);
-        };
-        return { data, loading };
+        return { data, loading, error };
     }
     catch (error) {
         console.log(error);

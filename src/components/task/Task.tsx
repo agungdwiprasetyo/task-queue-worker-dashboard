@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tag, Row, Col, Button, Divider, Space } from 'antd';
+import { Tag, Row, Col, Button, Divider, Space, Modal } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
@@ -36,7 +36,17 @@ const TaskComponent = (props: any) => {
     };
 
     const { cleanJob } = CleanJobGraphQL();
-    const { data, loading } = SubscribeTaskList(paramsTaskList);
+    const { data, loading, error } = SubscribeTaskList(paramsTaskList);
+    if (error) {
+        Modal.error({
+            title: 'Error:',
+            content: (
+                <p>{error.message}</p>
+            ),
+            onOk() { },
+            maskClosable: true,
+        })
+    }
     const meta = data?.listen_task?.meta;
 
     const propsTable: TableProps = {
