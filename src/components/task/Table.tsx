@@ -82,13 +82,7 @@ const TableComponent = (props: TableProps) => {
         {
             dataIndex: 'id',
             key: 'id',
-            title: 'ID',
-            width: 100
-        },
-        {
-            dataIndex: 'task_name',
-            key: 'task_name',
-            title: 'Task Name',
+            title: 'Job ID',
             width: 100
         },
         {
@@ -121,6 +115,19 @@ const TableComponent = (props: TableProps) => {
             key: 'next_retry_at',
             title: 'Next Retry',
             width: 150,
+            render: (next_retry_at: string) => {
+                return (
+                    <>
+                        {next_retry_at == "" ? "-" : next_retry_at}
+                    </>
+                );
+            }
+        },
+        {
+            dataIndex: 'finished_at',
+            key: 'finished_at',
+            title: 'Finished At',
+            width: 150,
         },
         {
             dataIndex: 'error',
@@ -147,15 +154,21 @@ const TableComponent = (props: TableProps) => {
         {
             dataIndex: 'trace_id',
             key: 'trace_id',
-            title: 'Trace ID',
+            title: 'Trace URL',
             width: 100,
+            render: (trace_id: string) => {
+                return (
+                    <>
+                        <a href={trace_id} target="blank">{trace_id}</a>
+                    </>
+                );
+            }
         },
         {
             dataIndex: 'status',
             key: 'status',
             title: 'Status',
             width: 120,
-            fixed: 'right',
             filters: [
                 { text: 'Success', value: 'SUCCESS' },
                 { text: 'Retrying', value: 'RETRYING' },
@@ -165,7 +178,7 @@ const TableComponent = (props: TableProps) => {
             ],
             render: (status: string, row: any) => {
                 let tag: any;
-                if (status == "RETRYING") tag = (<Tag icon={<SyncOutlined spin />} color="orange">{status}</Tag>);
+                if (status == "RETRYING") tag = (<Tag icon={<SyncOutlined spin />} color="geekblue">{status}</Tag>);
                 else if (status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
                 else if (status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{status}...</Tag>);
                 else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
@@ -182,7 +195,6 @@ const TableComponent = (props: TableProps) => {
             key: 'status',
             title: 'Action',
             width: 100,
-            fixed: 'right',
             render: (status: string, row: any) => {
                 return (
                     <Space direction="vertical">

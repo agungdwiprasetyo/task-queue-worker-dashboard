@@ -9,7 +9,7 @@ subscription ($taskName: String!, $page: Int!, $limit: Int!, $search: String, $s
             }
         }
         data {
-            id task_name args: arguments retries max_retry interval error status created_at next_retry_at trace_id
+            id args: arguments retries max_retry interval error status created_at finished_at next_retry_at trace_id
         }
     }
 }`;

@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Tag, Row, Col, Button, Divider, Space, Modal } from 'antd';
-import {
-    CheckCircleOutlined,
-    SyncOutlined,
-    CloseCircleOutlined,
-    ClockCircleOutlined,
-    StopOutlined,
-    LeftOutlined,
-    PlusOutlined,
-    ClearOutlined
-
-} from '@ant-design/icons';
+import { Row, Col, Button, Divider, Space, Modal, Tooltip } from 'antd';
+import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
-import { SubscribeTaskList } from './graphql';
+import { SubscribeTaskList, StopAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
-import { TableProps, ITaskListParam, ModalProps } from './interface';
+import { TableProps, ITaskListParam, ModalProps, MetaProps } from './interface';
+import Meta from './Meta';
 
 const TaskComponent = (props: any) => {
     const router = useRouter();
@@ -36,6 +27,7 @@ const TaskComponent = (props: any) => {
     };
 
     const { cleanJob } = CleanJobGraphQL();
+    const { stopAllJob } = StopAllJob();
     const { data, loading, error } = SubscribeTaskList(paramsTaskList);
     if (error) {
         Modal.error({
@@ -48,6 +40,12 @@ const TaskComponent = (props: any) => {
         })
     }
     const meta = data?.listen_task?.meta;
+
+    const propsMeta: MetaProps = {
+        params: paramsTaskList,
+        meta: meta,
+        loadData: setParamsTaskList,
+    }
 
     const propsTable: TableProps = {
         data: data?.listen_task?.data,
@@ -67,34 +65,34 @@ const TaskComponent = (props: any) => {
 
     return (
         <Row justify="end">
-            <Divider orientation="left" />
             <Col span={24}>
                 <div className="text-center">
-                    <Space>
-                        <b>{task_name}</b>
-                        <Tag icon={<CheckCircleOutlined />} color="processing"><b>Total Jobs: {meta?.total_records}</b></Tag>
-                        <Tag icon={<CheckCircleOutlined />} color="green"><b>Success: {meta?.detail?.success}</b></Tag>
-                        <Tag icon={<ClockCircleOutlined />} color="default"><b>Queueing: {meta?.detail?.queueing}</b></Tag>
-                        <Tag icon={<SyncOutlined />} color="orange"><b>Retrying: {meta?.detail?.retrying}</b></Tag>
-                        <Tag icon={<CloseCircleOutlined />} color="error"><b>Failure: {meta?.detail?.give_up}</b></Tag>
-                        <Tag icon={<StopOutlined />} color="red"><b>Stopped: {meta?.detail?.stopped}</b></Tag>
-                    </Space>
+                    <h3>Task Name:</h3> <h2><pre><b>{task_name}</b></pre></h2>
                 </div>
             </Col>
             <Divider orientation="left" />
-            <Col span={20}>
+            <Col span={24}>
+                <Meta {...propsMeta} />
+            </Col>
+            <Divider orientation="left" />
+            <Col span={18}>
                 <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                     router.push({
                         pathname: "/",
                     })
                 }}>Back to dashboard</Button>
             </Col>
-            <Col span={4}>
+            <Col span={6}>
                 <Space>
                     <Button icon={<PlusOutlined />} size="middle" type="primary" onClick={showModal}>Add Job</Button>
-                    <Button icon={<ClearOutlined />} danger size="middle" type="primary" onClick={() => {
+                    <Button icon={<ClearOutlined />} danger size="middle" onClick={() => {
                         cleanJob({ variables: { taskName: paramsTaskList.taskName } });
                     }}>Clear Job</Button>
+                    <Tooltip title="Stop all queued job" color="red">
+                        <Button icon={<StopOutlined />} danger size="middle" type="primary" onClick={() => {
+                            stopAllJob({ variables: { taskName: paramsTaskList.taskName } });
+                        }}>Stop All</Button>
+                    </Tooltip>
                 </Space>
             </Col>
             <Divider orientation="left" />

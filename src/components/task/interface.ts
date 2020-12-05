@@ -16,6 +16,12 @@ export interface ModalProps {
     setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
+export interface MetaProps {
+    params: ITaskListParam;
+    meta: any;
+    loadData: Dispatch<SetStateAction<ITaskListParam>>;
+}
+
 export interface ITaskListParam {
     page: number;
     limit: number;

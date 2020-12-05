@@ -38,7 +38,7 @@ export const TableComponent = (props: TableProps) => {
                     <Space>
                         <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
                         <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
-                        <Tag icon={<SyncOutlined spin={row?.detail.retrying != 0} />} color="orange">Retrying: {row?.detail?.retrying}</Tag>
+                        <Tag icon={<SyncOutlined spin={row?.detail.retrying != 0} />} color="geekblue">Retrying: {row?.detail?.retrying}</Tag>
                         <Tag icon={<CloseCircleOutlined />} color="red">Failure: {row?.detail?.give_up}</Tag>
                         <Tag icon={<StopOutlined />} color="red">Stopped: {row?.detail?.stopped}</Tag>
                     </Space>
