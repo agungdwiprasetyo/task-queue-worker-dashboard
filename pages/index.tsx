@@ -2,7 +2,7 @@ import { withAuthSync } from '../src/utils/auth';
 import Head from 'next/head';
 import React from 'react';
 import DashboardComponent from '../src/components/dashboard/Dashboard';
-import { Space } from 'antd';
+import { Layout, Space } from 'antd';
 
 const Index = (props: any) => {
   const candi = `
@@ -25,7 +25,7 @@ const Index = (props: any) => {
         />
       </Head>
 
-      <div className="container">
+      <Layout>
         <div className="text-center">
           <Space>
             <pre>
@@ -35,8 +35,7 @@ const Index = (props: any) => {
         </div>
 
         <DashboardComponent {...props} />
-
-      </div>
+      </Layout>
     </>
   );
 };

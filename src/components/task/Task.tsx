@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Row, Col, Button, Divider, Space, Modal, Tooltip } from 'antd';
+import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
 import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
@@ -64,44 +64,53 @@ const TaskComponent = (props: any) => {
     }
 
     return (
-        <Row justify="end">
-            <Col span={24}>
-                <div className="text-center">
-                    <h3>Task Name:</h3> <h2><pre><b>{task_name}</b></pre></h2>
-                </div>
-            </Col>
-            <Divider orientation="left" />
-            <Col span={24}>
-                <Meta {...propsMeta} />
-            </Col>
-            <Divider orientation="left" />
-            <Col span={18}>
-                <Button icon={<LeftOutlined />} size="middle" onClick={() => {
-                    router.push({
-                        pathname: "/",
-                    })
-                }}>Back to dashboard</Button>
-            </Col>
-            <Col span={6}>
-                <Space>
-                    <Button icon={<PlusOutlined />} size="middle" type="primary" onClick={showModal}>Add Job</Button>
-                    <Button icon={<ClearOutlined />} danger size="middle" onClick={() => {
-                        cleanJob({ variables: { taskName: paramsTaskList.taskName } });
-                    }}>Clear Job</Button>
-                    <Tooltip title="Stop all queued job" color="red">
-                        <Button icon={<StopOutlined />} danger size="middle" type="primary" onClick={() => {
-                            stopAllJob({ variables: { taskName: paramsTaskList.taskName } });
-                        }}>Stop All</Button>
-                    </Tooltip>
-                </Space>
-            </Col>
-            <Divider orientation="left" />
-            <Col span={24}>
-                <ModalAddJob {...propsModal} />
-                <TableComponent {...propsTable} />
-            </Col>
-            <Divider orientation="left" />
-        </Row>
+        <Layout.Content style={{ padding: '10px 50px' }}>
+            <Row>
+                <Col span={24}>
+                    <div className="text-center">
+                        <h3>Task Name:</h3> <h2><pre><b>{task_name}</b></pre></h2>
+                    </div>
+                </Col>
+            </Row>
+
+            <Row>
+                <Divider orientation="left" />
+                <Col span={24}>
+                    <Meta {...propsMeta} />
+                </Col>
+            </Row>
+
+            <Row>
+                <Divider orientation="left" />
+                <Col span={16}>
+                    <Button icon={<LeftOutlined />} size="middle" onClick={() => {
+                        router.push({
+                            pathname: "/",
+                        })
+                    }}>Back to dashboard</Button>
+                </Col>
+                <Col span={6} offset={2}>
+                    <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                        <Button style={{ marginBottom: "2px", marginTop: "2px" }} icon={<PlusOutlined />} size="middle" type="primary" onClick={showModal}>Add Job</Button>
+                        <Button style={{ marginBottom: "2px", marginTop: "2px" }} icon={<ClearOutlined />} danger size="middle" onClick={() => {
+                            cleanJob({ variables: { taskName: paramsTaskList.taskName } });
+                        }}>Clear Job</Button>
+                        <Tooltip title="Stop all queued job" color="red">
+                            <Button style={{ marginBottom: "2px", marginTop: "2px" }} icon={<StopOutlined />} danger size="middle" type="primary" onClick={() => {
+                                stopAllJob({ variables: { taskName: paramsTaskList.taskName } });
+                            }}>Stop All</Button>
+                        </Tooltip>
+                    </Space>
+                </Col>
+                <Divider orientation="left" />
+            </Row>
+            <Row>
+                <Col span={24}>
+                    <ModalAddJob {...propsModal} />
+                    <TableComponent {...propsTable} />
+                </Col>
+            </Row>
+        </Layout.Content>
     );
 };
 
