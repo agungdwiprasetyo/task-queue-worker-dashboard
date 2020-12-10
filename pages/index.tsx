@@ -25,7 +25,7 @@ const Index = (props: any) => {
         />
       </Head>
 
-      <Layout>
+      <Layout style={{ height: "100vh" }}>
         <div className="text-center">
           <Space>
             <pre>

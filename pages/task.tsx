@@ -4,7 +4,7 @@ import { Layout } from 'antd';
 
 const Task = (props: any) => {
   return (
-    <Layout>
+    <Layout style={{ height: "100vh" }}>
       <TaskComponent {...props} />
     </Layout>
   );
