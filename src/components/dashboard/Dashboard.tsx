@@ -27,8 +27,22 @@ const DashboardComponent = (props: any) => {
         console.log(params)
     }
 
+    const meta = data?.listen_task?.meta;
+    if (meta?.is_close_session) {
+        Modal.error({
+            title: 'Session expired, refresh page',
+            content: (
+                <p>Please refresh page</p>
+            ),
+            onOk() {
+                location.reload();
+            },
+            maskClosable: true,
+        })
+    }
+
     const propsTable: TableProps = {
-        data: data?.subscribe_all_task,
+        data: data?.listen_task?.data,
         cleanJob: cleanJob,
         loading: loading,
         defaultOrder: "",

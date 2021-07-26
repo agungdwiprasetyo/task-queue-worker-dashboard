@@ -39,7 +39,22 @@ const TaskComponent = (props: any) => {
             maskClosable: true,
         })
     }
-    const meta = data?.listen_task?.meta;
+    const meta = data?.listen_task_job_detail?.meta;
+
+    if (meta?.is_close_session) {
+        Modal.error({
+            title: 'Session expired, refresh page',
+            content: (
+                <p>Please refresh page</p>
+            ),
+            onOk() {
+                router.push({
+                    pathname: "/"
+                })
+            },
+            maskClosable: true,
+        })
+    }
 
     const propsMeta: MetaProps = {
         params: paramsTaskList,
@@ -48,7 +63,7 @@ const TaskComponent = (props: any) => {
     }
 
     const propsTable: TableProps = {
-        data: data?.listen_task?.data,
+        data: data?.listen_task_job_detail?.data,
         meta: meta,
         loadData: setParamsTaskList,
         loading: loading,

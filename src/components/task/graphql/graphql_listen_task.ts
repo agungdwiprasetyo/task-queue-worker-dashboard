@@ -2,9 +2,9 @@ import gql from 'graphql-tag';
 
 const LISTEN_JOB_TASK = gql`
 subscription ($taskName: String!, $page: Int!, $limit: Int!, $search: String, $status: [String!]!) {
-    listen_task(task_name: $taskName, page: $page, limit: $limit, search: $search, status: $status) {
+    listen_task_job_detail(task_name: $taskName, page: $page, limit: $limit, search: $search, status: $status) {
         meta{
-            page limit total_pages total_records detail {
+            page limit total_pages total_records is_close_session detail {
                 give_up retrying success queueing stopped
             }
         }

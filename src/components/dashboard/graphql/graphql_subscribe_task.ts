@@ -2,9 +2,14 @@ import gql from 'graphql-tag';
 
 const SUBSCRIBE_TASK = gql`
 subscription {
-  subscribe_all_task {
-    name total_jobs detail {
-      give_up retrying success queueing stopped
+  listen_task {
+    meta {
+      page limit total_pages total_records is_close_session
+    }
+    data {
+      name total_jobs detail {
+        give_up retrying success queueing stopped
+      }
     }
   }
 }`;
