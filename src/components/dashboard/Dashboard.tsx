@@ -1,4 +1,4 @@
-import { SubscribeTaskList, CleanJobGraphQL } from './graphql';
+import { SubscribeTaskList, CleanJobGraphQL, GetTagLine } from './graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
 import { Modal } from 'antd';
@@ -16,6 +16,9 @@ const DashboardComponent = (props: any) => {
         })
     }
     const { cleanJob } = CleanJobGraphQL();
+
+    const dataTagline = GetTagLine();
+    const memStats = dataTagline?.tagline?.memory_statistics;
 
     const content = {
         marginTop: '30px',
@@ -52,6 +55,12 @@ const DashboardComponent = (props: any) => {
 
     return (
         <>
+            <div>
+                <div className="text-center mb-5">
+                    <pre>{dataTagline?.tagline?.tagline}</pre>
+                    <pre>Memory Alloc: {memStats?.alloc}, Total Alloc: {memStats?.total_alloc}, Num Goroutines: {memStats?.num_goroutines}</pre>
+                </div>
+            </div>
             <div style={content}>
                 <div className="text-center mb-5">
                     <TableComponent {...propsTable} />

@@ -28,9 +28,7 @@ const Index = (props: any) => {
       <Layout style={{ height: "100vh" }}>
         <div className="text-center">
           <Space>
-            <pre>
-              {candi} Task Queue Worker
-            </pre>
+            <pre>{candi}</pre>
           </Space>
         </div>
 

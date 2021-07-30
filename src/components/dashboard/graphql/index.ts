@@ -1,6 +1,7 @@
-import { useMutation, useSubscription } from '@apollo/react-hooks';
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import CLEAN_JOB from './graphql_clean_job';
 import SUBSCRIBE_TASK from './graphql_subscribe_task';
+import TAGLINE from './graphql_get_tagline';
 
 export const CleanJobGraphQL = () => {
 	try {
@@ -21,3 +22,13 @@ export const SubscribeTaskList = () => {
 		console.log(error);
 	}
 };
+
+export const GetTagLine = () => {
+	try {
+		const { data } = useQuery(TAGLINE);
+		return data;
+	}
+	catch (error) {
+		console.log(error);
+	}
+}
