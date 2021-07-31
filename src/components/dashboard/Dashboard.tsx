@@ -1,7 +1,9 @@
 import { SubscribeTaskList, CleanJobGraphQL, GetTagLine } from './graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal } from 'antd';
+import { Modal, Layout } from 'antd';
+
+const { Footer } = Layout;
 
 const DashboardComponent = (props: any) => {
     const { data, loading, error } = SubscribeTaskList();
@@ -55,17 +57,21 @@ const DashboardComponent = (props: any) => {
 
     return (
         <>
-            <div>
-                <div className="text-center mb-5">
-                    <pre>{dataTagline?.tagline?.tagline}</pre>
-                    <pre>Memory Alloc: {memStats?.alloc}, Total Alloc: {memStats?.total_alloc}, Num Goroutines: {memStats?.num_goroutines}</pre>
+            <Layout style={{ height: "100vh" }}>
+                <div>
+                    <div className="text-center mb-5">
+                        <pre>{dataTagline?.tagline?.banner}</pre>
+                        <pre>{dataTagline?.tagline?.tagline}</pre>
+                        <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
+                    </div>
                 </div>
-            </div>
-            <div style={content}>
-                <div className="text-center mb-5">
-                    <TableComponent {...propsTable} />
+                <div style={content}>
+                    <div className="text-center mb-5">
+                        <TableComponent {...propsTable} />
+                    </div>
                 </div>
-            </div>
+            </Layout>
+            <Footer style={{ textAlign: 'center' }}>Candi version <b>{dataTagline?.tagline?.version}</b></Footer>
         </>
     );
 };

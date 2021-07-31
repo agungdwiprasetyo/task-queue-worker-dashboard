@@ -11,6 +11,7 @@ import {
 import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL } from './graphql';
 import Highlighter from 'react-highlight-words';
+import JSONPretty from 'react-json-pretty';
 
 const { Paragraph } = Typography;
 
@@ -27,7 +28,7 @@ const TableComponent = (props: TableProps) => {
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => {
                         props.loadData({
-                            page: props?.meta?.page,
+                            page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
                             search: selectedKeys[0],
@@ -37,7 +38,7 @@ const TableComponent = (props: TableProps) => {
                     onSearch={value => {
                         if (value === "") { value = null }
                         props.loadData({
-                            page: props?.meta?.page,
+                            page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
                             search: value,
@@ -59,7 +60,7 @@ const TableComponent = (props: TableProps) => {
                     <pre onClick={() => Modal.info({
                         title: 'Arguments:',
                         content: (
-                            <Paragraph copyable={{ text: args }}><pre>{args}</pre></Paragraph>
+                            <Paragraph copyable={{ text: args }}><JSONPretty id="json-pretty" data={args} /></Paragraph>
                         ),
                         onOk() { },
                         onCancel() { },
@@ -111,19 +112,6 @@ const TableComponent = (props: TableProps) => {
             width: 150,
         },
         {
-            dataIndex: 'next_retry_at',
-            key: 'next_retry_at',
-            title: 'Next Retry',
-            width: 150,
-            render: (next_retry_at: string) => {
-                return (
-                    <>
-                        {next_retry_at == "" ? "-" : next_retry_at}
-                    </>
-                );
-            }
-        },
-        {
             dataIndex: 'finished_at',
             key: 'finished_at',
             title: 'Finished At',
@@ -142,7 +130,7 @@ const TableComponent = (props: TableProps) => {
                         <pre onClick={() => Modal.info({
                             title: 'Error:',
                             content: (
-                                <Paragraph copyable={{ text: error }}><pre>{error}</pre></Paragraph>
+                                <Paragraph copyable={{ text: error }}><JSONPretty id="json-pretty" data={error} /></Paragraph>
                             ),
                             onOk() { },
                             maskClosable: true,
@@ -181,8 +169,8 @@ const TableComponent = (props: TableProps) => {
                 if (status == "RETRYING") tag = (<Tag icon={<SyncOutlined spin />} color="geekblue">{status}</Tag>);
                 else if (status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
                 else if (status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{status}...</Tag>);
-                else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="red">{status} </Tag>);
-                else if (status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="red">{status} </Tag>);
+                else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="error">{status} </Tag>);
+                else if (status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="warning">{status} </Tag>);
                 return (
                     <Space>
                         {tag}

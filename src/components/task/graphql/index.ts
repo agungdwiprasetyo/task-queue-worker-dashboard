@@ -4,6 +4,7 @@ import RETRY_JOB from './graphql_retry_job';
 import STOP_JOB from './graphql_stop_job';
 import ADD_JOB from './graphql_add_job';
 import STOP_ALL_JOB from './graphql_stop_all';
+import RETRY_ALL_JOB from './graphql_retry_all_job';
 import { ITaskListParam } from '../interface';
 
 export const RetryJobGraphQL = () => {
@@ -61,6 +62,16 @@ export const StopAllJob = () => {
     try {
         const [stopAllJob, { }] = useMutation(STOP_ALL_JOB);
         return { stopAllJob };
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+export const RetryAllJob = () => {
+    try {
+        const [retryAllJob, { }] = useMutation(RETRY_ALL_JOB);
+        return { retryAllJob };
     }
     catch (error) {
         console.log(error);

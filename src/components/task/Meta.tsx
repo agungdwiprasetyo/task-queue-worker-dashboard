@@ -53,7 +53,7 @@ const Meta = (props: MetaProps) => {
                 <b>Failure: {props?.meta?.detail?.give_up}</b>
             </Tag>
             <Tag style={pointerHover}
-                icon={<StopOutlined />} color="red"
+                icon={<StopOutlined />} color="warning"
                 onClick={() => { onTagClicked('STOPPED') }}>
                 <b>Stopped: {props?.meta?.detail?.stopped}</b>
             </Tag>
