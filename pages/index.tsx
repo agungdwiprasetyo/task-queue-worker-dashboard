@@ -17,7 +17,7 @@ const Index = (props: any) => {
         />
       </Head>
 
-      <Layout style={{ height: "100vh" }}>
+      <Layout>
         <DashboardComponent {...props} />
       </Layout>
     </>

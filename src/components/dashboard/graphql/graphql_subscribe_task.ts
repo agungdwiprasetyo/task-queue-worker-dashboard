@@ -5,10 +5,11 @@ subscription {
   listen_task {
     meta {
       page limit total_pages total_records is_close_session
+      total_client_subscriber
     }
     data {
       name total_jobs detail {
-        give_up retrying success queueing stopped
+        failure retrying success queueing stopped
       }
     }
   }

@@ -1,7 +1,7 @@
-import { SubscribeTaskList, CleanJobGraphQL, GetTagLine } from './graphql';
+import { SubscribeTaskList, CleanJobGraphQL, GetTagLine, ClearAllClientSubscriber } from './graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
 
 const { Footer } = Layout;
 
@@ -18,6 +18,7 @@ const DashboardComponent = (props: any) => {
         })
     }
     const { cleanJob } = CleanJobGraphQL();
+    const { clearClient } = ClearAllClientSubscriber();
 
     const dataTagline = GetTagLine();
     const memStats = dataTagline?.tagline?.memory_statistics;
@@ -57,21 +58,26 @@ const DashboardComponent = (props: any) => {
 
     return (
         <>
-            <Layout style={{ height: "100vh" }}>
-                <div>
-                    <div className="text-center mb-5">
-                        <pre>{dataTagline?.tagline?.banner}</pre>
-                        <pre>{dataTagline?.tagline?.tagline}</pre>
-                        <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
-                    </div>
+            <div>
+                <div className="text-center mb-5">
+                    <pre>{dataTagline?.tagline?.banner}</pre>
+                    <pre>{dataTagline?.tagline?.tagline}</pre>
+                    <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
+                    <pre>
+                        <Space>Total Client Subscriber:<b>{data?.listen_task?.meta?.total_client_subscriber}</b>
+                            <Tooltip title="close all client subscriber session"><Tag style={{
+                                cursor: 'pointer'
+                            }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
+                        </Space>
+                    </pre>
                 </div>
-                <div style={content}>
-                    <div className="text-center mb-5">
-                        <TableComponent {...propsTable} />
-                    </div>
+            </div>
+            <div style={content}>
+                <div className="text-center mb-5">
+                    <TableComponent {...propsTable} />
                 </div>
-            </Layout>
-            <Footer style={{ textAlign: 'center' }}>Candi version <b>{dataTagline?.tagline?.version}</b></Footer>
+            </div>
+            <Footer style={{ textAlign: 'center' }}>version <b>{dataTagline?.tagline?.version}</b></Footer>
         </>
     );
 };

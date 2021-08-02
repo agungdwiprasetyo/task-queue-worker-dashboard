@@ -39,7 +39,7 @@ export const TableComponent = (props: TableProps) => {
                         <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
                         <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
                         <Tag icon={<SyncOutlined spin={row?.detail.retrying != 0} />} color="geekblue">Retrying: {row?.detail?.retrying}</Tag>
-                        <Tag icon={<CloseCircleOutlined />} color="error">Failure: {row?.detail?.give_up}</Tag>
+                        <Tag icon={<CloseCircleOutlined />} color="error">Failure: {row?.detail?.failure}</Tag>
                         <Tag icon={<StopOutlined />} color="warning">Stopped: {row?.detail?.stopped}</Tag>
                     </Space>
                 )
@@ -102,6 +102,7 @@ export const TableComponent = (props: TableProps) => {
                 loading={props.loading}
                 onChange={handleOnChange}
                 scroll={{ x: 560 }}
+                pagination={false}
             />
         </div>
     );
