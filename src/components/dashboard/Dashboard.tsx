@@ -77,7 +77,7 @@ const DashboardComponent = (props: any) => {
                     <TableComponent {...propsTable} />
                 </div>
             </div>
-            <Footer style={{ textAlign: 'center' }}>version <b>{dataTagline?.tagline?.version}</b></Footer>
+            <Footer style={{ textAlign: 'center' }}>candi version <b>{dataTagline?.tagline?.version}</b></Footer>
         </>
     );
 };

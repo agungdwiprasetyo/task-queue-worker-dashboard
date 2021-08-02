@@ -13,7 +13,7 @@ const Index = (props: any) => {
         <meta name="theme-color" content="#ffffff" />
         <meta
           name="description"
-          content="Don't take too long to get started!"
+          content="Membangun candi kini lebih cepat"
         />
       </Head>
 

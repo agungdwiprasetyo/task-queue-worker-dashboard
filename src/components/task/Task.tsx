@@ -8,8 +8,9 @@ import { SubscribeTaskList, StopAllJob, RetryAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import { TableProps, ITaskListParam, ModalProps, MetaProps } from './interface';
 import Meta from './Meta';
+import { GetTagLine } from "../dashboard/graphql";
 
-const { Content } = Layout;
+const { Content, Footer } = Layout;
 
 const TaskComponent = (props: any) => {
     const router = useRouter();
@@ -31,6 +32,7 @@ const TaskComponent = (props: any) => {
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
     const { retryAllJob } = RetryAllJob();
+    const dataTagline = GetTagLine();
     const { data, loading, error } = SubscribeTaskList(paramsTaskList);
     if (error) {
         Modal.error({
@@ -116,13 +118,15 @@ const TaskComponent = (props: any) => {
                                     size="middle"
                                     type="primary"
                                     onClick={showModal}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                                <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                    icon={<ClearOutlined />}
-                                    danger
-                                    size="middle"
-                                    onClick={() => {
-                                        cleanJob({ variables: { taskName: paramsTaskList.taskName } });
-                                    }}>Clear Job</Button>
+                                <Tooltip title="Clear all success, failure, and stopped job">
+                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                        icon={<ClearOutlined />}
+                                        danger
+                                        size="middle"
+                                        onClick={() => {
+                                            cleanJob({ variables: { taskName: paramsTaskList.taskName } });
+                                        }}>Clear Job</Button>
+                                </Tooltip>
                                 <Tooltip title="Retry all failure and stopped job">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                         icon={<SyncOutlined />}
@@ -151,6 +155,7 @@ const TaskComponent = (props: any) => {
                             <TableComponent {...propsTable} />
                         </Col>
                     </Row>
+                    <Footer style={{ textAlign: 'center' }}>candi version <b>{dataTagline?.tagline?.version}</b></Footer>
                 </Content>
             </Layout>
         </>
