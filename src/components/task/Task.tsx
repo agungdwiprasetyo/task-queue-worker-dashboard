@@ -136,7 +136,7 @@ const TaskComponent = (props: any) => {
                                             retryAllJob({ variables: { taskName: paramsTaskList.taskName } });
                                         }}>Retry All<span>&nbsp;&nbsp;</span></Button>
                                 </Tooltip>
-                                <Tooltip title="Stop all queued job">
+                                <Tooltip title="Stop all running and queued job">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                         icon={<StopOutlined />}
                                         danger

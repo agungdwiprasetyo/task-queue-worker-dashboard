@@ -45,7 +45,7 @@ const Meta = (props: MetaProps) => {
             <Tag style={pointerHover}
                 icon={<SyncOutlined spin={props?.meta?.detail?.retrying != 0} />}
                 color="geekblue" onClick={() => { onTagClicked('RETRYING') }}>
-                <b>Retrying: {props?.meta?.detail?.retrying}</b>
+                <b>Running: {props?.meta?.detail?.retrying}</b>
             </Tag>
             <Tag style={pointerHover}
                 icon={<CloseCircleOutlined />} color="error"

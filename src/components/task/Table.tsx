@@ -159,14 +159,19 @@ const TableComponent = (props: TableProps) => {
             width: 120,
             filters: [
                 { text: 'Success', value: 'SUCCESS' },
-                { text: 'Retrying', value: 'RETRYING' },
+                { text: 'Running/Retrying', value: 'RETRYING' },
                 { text: 'Queueing', value: 'QUEUEING' },
                 { text: 'Failure', value: 'FAILURE' },
                 { text: 'Stopped', value: 'STOPPED' },
             ],
             render: (status: string, row: any) => {
                 let tag: any;
-                if (status == "RETRYING") tag = (<Tag icon={<SyncOutlined spin />} color="geekblue">{status}</Tag>);
+                if (status == "RETRYING") tag = (
+                    <Tag
+                        icon={<SyncOutlined spin />}
+                        color="geekblue">
+                        {row?.retries > 1 ? status : "RUNNING"}
+                    </Tag>);
                 else if (status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
                 else if (status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{status}...</Tag>);
                 else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="error">{status} </Tag>);
