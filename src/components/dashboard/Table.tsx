@@ -3,7 +3,7 @@ import React from 'react';
 import { Task, TableProps } from './interface';
 import { Button } from 'antd';
 import { useRouter } from 'next/router';
-import { Tag, Space } from 'antd';
+import { Tag, Space, Tooltip } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 
 export const TableComponent = (props: TableProps) => {
-    const router = useRouter()
+    const router = useRouter();
     const columns: Array<ColumnProps<Task>> = [
         {
             dataIndex: 'name',
@@ -48,6 +48,7 @@ export const TableComponent = (props: TableProps) => {
         {
             dataIndex: 'name',
             key: 'action',
+            title: 'Action',
             render: (name: string) => {
                 return (
                     <Space>
@@ -56,14 +57,14 @@ export const TableComponent = (props: TableProps) => {
                                 pathname: "/task",
                                 query: { task_name: name }
                             })
-                        }}>
-                            View jobs
+                        }}>View Jobs</Button>
+                        <Tooltip title={"Retry all failure and stopped job in task '" + name + "'"}>
+                            <Button type="primary" size="middle" onClick={() => {
+                                props.retryAllJob({ variables: { taskName: name } });
+                            }}>
+                                Retry All
                             </Button>
-                        <Button danger size="middle" onClick={() => {
-                            props.cleanJob({ variables: { taskName: name } });
-                        }}>
-                            Clear Jobs
-                            </Button>
+                        </Tooltip>
                     </Space>
                 )
             },

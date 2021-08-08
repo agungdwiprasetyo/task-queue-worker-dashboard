@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
-import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
+import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
 import { SubscribeTaskList, StopAllJob, RetryAllJob } from './graphql';
@@ -9,6 +9,8 @@ import { CleanJobGraphQL } from '../dashboard/graphql';
 import { TableProps, ITaskListParam, ModalProps, MetaProps } from './interface';
 import Meta from './Meta';
 import { GetTagLine } from "../dashboard/graphql";
+
+const { confirm } = Modal;
 
 const { Content, Footer } = Layout;
 
@@ -59,6 +61,25 @@ const TaskComponent = (props: any) => {
             },
             maskClosable: true,
         })
+    }
+
+    const showAlertConfirm = (title: string, taskName: string, action: string) => {
+        confirm({
+            title: title,
+            icon: <ExclamationCircleOutlined />,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                if (action === "CLEAN") {
+                    cleanJob({ variables: { taskName: taskName } });
+                } else if (action === "STOP") {
+                    stopAllJob({ variables: { taskName: taskName } });
+                }
+            },
+            onCancel() {
+            },
+        });
     }
 
     const propsMeta: MetaProps = {
@@ -124,7 +145,11 @@ const TaskComponent = (props: any) => {
                                         danger
                                         size="middle"
                                         onClick={() => {
-                                            cleanJob({ variables: { taskName: paramsTaskList.taskName } });
+                                            showAlertConfirm(
+                                                "Are you sure clear all success, failure, and stopped job in this task?",
+                                                paramsTaskList.taskName,
+                                                "CLEAN"
+                                            );
                                         }}>Clear Job</Button>
                                 </Tooltip>
                                 <Tooltip title="Retry all failure and stopped job">
@@ -142,7 +167,11 @@ const TaskComponent = (props: any) => {
                                         danger
                                         size="middle"
                                         onClick={() => {
-                                            stopAllJob({ variables: { taskName: paramsTaskList.taskName } });
+                                            showAlertConfirm(
+                                                "Are you sure stop all running and queued job in this task?",
+                                                paramsTaskList.taskName,
+                                                "STOP"
+                                            );
                                         }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                 </Tooltip>
                             </Space>

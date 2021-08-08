@@ -1,4 +1,5 @@
-import { SubscribeTaskList, CleanJobGraphQL, GetTagLine, ClearAllClientSubscriber } from './graphql';
+import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graphql';
+import { RetryAllJob } from '../task/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
 import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
@@ -17,7 +18,7 @@ const DashboardComponent = (props: any) => {
             maskClosable: true,
         })
     }
-    const { cleanJob } = CleanJobGraphQL();
+    const { retryAllJob } = RetryAllJob();
     const { clearClient } = ClearAllClientSubscriber();
 
     const dataTagline = GetTagLine();
@@ -49,7 +50,7 @@ const DashboardComponent = (props: any) => {
 
     const propsTable: TableProps = {
         data: data?.listen_task?.data,
-        cleanJob: cleanJob,
+        retryAllJob: retryAllJob,
         loading: loading,
         defaultOrder: "",
         defaultSort: "desc",

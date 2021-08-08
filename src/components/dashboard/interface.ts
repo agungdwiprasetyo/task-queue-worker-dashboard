@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 
 export interface Task {
     name: string
@@ -5,10 +6,16 @@ export interface Task {
 }
 
 export interface TableProps {
-    cleanJob: any;
+    retryAllJob: any;
     loading: boolean;
     data: any;
     defaultSort: any;
     defaultOrder: any;
     loadData: any;
+}
+
+export interface ModalConfirmProps {
+    taskName: string;
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
 }
