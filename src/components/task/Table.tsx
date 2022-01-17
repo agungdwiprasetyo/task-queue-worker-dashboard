@@ -1,11 +1,8 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React, { useState } from 'react';
-import { Tag, Space, Button, Input, Modal, Typography } from 'antd';
+import { Space, Button, Input, Modal, Typography } from 'antd';
 import {
-    CheckCircleOutlined,
     SyncOutlined,
-    CloseCircleOutlined,
-    ClockCircleOutlined,
     StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { TableProps, ViewJobDetailProps, IJobDetailParam } from './interface';
@@ -24,6 +21,8 @@ const TableComponent = (props: TableProps) => {
     const { deleteJob } = DeleteJobGraphQL();
 
     const [modalViewJobDetail, setModalViewJobDetail] = useState<IJobDetailParam>(null);
+
+    const [searchValue, setSearchValue] = useState<string>("");
 
     const showModalJobDetail = (job_id: string) => {
         setModalViewJobDetail({
@@ -57,9 +56,12 @@ const TableComponent = (props: TableProps) => {
                 <Input.Search allowClear
                     placeholder={`Search ${dataIndex}`}
                     value={selectedKeys[0]}
-                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onChange={e => {
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                        setSearchValue(e.target.value);
+                    }}
                     onPressEnter={() => {
-                        props.loadData({
+                        props.setLoadData({
                             loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
@@ -70,7 +72,7 @@ const TableComponent = (props: TableProps) => {
                     }}
                     onSearch={value => {
                         if (value === "") { value = null }
-                        props.loadData({
+                        props.setLoadData({
                             loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
@@ -261,13 +263,21 @@ const TableComponent = (props: TableProps) => {
             orderBy = order.replace('end', '');
         }
 
-        props.loadData({
+        let statusList = [];
+        if (filters?.status) {
+            statusList = statusList.concat(filters?.status);
+            props.setJobStatus(statusList);
+        } else {
+            statusList = props.params.status;
+        }
+
+        props.setLoadData({
             loading: props.params.loading,
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
-            search: null,
-            status: filters?.status || [],
+            search: searchValue,
+            status: statusList,
         });
     };
 

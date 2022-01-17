@@ -23,18 +23,22 @@ const TaskComponent = (props: any) => {
         setModalAddJobVisible(true);
     };
 
-    const { cleanJob } = CleanJobGraphQL();
-    const { stopAllJob } = StopAllJob();
-    const { retryAllJob } = RetryAllJob();
-    const dataTagline = GetTagLine();
-    const { data, loading, error } = SubscribeTaskList({
+    const [jobStatus, setJobStatus] = useState<string[]>([]);
+
+    const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         loading: false,
         page: 1,
         limit: 10,
         taskName: task_name as string,
         search: null,
-        status: [],
+        status: jobStatus,
     });
+
+    const { cleanJob } = CleanJobGraphQL();
+    const { stopAllJob } = StopAllJob();
+    const { retryAllJob } = RetryAllJob();
+    const dataTagline = GetTagLine();
+    const { data, loading, error } = SubscribeTaskList(paramsTaskList);
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -47,14 +51,6 @@ const TaskComponent = (props: any) => {
     }
     const meta = data?.listen_task_job_detail?.meta;
 
-    const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
-        loading: loading,
-        page: 1,
-        limit: 10,
-        taskName: task_name as string,
-        search: null,
-        status: [],
-    });
 
     if (meta?.is_close_session) {
         Modal.error({
@@ -93,13 +89,15 @@ const TaskComponent = (props: any) => {
     const propsMeta: MetaProps = {
         params: paramsTaskList,
         meta: meta,
-        loadData: setParamsTaskList,
+        setLoadData: setParamsTaskList,
+        setJobStatus: setJobStatus,
     }
 
     const propsTable: TableProps = {
         data: data?.listen_task_job_detail?.data,
         meta: meta,
-        loadData: setParamsTaskList,
+        setLoadData: setParamsTaskList,
+        setJobStatus: setJobStatus,
         loading: loading,
         defaultSort: "desc",
         defaultOrder: "",

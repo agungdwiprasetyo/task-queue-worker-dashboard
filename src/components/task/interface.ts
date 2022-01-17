@@ -7,7 +7,8 @@ export interface TableProps {
     defaultSort: any;
     defaultOrder: any;
     params: ITaskListParam;
-    loadData: Dispatch<SetStateAction<ITaskListParam>>;
+    setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
+    setJobStatus: Dispatch<SetStateAction<string[]>>;
 }
 
 export interface ModalProps {
@@ -19,7 +20,8 @@ export interface ModalProps {
 export interface MetaProps {
     params: ITaskListParam;
     meta: any;
-    loadData: Dispatch<SetStateAction<ITaskListParam>>;
+    setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
+    setJobStatus: Dispatch<SetStateAction<string[]>>;
 }
 
 export interface ITaskListParam {

@@ -16,7 +16,8 @@ const Meta = (props: MetaProps) => {
     }
 
     const onTagClicked = (status: string) => {
-        props.loadData({
+        props.setJobStatus(status ? [status] : [])
+        props.setLoadData({
             loading: props.params.loading,
             page: props.params.page,
             limit: props.params.limit,
