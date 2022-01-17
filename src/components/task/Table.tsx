@@ -1,23 +1,55 @@
 import Table, { ColumnProps } from 'antd/lib/table';
-import React from 'react';
+import React, { useState } from 'react';
 import { Tag, Space, Button, Input, Modal, Typography } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
     CloseCircleOutlined,
     ClockCircleOutlined,
-    StopOutlined, SearchOutlined
+    StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
-import { TableProps } from './interface';
-import { RetryJobGraphQL, StopJobGraphQL } from './graphql';
+import { TableProps, ViewJobDetailProps, IJobDetailParam } from './interface';
+import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
 import Highlighter from 'react-highlight-words';
 import JSONPretty from 'react-json-pretty';
+import ViewJobDetail from './ViewJobDetail';
+import Moment from 'react-moment';
+import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 
 const { Paragraph } = Typography;
 
 const TableComponent = (props: TableProps) => {
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
+    const { deleteJob } = DeleteJobGraphQL();
+
+    const [modalViewJobDetail, setModalViewJobDetail] = useState<IJobDetailParam>(null);
+
+    const showModalJobDetail = (job_id: string) => {
+        setModalViewJobDetail({
+            visible: true, job_id: job_id
+        });
+    };
+
+    const propsModal: ViewJobDetailProps = {
+        param: modalViewJobDetail,
+        setParam: setModalViewJobDetail,
+    }
+
+    const showAlertDeleteJob = (jobId: string) => {
+        Modal.confirm({
+            title: `Are you sure to delete this job?`,
+            icon: <ExclamationCircleOutlined />,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                deleteJob({ variables: { jobId: jobId } });
+            },
+            onCancel() {
+            },
+        });
+    }
 
     const getColumnSearchProps = dataIndex => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -28,6 +60,7 @@ const TableComponent = (props: TableProps) => {
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => {
                         props.loadData({
+                            loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
@@ -38,6 +71,7 @@ const TableComponent = (props: TableProps) => {
                     onSearch={value => {
                         if (value === "") { value = null }
                         props.loadData({
+                            loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
@@ -84,7 +118,14 @@ const TableComponent = (props: TableProps) => {
             dataIndex: 'id',
             key: 'id',
             title: 'Job ID',
-            width: 100
+            width: 100,
+            render: (id: string) => {
+                return (
+                    <>
+                        <a onClick={() => { showModalJobDetail(id) }}>{id}</a>
+                    </>
+                )
+            }
         },
         {
             dataIndex: 'args',
@@ -110,12 +151,13 @@ const TableComponent = (props: TableProps) => {
             key: 'created_at',
             title: 'Created At',
             width: 150,
-        },
-        {
-            dataIndex: 'finished_at',
-            key: 'finished_at',
-            title: 'Finished At',
-            width: 150,
+            render: (date: string) => {
+                return (
+                    <>
+                        <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{date}</Moment>
+                    </>
+                )
+            }
         },
         {
             dataIndex: 'error',
@@ -156,7 +198,7 @@ const TableComponent = (props: TableProps) => {
             dataIndex: 'status',
             key: 'status',
             title: 'Status',
-            width: 120,
+            width: 100,
             filters: [
                 { text: 'Success', value: 'SUCCESS' },
                 { text: 'Running/Retrying', value: 'RETRYING' },
@@ -165,21 +207,11 @@ const TableComponent = (props: TableProps) => {
                 { text: 'Stopped', value: 'STOPPED' },
             ],
             render: (status: string, row: any) => {
-                let tag: any;
-                if (status == "RETRYING") tag = (
-                    <Tag
-                        icon={<SyncOutlined spin />}
-                        color="geekblue">
-                        {row?.retries > 1 ? status : "RUNNING"}
-                    </Tag>);
-                else if (status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{status}</Tag>);
-                else if (status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{status}...</Tag>);
-                else if (status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="error">{status} </Tag>);
-                else if (status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="warning">{status} </Tag>);
+                const statusProps: StatusLayoutProps = {
+                    status: status, retry: row?.retries
+                }
                 return (
-                    <Space>
-                        {tag}
-                    </Space>
+                    <StatusLayout {...statusProps} />
                 );
             }
         },
@@ -190,18 +222,24 @@ const TableComponent = (props: TableProps) => {
             width: 100,
             render: (status: string, row: any) => {
                 return (
-                    <Space direction="vertical">
+                    <Space direction="vertical" align="center">
                         {
                             (status == "RETRYING" || status == "QUEUEING") ?
                                 <Button icon={<StopOutlined />} type="primary" danger size="small" disabled={status == "RETRYING"} onClick={() => {
                                     stopJob({ variables: { jobId: row?.id } })
-                                }}>Stop</Button>
+                                }}>Stop<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                 :
                                 <Button icon={<SyncOutlined />} type="primary" size="small" onClick={() => {
                                     retryJob({ variables: { jobId: row?.id } });
-                                }}>Retry</Button>
+                                }}>Retry<span>&nbsp;&nbsp;</span></Button>
 
                         }
+                        <Button danger type="primary" size="small"
+                            disabled={status == "QUEUEING" || status == "RETRYING"}
+                            icon={<DeleteOutlined />}
+                            onClick={() => {
+                                showAlertDeleteJob(row?.id);
+                            }}>Delete</Button>
                     </Space>
                 );
             }
@@ -224,6 +262,7 @@ const TableComponent = (props: TableProps) => {
         }
 
         props.loadData({
+            loading: props.params.loading,
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
@@ -245,6 +284,7 @@ const TableComponent = (props: TableProps) => {
                 }}
                 scroll={{ x: 560 }}
             />
+            <ViewJobDetail {...propsModal} />
         </div>
     );
 };

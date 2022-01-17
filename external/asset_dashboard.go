@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -27,7 +28,7 @@ import (
 
 func main() {
 	err := vfsgen.Generate(http.Dir("out"), vfsgen.Options{
-		PackageName:  "external",
+		PackageName:  "dashboard",
 		BuildTags:    "!dev",
 		VariableName: "Dashboard",
 		Filename:     "assets_dashboard_build.go",

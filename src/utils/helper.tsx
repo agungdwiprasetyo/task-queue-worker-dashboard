@@ -1,0 +1,26 @@
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, StopOutlined, SyncOutlined } from "@ant-design/icons";
+import { Space, Tag } from "antd";
+
+export interface StatusLayoutProps {
+    status: string;
+    retry: number;
+}
+
+export const StatusLayout = (props: StatusLayoutProps) => {
+    let tag: any;
+    if (props.status == "RETRYING") tag = (
+        <Tag
+            icon={<SyncOutlined spin />}
+            color="geekblue">
+            {props.retry > 1 ? props.status : "RUNNING"}
+        </Tag>);
+    else if (props.status == "SUCCESS") tag = (<Tag icon={<CheckCircleOutlined />} color="green">{props.status}</Tag>);
+    else if (props.status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{props.status}...</Tag>);
+    else if (props.status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="error">{props.status} </Tag>);
+    else if (props.status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="warning">{props.status} </Tag>);
+    return (
+        <Space>
+            {tag}
+        </Space>
+    );
+}

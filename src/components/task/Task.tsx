@@ -18,16 +18,8 @@ const TaskComponent = (props: any) => {
     const router = useRouter();
     const { task_name } = router.query;
 
-    const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
-        page: 1,
-        limit: 10,
-        taskName: task_name as string,
-        search: null,
-        status: [],
-    });
-
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
-    const showModal = () => {
+    const showModalAddJob = () => {
         setModalAddJobVisible(true);
     };
 
@@ -35,7 +27,14 @@ const TaskComponent = (props: any) => {
     const { stopAllJob } = StopAllJob();
     const { retryAllJob } = RetryAllJob();
     const dataTagline = GetTagLine();
-    const { data, loading, error } = SubscribeTaskList(paramsTaskList);
+    const { data, loading, error } = SubscribeTaskList({
+        loading: false,
+        page: 1,
+        limit: 10,
+        taskName: task_name as string,
+        search: null,
+        status: [],
+    });
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -47,6 +46,15 @@ const TaskComponent = (props: any) => {
         })
     }
     const meta = data?.listen_task_job_detail?.meta;
+
+    const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
+        loading: loading,
+        page: 1,
+        limit: 10,
+        taskName: task_name as string,
+        search: null,
+        status: [],
+    });
 
     if (meta?.is_close_session) {
         Modal.error({
@@ -138,7 +146,7 @@ const TaskComponent = (props: any) => {
                                     icon={<PlusOutlined />}
                                     size="middle"
                                     type="primary"
-                                    onClick={showModal}>Add Job<span>&nbsp;&nbsp;</span></Button>
+                                    onClick={showModalAddJob}>Add Job<span>&nbsp;&nbsp;</span></Button>
                                 <Tooltip title="Clear all success, failure, and stopped job">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                         icon={<ClearOutlined />}

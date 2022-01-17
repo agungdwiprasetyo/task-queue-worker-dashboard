@@ -1,11 +1,13 @@
-import { useMutation, useSubscription } from '@apollo/react-hooks';
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import LISTEN_JOB_TASK from './graphql_listen_task';
 import RETRY_JOB from './graphql_retry_job';
 import STOP_JOB from './graphql_stop_job';
 import ADD_JOB from './graphql_add_job';
 import STOP_ALL_JOB from './graphql_stop_all';
 import RETRY_ALL_JOB from './graphql_retry_all_job';
+import GET_JOB_DETAIL from './graphql_get_job_detail';
 import { ITaskListParam } from '../interface';
+import DELETE_JOB from 'src/components/task/graphql/graphql_delete_job';
 
 export const RetryJobGraphQL = () => {
     try {
@@ -72,6 +74,29 @@ export const RetryAllJob = () => {
     try {
         const [retryAllJob, { }] = useMutation(RETRY_ALL_JOB);
         return { retryAllJob };
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+export const GetDetailJob = (job_id: string) => {
+    try {
+        const { data } = useQuery(
+            GET_JOB_DETAIL,
+            { variables: { job_id: job_id }, fetchPolicy: "no-cache" },
+        );
+        return data;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+export const DeleteJobGraphQL = () => {
+    try {
+        const [deleteJob, { }] = useMutation(DELETE_JOB);
+        return { deleteJob };
     }
     catch (error) {
         console.log(error);
