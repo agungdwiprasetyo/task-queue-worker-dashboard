@@ -15,11 +15,6 @@ interface Definintion {
 
 let authToken = null;
 
-const httpLink = new HttpLink({
-  fetch,
-  uri: process.env.REACT_APP_GRAPHQL_HOST || '/graphql',
-});
-
 const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
     headers: {
@@ -32,15 +27,29 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-const getWebsocketHost = () => {
+const getHost = (isWebsocket: boolean) => {
+  if (typeof window === "undefined") {
+    return "";
+  }
   let protocol = window.location.protocol;
-  protocol = protocol.replace(/http/gi, "ws");
-  return `${protocol}//${window.location.host}`;
+
+  if (isWebsocket) {
+    protocol = protocol.replace(/http/gi, "ws");
+  }
+  let host = window.location.host;
+  let path = window.location.pathname.replace("/task", "");
+  if (path == "/") path = "";
+  return `${protocol}//${host}${path}`;
 }
+
+const httpLink = new HttpLink({
+  fetch,
+  uri: process.env.REACT_APP_GRAPHQL_HOST || `${getHost(false)}/graphql`,
+});
 
 const webSocketLink: any = process.browser
   ? new WebSocketLink({
-    uri: process.env.REACT_APP_GRAPHQL_WS || `${getWebsocketHost()}/graphql`,
+    uri: process.env.REACT_APP_GRAPHQL_WS || `${getHost(true)}/graphql`,
     options: {
       reconnect: true,
     },

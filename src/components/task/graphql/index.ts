@@ -82,11 +82,11 @@ export const RetryAllJob = () => {
 
 export const GetDetailJob = (job_id: string) => {
     try {
-        const { data } = useQuery(
+        const { data, loading, error } = useQuery(
             GET_JOB_DETAIL,
             { variables: { job_id: job_id }, fetchPolicy: "no-cache" },
         );
-        return data;
+        return { data, loading, error };
     }
     catch (error) {
         console.log(error);

@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction } from 'react';
 
+export interface ITaskComponentProps {
+    taskName: string;
+}
+
 export interface TableProps {
     loading: boolean;
     data: any;

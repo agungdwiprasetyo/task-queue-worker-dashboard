@@ -6,7 +6,7 @@ import TableComponent from './Table';
 import ModalAddJob from './AddJob';
 import { SubscribeTaskList, StopAllJob, RetryAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
-import { TableProps, ITaskListParam, ModalProps, MetaProps } from './interface';
+import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps } from './interface';
 import Meta from './Meta';
 import { GetTagLine } from "../dashboard/graphql";
 
@@ -14,22 +14,16 @@ const { confirm } = Modal;
 
 const { Content, Footer } = Layout;
 
-const TaskComponent = (props: any) => {
+const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
-    const { task_name } = router.query;
 
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
-    const showModalAddJob = () => {
-        setModalAddJobVisible(true);
-    };
-
     const [jobStatus, setJobStatus] = useState<string[]>([]);
-
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         loading: false,
         page: 1,
         limit: 10,
-        taskName: task_name as string,
+        taskName: props.taskName,
         search: null,
         status: jobStatus,
     });
@@ -117,7 +111,7 @@ const TaskComponent = (props: any) => {
                     <Row>
                         <Col span={24}>
                             <div className="text-center">
-                                <h3>Task Name:</h3> <h2><pre><b>{task_name}</b></pre></h2>
+                                <h3>Task Name:</h3> <h2><pre><b>{props.taskName}</b></pre></h2>
                             </div>
                         </Col>
                     </Row>
@@ -131,56 +125,62 @@ const TaskComponent = (props: any) => {
 
                     <Row>
                         <Divider orientation="left" />
-                        <Col span={16}>
+                        <Col span={14}>
                             <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                                 router.push({
                                     pathname: "/",
                                 })
                             }}>Back to dashboard</Button>
                         </Col>
-                        <Col span={6} offset={2}>
-                            <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                    icon={<PlusOutlined />}
-                                    size="middle"
-                                    type="primary"
-                                    onClick={showModalAddJob}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                                <Tooltip title="Clear all success, failure, and stopped job">
+                        <Col span={9}>
+                            <Row justify="end" gutter={[48, 16]}>
+                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                        icon={<ClearOutlined />}
-                                        danger
-                                        size="middle"
-                                        onClick={() => {
-                                            showAlertConfirm(
-                                                "Are you sure clear all success, failure, and stopped job in this task?",
-                                                paramsTaskList.taskName,
-                                                "CLEAN"
-                                            );
-                                        }}>Clear Job</Button>
-                                </Tooltip>
-                                <Tooltip title="Retry all failure and stopped job">
-                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                        icon={<SyncOutlined />}
+                                        icon={<PlusOutlined />}
                                         size="middle"
                                         type="primary"
-                                        onClick={() => {
-                                            retryAllJob({ variables: { taskName: paramsTaskList.taskName } });
-                                        }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                </Tooltip>
-                                <Tooltip title="Stop all running and queued job">
-                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                        icon={<StopOutlined />}
-                                        danger
-                                        size="middle"
-                                        onClick={() => {
-                                            showAlertConfirm(
-                                                "Are you sure stop all running and queued job in this task?",
-                                                paramsTaskList.taskName,
-                                                "STOP"
-                                            );
-                                        }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
-                                </Tooltip>
-                            </Space>
+                                        onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
+                                    <Tooltip title="Retry all failure and stopped job">
+                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            icon={<SyncOutlined />}
+                                            size="middle"
+                                            type="primary"
+                                            onClick={() => {
+                                                retryAllJob({ variables: { taskName: paramsTaskList.taskName } });
+                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Space>
+                            </Row>
+                            <Row justify="end" gutter={48}>
+                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                                    <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
+                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            icon={<ClearOutlined />}
+                                            danger
+                                            size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    "Are you sure clear all success, failure, and stopped job in this task?",
+                                                    paramsTaskList.taskName,
+                                                    "CLEAN"
+                                                );
+                                            }}>Clear Job</Button>
+                                    </Tooltip>
+                                    <Tooltip title="Stop all running and queued job" placement="bottom">
+                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            icon={<StopOutlined />}
+                                            danger
+                                            size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    "Are you sure stop all running and queued job in this task?",
+                                                    paramsTaskList.taskName,
+                                                    "STOP"
+                                                );
+                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Space>
+                            </Row>
                         </Col>
                         <Divider orientation="left" />
                     </Row>

@@ -1,12 +1,30 @@
 import React from 'react';
-import { withAuthSync } from '../src/utils/auth'; import TaskComponent from '../src/components/task/Task';
+import { withAuthSync } from '../src/utils/auth';
+import TaskComponent from '../src/components/task/Task';
+import { ITaskComponentProps } from '../src/components/task/interface';
 import { Layout } from 'antd';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 const Task = (props: any) => {
+
+  const router = useRouter();
+  const { task_name } = router.query;
+
+  const taskComponentProps: ITaskComponentProps = {
+    taskName: task_name as string,
+  }
+
   return (
-    <Layout style={{ height: "100vh" }}>
-      <TaskComponent {...props} />
-    </Layout>
+    <>
+      <Head>
+        <title>Detail Task</title>
+      </Head>
+
+      <Layout style={{ height: "100vh" }}>
+        <TaskComponent {...taskComponentProps} />
+      </Layout>
+    </>
   );
 };
 

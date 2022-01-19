@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, Button, Form, Input, InputNumber, } from 'antd';
+import { Modal, Form, Input, InputNumber, } from 'antd';
 import { ModalProps } from './interface';
 import { AddJob } from './graphql';
 
@@ -37,10 +37,10 @@ const ModalAddJob = (props: ModalProps) => {
         >
             <Form
                 form={form} layout="vertical" name="formAddJob">
-                <Form.Item name="max_retry" label="Max Retry" rules={[{ required: true }]}>
+                <Form.Item name="max_retry" label="Max Retry:" rules={[{ required: true }]}>
                     <InputNumber min={1} />
                 </Form.Item>
-                <Form.Item name="args" label="Arguments" rules={[{ required: true }]}>
+                <Form.Item name="args" label="Argument / message:" rules={[{ required: true }]}>
                     <Input.TextArea rows={7} />
                 </Form.Item>
             </Form>
