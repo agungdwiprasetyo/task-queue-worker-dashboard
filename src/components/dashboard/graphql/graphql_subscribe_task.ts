@@ -8,7 +8,7 @@ subscription {
       total_client_subscriber
     }
     data {
-      name total_jobs detail {
+      name module_name total_jobs detail {
         failure retrying success queueing stopped
       }
     }

@@ -7,6 +7,7 @@ import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import Table, { ColumnProps } from 'antd/lib/table';
 
 const ViewJobDetail = (props: ViewJobDetailProps) => {
     let detailJob;
@@ -32,13 +33,67 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
         retry: detailJob?.retries
     }
 
-    const renderStatusHistories = (obj: any) => {
-        const statusProps: StatusLayoutProps = {
-            status: obj?.status,
-            retry: obj?.retries
+    let columns: Array<ColumnProps<any>> = [
+        {
+            title: 'Timestamp',
+            dataIndex: 'timestamp',
+            key: 'timestamp',
+            render: (text: string) => {
+                return (
+                    <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{text}</Moment>
+                );
+            },
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text: string, row: any) => {
+                const statusProps: StatusLayoutProps = {
+                    status: row?.status,
+                    retry: row?.retries
+                }
+                return (<StatusLayout {...statusProps} />);
+            },
+        },
+        {
+            title: 'Trace URL',
+            dataIndex: 'trace_id',
+            key: 'trace_id',
+            render: (text: string) => {
+                return (
+                    <a href={text} target="blank">{text}</a>
+                );
+            },
+        },
+        {
+            title: 'Error',
+            dataIndex: 'error',
+            key: 'error',
+            render: (text: string) => {
+                if (!text) { return (<></>) };
+                return (
+                    <Paragraph>
+                        <JSONPretty id="json-pretty" data={text} />
+                    </Paragraph>
+                )
+            },
+        },
+        {
+            title: 'Error Stack',
+            dataIndex: 'error_stack',
+            key: 'error_stack',
+            ellipsis: true,
+            render: (text: string) => {
+                if (!text) { return (<></>) };
+                return (
+                    <Paragraph>
+                        <JSONPretty id="json-pretty" data={text} />
+                    </Paragraph>
+                );
+            },
         }
-        return (<StatusLayout {...statusProps} />);
-    }
+    ]
 
     return (
 
@@ -144,35 +199,16 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
                     </Row>
                     <Divider orientation="left" />
                     <Row>
-                        <Col span={6}><b>Retry Histories</b></Col>
-                        <Col span={18}>
-                            <Row>
-                                <Col span={6}><b>Timestamp</b></Col>
-                                <Col span={4}><b>Status</b></Col>
-                                <Col span={4}><b>Error</b></Col>
-                                <Col span={10}><b>Trace URL</b></Col>
-                            </Row>
-                            {detailJob?.retry_histories?.map((object, i) =>
-                                <>
-                                    <Divider orientation="left" />
-                                    <Row>
-                                        <Col span={5}>
-                                            <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{object.timestamp}</Moment>
-                                        </Col>
-                                        <Col span={4}>{renderStatusHistories(object)}</Col>
-                                        <Col span={5} style={{ padding: '0 10px 0 0' }}>
-                                            {
-                                                object.error ? (
-                                                    <Paragraph>
-                                                        <JSONPretty id="json-pretty" data={object.error} />
-                                                    </Paragraph>
-                                                ) : ""
-                                            }
-                                        </Col>
-                                        <Col span={10}><a href={object?.trace_id} target="blank">{object?.trace_id}</a></Col>
-                                    </Row>
-                                </>
-                            )}
+                        <Col><b>Retry Histories</b></Col>
+                    </Row>
+                    <Divider orientation="left" />
+                    <Row>
+                        <Col span={24}>
+                            <Table
+                                columns={columns}
+                                dataSource={detailJob?.retry_histories}
+                                pagination={{ defaultPageSize: 10, hideOnSinglePage: true }}
+                            />
                         </Col>
                     </Row>
                 </>)}

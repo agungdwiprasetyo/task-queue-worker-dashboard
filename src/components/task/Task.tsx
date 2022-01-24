@@ -9,6 +9,8 @@ import { CleanJobGraphQL } from '../dashboard/graphql';
 import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps } from './interface';
 import Meta from './Meta';
 import { GetTagLine } from "../dashboard/graphql";
+import { IFooterComponentProps } from 'src/components/footer/interface';
+import FooterComponent from 'src/components/footer/Footer';
 
 const { confirm } = Modal;
 
@@ -104,9 +106,15 @@ const TaskComponent = (props: ITaskComponentProps) => {
         setVisible: setModalAddJobVisible,
     }
 
+    const propsFooter: IFooterComponentProps = {
+        serverStartedAt: dataTagline?.tagline?.start_at,
+        version: dataTagline?.tagline?.version,
+        buildNumber: dataTagline?.tagline?.build_number,
+    }
+
     return (
         <>
-            <Layout>
+            <Layout style={{ minHeight: "88vh" }}>
                 <Content style={{ padding: '10px 50px' }}>
                     <Row>
                         <Col span={24}>
@@ -190,9 +198,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             <TableComponent {...propsTable} />
                         </Col>
                     </Row>
-                    <Footer style={{ textAlign: 'center' }}>candi version <b>{dataTagline?.tagline?.version}</b></Footer>
                 </Content>
             </Layout>
+            <FooterComponent {...propsFooter} />
         </>
     );
 };

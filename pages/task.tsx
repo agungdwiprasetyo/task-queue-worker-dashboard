@@ -21,9 +21,7 @@ const Task = (props: any) => {
         <title>Detail Task</title>
       </Head>
 
-      <Layout style={{ height: "100vh" }}>
-        <TaskComponent {...taskComponentProps} />
-      </Layout>
+      <TaskComponent {...taskComponentProps} />
     </>
   );
 };

@@ -2,7 +2,10 @@ import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graph
 import { RetryAllJob } from '../task/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip, Row } from 'antd';
+import { IFooterComponentProps } from 'src/components/footer/interface';
+import FooterComponent from 'src/components/footer/Footer';
+import { Content } from 'antd/lib/layout/layout';
 
 const { Footer } = Layout;
 
@@ -57,29 +60,37 @@ const DashboardComponent = (props: any) => {
         loadData: loadData,
     };
 
+    const propsFooter: IFooterComponentProps = {
+        serverStartedAt: dataTagline?.tagline?.start_at,
+        version: dataTagline?.tagline?.version,
+        buildNumber: dataTagline?.tagline?.build_number,
+    }
+
     return (
-        <>
-            <div>
-                <div className="text-center mb-5">
-                    <pre>{dataTagline?.tagline?.banner}</pre>
-                    <pre>{dataTagline?.tagline?.tagline}</pre>
-                    <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
-                    <pre>
-                        <Space>Total Client Subscriber:<b>{data?.listen_task?.meta?.total_client_subscriber}</b>
-                            <Tooltip title="close all client subscriber session"><Tag style={{
-                                cursor: 'pointer'
-                            }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
-                        </Space>
-                    </pre>
+        <Layout>
+            <Content style={{ minHeight: "88vh" }}>
+                <div>
+                    <div className="text-center mb-5">
+                        <pre>{dataTagline?.tagline?.banner}</pre>
+                        <pre>{dataTagline?.tagline?.tagline}</pre>
+                        <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
+                        <pre>
+                            <Space>Total Client Subscriber:<b>{data?.listen_task?.meta?.total_client_subscriber}</b>
+                                <Tooltip title="close all client subscriber session"><Tag style={{
+                                    cursor: 'pointer'
+                                }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
+                            </Space>
+                        </pre>
+                    </div>
                 </div>
-            </div>
-            <div style={content}>
-                <div className="text-center mb-5">
-                    <TableComponent {...propsTable} />
+                <div style={content}>
+                    <div className="text-center mb-5">
+                        <TableComponent {...propsTable} />
+                    </div>
                 </div>
-            </div>
-            <Footer style={{ textAlign: 'center' }}>candi version <b>{dataTagline?.tagline?.version}</b></Footer>
-        </>
+            </Content>
+            <FooterComponent {...propsFooter} />
+        </Layout>
     );
 };
 

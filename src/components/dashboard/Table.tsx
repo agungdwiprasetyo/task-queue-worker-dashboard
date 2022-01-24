@@ -21,9 +21,20 @@ export const TableComponent = (props: TableProps) => {
             title: 'Task Name',
         },
         {
+            dataIndex: 'module_name',
+            key: 'module_name',
+            title: 'Module Name',
+            render: (module_name: number) => {
+                return (
+                    <div><b>{module_name}</b></div>
+                );
+            }
+        },
+        {
             dataIndex: 'total_jobs',
             key: 'total_jobs',
             title: 'Total Jobs',
+            sorter: (a: any, b: any) => b?.total_jobs - a?.total_jobs,
             render: (total_jobs: number) => {
                 return (
                     <div><b>{total_jobs}</b></div>
