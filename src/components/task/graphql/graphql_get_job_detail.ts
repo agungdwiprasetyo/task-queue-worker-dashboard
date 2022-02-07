@@ -15,7 +15,8 @@ query ($job_id: String!) {
       status
       trace_id
       error
-      timestamp
+      start_at
+      end_at
       error_stack
     }
     status

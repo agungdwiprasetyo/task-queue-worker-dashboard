@@ -35,9 +35,19 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
 
     let columns: Array<ColumnProps<any>> = [
         {
-            title: 'Timestamp',
-            dataIndex: 'timestamp',
-            key: 'timestamp',
+            title: 'Start At',
+            dataIndex: 'start_at',
+            key: 'start_at',
+            render: (text: string) => {
+                return (
+                    <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{text}</Moment>
+                );
+            },
+        },
+        {
+            title: 'End At',
+            dataIndex: 'end_at',
+            key: 'end_at',
             render: (text: string) => {
                 return (
                     <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{text}</Moment>
