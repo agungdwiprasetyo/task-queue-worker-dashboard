@@ -35,6 +35,8 @@ export interface ITaskListParam {
     taskName: string;
     search: string;
     status: string[];
+    startDate: string;
+    endDate: string;
 }
 
 export interface ViewJobDetailProps {

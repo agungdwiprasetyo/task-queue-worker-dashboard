@@ -40,7 +40,7 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
             key: 'start_at',
             render: (text: string) => {
                 return (
-                    <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{text}</Moment>
+                    <Moment format="DD MMMM YYYY, HH:mm:ssZ">{text}</Moment>
                 );
             },
         },
@@ -50,7 +50,7 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
             key: 'end_at',
             render: (text: string) => {
                 return (
-                    <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{text}</Moment>
+                    <Moment format="DD MMMM YYYY, HH:mm:ssZ">{text}</Moment>
                 );
             },
         },
@@ -161,21 +161,21 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
                     <Row>
                         <Col span={6}><b>Created At</b></Col>
                         <Col span={18}>
-                            <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{detailJob?.created_at}</Moment>
+                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.created_at}</Moment>
                         </Col>
                     </Row>
                     <Divider orientation="left" />
                     <Row>
                         <Col span={6}><b>Finished At</b></Col>
                         <Col span={18}>
-                            <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{detailJob?.finished_at}</Moment>
+                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.finished_at}</Moment>
                         </Col>
                     </Row>
                     <Divider orientation="left" />
                     <Row>
                         <Col span={6}><b>Next Retry At</b></Col>
                         <Col span={18}>
-                            {detailJob?.next_retry_at ? (<Moment format="MMMM DD YYYY, HH:mm:ss TZ">{detailJob?.next_retry_at}</Moment>) : "-"}
+                            {detailJob?.next_retry_at ? (<Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.next_retry_at}</Moment>) : "-"}
                         </Col>
                     </Row>
                     <Divider orientation="left" />

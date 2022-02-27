@@ -24,6 +24,8 @@ const Meta = (props: MetaProps) => {
             taskName: props.params.taskName,
             search: null,
             status: status ? [status] : [],
+            startDate: props.params.startDate,
+            endDate: props.params.endDate
         });
     }
 

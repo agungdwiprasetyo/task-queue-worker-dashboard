@@ -59,28 +59,20 @@ export const TableComponent = (props: TableProps) => {
         {
             dataIndex: 'name',
             key: 'action',
-            title: 'Action',
+            title: '',
             render: (name: string) => {
                 return (
                     <Space>
-                        <Button type="primary" size="middle" onClick={() => {
+                        <Button type="primary" size="large" onClick={() => {
                             router.push({
                                 pathname: "/task",
                                 query: { task_name: name }
                             })
                         }}>View Jobs</Button>
-                        <Tooltip title={"Retry all failure and stopped job in task '" + name + "'"}>
-                            <Button type="primary" size="middle" onClick={() => {
-                                props.retryAllJob({ variables: { taskName: name } });
-                            }}>
-                                Retry All
-                            </Button>
-                        </Tooltip>
                     </Space>
                 )
             },
         },
-
     ];
 
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {

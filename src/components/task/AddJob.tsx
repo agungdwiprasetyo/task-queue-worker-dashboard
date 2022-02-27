@@ -37,7 +37,7 @@ const ModalAddJob = (props: ModalProps) => {
         >
             <Form
                 form={form} layout="vertical" name="formAddJob">
-                <Form.Item name="max_retry" label="Max Retry:" rules={[{ required: true }]}>
+                <Form.Item name="max_retry" label="Max retry:" rules={[{ required: true }]}>
                     <InputNumber min={1} />
                 </Form.Item>
                 <Form.Item name="args" label="Argument / message:" rules={[{ required: true }]}>

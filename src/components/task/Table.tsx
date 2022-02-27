@@ -68,6 +68,8 @@ const TableComponent = (props: TableProps) => {
                             taskName: props.params.taskName,
                             search: selectedKeys[0],
                             status: props.params.status,
+                            startDate: props.params.startDate,
+                            endDate: props.params.endDate,
                         });
                     }}
                     onSearch={value => {
@@ -79,6 +81,8 @@ const TableComponent = (props: TableProps) => {
                             taskName: props.params.taskName,
                             search: value,
                             status: props.params.status,
+                            startDate: props.params.startDate,
+                            endDate: props.params.endDate,
                         });
                     }}
                     style={{ width: 188, marginBottom: 8, display: 'block' }}
@@ -156,7 +160,7 @@ const TableComponent = (props: TableProps) => {
             render: (date: string) => {
                 return (
                     <>
-                        <Moment format="MMMM DD YYYY, HH:mm:ss TZ">{date}</Moment>
+                        <Moment format="DD MMMM YYYY, HH:mm:ssZ">{date}</Moment>
                     </>
                 )
             }
@@ -227,7 +231,7 @@ const TableComponent = (props: TableProps) => {
                     <Space direction="vertical" align="center">
                         {
                             (status == "RETRYING" || status == "QUEUEING") ?
-                                <Button icon={<StopOutlined />} type="primary" danger size="small" disabled={status == "RETRYING"} onClick={() => {
+                                <Button icon={<StopOutlined />} type="primary" danger size="small" onClick={() => {
                                     stopJob({ variables: { jobId: row?.id } })
                                 }}>Stop<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                 :
@@ -278,6 +282,8 @@ const TableComponent = (props: TableProps) => {
             taskName: props.params.taskName,
             search: searchValue,
             status: statusList,
+            startDate: props.params.startDate,
+            endDate: props.params.endDate,
         });
     };
 

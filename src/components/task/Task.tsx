@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
+import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout, Input, DatePicker, Select, Form } from 'antd';
 import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
@@ -28,6 +28,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
         taskName: props.taskName,
         search: null,
         status: jobStatus,
+        startDate: null,
+        endDate: null
     });
 
     const { cleanJob } = CleanJobGraphQL();
@@ -112,6 +114,31 @@ const TaskComponent = (props: ITaskComponentProps) => {
         buildNumber: dataTagline?.tagline?.build_number,
     }
 
+    const [form] = Form.useForm();
+    const onApplyFilter = () => {
+        form.validateFields().then(values => {
+            let startDate, endDate: string;
+            if (values?.dateRange?.length == 2) {
+                startDate = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
+                endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
+            }
+            setParamsTaskList({
+                loading: paramsTaskList.loading,
+                page: 1,
+                limit: paramsTaskList.limit,
+                taskName: paramsTaskList.taskName,
+                search: values?.search,
+                status: values?.status ? [values?.status] : [],
+                startDate: startDate,
+                endDate: endDate
+            })
+        }).catch(info => {
+            console.log('Validate Failed:', info);
+        });
+    }
+
+    const { Option } = Select;
+
     return (
         <>
             <Layout style={{ minHeight: "88vh" }}>
@@ -192,7 +219,44 @@ const TaskComponent = (props: ITaskComponentProps) => {
                         </Col>
                         <Divider orientation="left" />
                     </Row>
+
+                    <Row justify="center">
+                        <Form
+                            form={form} layout="inline" name="formFilterJob">
+                            <Form.Item name="search" label="Search:">
+                                <Input allowClear placeholder="Search args..." />
+                            </Form.Item>
+                            <Form.Item name="status" label="Status:">
+                                <Select
+                                    allowClear
+                                    placeholder="Select status"
+                                >
+                                    <Option value='SUCCESS' >Success</Option>
+                                    <Option value='RETRYING' >Running/Retrying</Option>
+                                    <Option value='QUEUEING' >Queueing</Option>
+                                    <Option value='FAILURE' >Failure</Option>
+                                    <Option value='STOPPED' >Stopped</Option>
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name="dateRange" label="Created At:">
+                                <DatePicker.RangePicker
+                                    showTime={{ format: 'HH:mm' }}
+                                    format="YYYY-MM-DDTHH:mm:ssZ"
+                                />
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="ghost" size="middle" onClick={() => { onApplyFilter() }}>Apply Filter</Button>
+                            </Form.Item>
+                            <Form.Item>
+                                <Button type="link" size="middle" onClick={() => {
+                                    form.resetFields();
+                                    onApplyFilter();
+                                }}>Clear Filter</Button>
+                            </Form.Item>
+                        </Form>
+                    </Row>
                     <Row>
+                        <Divider orientation="left" />
                         <Col span={24}>
                             <ModalAddJob {...propsModal} />
                             <TableComponent {...propsTable} />

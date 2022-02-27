@@ -31,6 +31,8 @@ export const SubscribeTaskList = (params: ITaskListParam) => {
                 "limit": params.limit,
                 "search": params.search,
                 "status": params.status,
+                "startDate": params.startDate,
+                "endDate": params.endDate,
             }
         });
         return { data, loading, error };
