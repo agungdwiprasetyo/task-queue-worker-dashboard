@@ -11,6 +11,7 @@ import Meta from './Meta';
 import { GetTagLine } from "../dashboard/graphql";
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
+import moment from 'moment';
 
 const { confirm } = Modal;
 
@@ -240,7 +241,10 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             </Form.Item>
                             <Form.Item name="dateRange" label="Created At:">
                                 <DatePicker.RangePicker
-                                    showTime={{ format: 'HH:mm' }}
+                                    showTime={{
+                                        format: 'HH:mm:ss',
+                                        defaultValue: [moment().startOf('day'), moment().endOf('day')],
+                                    }}
                                     format="YYYY-MM-DDTHH:mm:ssZ"
                                 />
                             </Form.Item>

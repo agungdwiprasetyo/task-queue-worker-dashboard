@@ -22,7 +22,7 @@ const TableComponent = (props: TableProps) => {
 
     const [modalViewJobDetail, setModalViewJobDetail] = useState<IJobDetailParam>(null);
 
-    const [searchValue, setSearchValue] = useState<string>("");
+    const [searchValue, setSearchValue] = useState<string>(props.params.search);
 
     const showModalJobDetail = (job_id: string) => {
         setModalViewJobDetail({
@@ -280,7 +280,7 @@ const TableComponent = (props: TableProps) => {
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
-            search: searchValue,
+            search: props.params.search ? props.params.search : searchValue,
             status: statusList,
             startDate: props.params.startDate,
             endDate: props.params.endDate,
