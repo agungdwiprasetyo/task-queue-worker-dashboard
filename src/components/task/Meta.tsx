@@ -37,21 +37,24 @@ const Meta = (props: MetaProps) => {
                 <b>Total Jobs: {props?.meta?.total_records}</b>
             </Tag>
             <Tag style={pointerHover}
-                icon={<CheckCircleOutlined />} color="green"
-                onClick={() => { onTagClicked('SUCCESS') }}>
-                <b>Success: {props?.meta?.detail?.success}</b>
-            </Tag>
-            <Tag style={pointerHover}
+                className={props?.meta?.detail?.queueing > 0 ? "fade-in-default" : "fade-out"}
                 icon={<ClockCircleOutlined />} color="default"
                 onClick={() => { onTagClicked('QUEUEING') }}>
                 <b>Queueing: {props?.meta?.detail?.queueing}</b>
             </Tag>
             <Tag style={pointerHover}
+                className={props?.meta?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"}
                 icon={<SyncOutlined spin={props?.meta?.detail?.retrying != 0} />}
                 color="geekblue" onClick={() => { onTagClicked('RETRYING') }}>
                 <b>Running: {props?.meta?.detail?.retrying}</b>
             </Tag>
             <Tag style={pointerHover}
+                icon={<CheckCircleOutlined />} color="green"
+                onClick={() => { onTagClicked('SUCCESS') }}>
+                <b>Success: {props?.meta?.detail?.success}</b>
+            </Tag>
+            <Tag style={pointerHover}
+                className={props?.meta?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"}
                 icon={<CloseCircleOutlined />} color="error"
                 onClick={() => { onTagClicked('FAILURE') }}>
                 <b>Failure: {props?.meta?.detail?.failure}</b>

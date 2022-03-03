@@ -3,7 +3,7 @@ import React from 'react';
 import { Task, TableProps } from './interface';
 import { Button } from 'antd';
 import { useRouter } from 'next/router';
-import { Tag, Space, Tooltip } from 'antd';
+import { Tag, Space } from 'antd';
 import {
     CheckCircleOutlined,
     SyncOutlined,
@@ -47,10 +47,10 @@ export const TableComponent = (props: TableProps) => {
             render: (total_jobs: number, row: any) => {
                 return (
                     <Space>
+                        <Tag className={row?.detail?.queueing > 0 ? "fade-in-default" : "fade-out"} icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
+                        <Tag className={row?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"} icon={<SyncOutlined spin={row?.detail?.retrying != 0} />} color="geekblue">Running: {row?.detail?.retrying}</Tag>
                         <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
-                        <Tag icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
-                        <Tag icon={<SyncOutlined spin={row?.detail?.retrying != 0} />} color="geekblue">Running: {row?.detail?.retrying}</Tag>
-                        <Tag icon={<CloseCircleOutlined />} color="error">Failure: {row?.detail?.failure}</Tag>
+                        <Tag className={row?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"} icon={<CloseCircleOutlined />} color="error">Failure: {row?.detail?.failure}</Tag>
                         <Tag icon={<StopOutlined />} color="warning">Stopped: {row?.detail?.stopped}</Tag>
                     </Space>
                 )

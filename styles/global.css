@@ -190,3 +190,42 @@ body {
 .text-disabled {
   color: var(--textColorSecondary) !important;
 }
+
+.fade-in-default{
+  animation: pulse-animation-default 2s infinite;
+}
+.fade-in-failure{
+  animation: pulse-animation-failure 1s infinite;
+}
+.fade-in-running{
+  animation: pulse-animation-running 2s infinite;
+}
+.fade-out{
+  transition: all 2s normal;
+  box-shadow: none;
+}
+
+@keyframes pulse-animation-default {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0px -2px 15px 12px rgba(0, 0, 0, 0);
+  }
+}
+@keyframes pulse-animation-failure {
+  0% {
+    box-shadow: 0 0 0 0px rgba(208, 180, 200, 0.9);
+  }
+  100% {
+    box-shadow: 0px -2px 15px 12px rgba(208, 180, 200, 0);
+  }
+}
+@keyframes pulse-animation-running {
+  0% {
+    box-shadow: 0 0 0 0px rgba(173, 198, 255, 0.9);
+  }
+  100% {
+    box-shadow: 0px -2px 15px 12px rgba(173, 198, 255, 0);
+  }
+}

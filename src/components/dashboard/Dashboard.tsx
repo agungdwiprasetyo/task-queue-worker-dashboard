@@ -2,12 +2,10 @@ import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graph
 import { RetryAllJob } from '../task/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip, Row } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
-
-const { Footer } = Layout;
 
 const DashboardComponent = (props: any) => {
     const { data, loading, error } = SubscribeTaskList();
