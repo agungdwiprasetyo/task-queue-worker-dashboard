@@ -11,6 +11,7 @@ export interface TableProps {
     defaultSort: any;
     defaultOrder: any;
     params: ITaskListParam;
+    showJobId: string | null;
     setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
     setJobStatus: Dispatch<SetStateAction<string[]>>;
 }

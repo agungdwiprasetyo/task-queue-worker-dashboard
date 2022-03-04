@@ -19,6 +19,12 @@ const Task = (props: any) => {
     <>
       <Head>
         <title>Detail Task</title>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta
+          name="description"
+          content="Membangun candi kini lebih cepat"
+        />
       </Head>
 
       <TaskComponent {...taskComponentProps} />

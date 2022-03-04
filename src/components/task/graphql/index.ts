@@ -19,7 +19,7 @@ export const RetryJobGraphQL = () => {
     }
 }
 
-export const SubscribeTaskList = (params: ITaskListParam) => {
+export const SubscribeTaskJobList = (params: ITaskListParam) => {
     try {
         if (!params.taskName || params.taskName == "") {
             return {};
@@ -84,14 +84,17 @@ export const RetryAllJob = () => {
 
 export const GetDetailJob = (job_id: string) => {
     try {
-        const { data, loading, error } = useQuery(
+        const { loading, error, data } = useQuery(
             GET_JOB_DETAIL,
-            { variables: { job_id: job_id }, fetchPolicy: "no-cache" },
+            {
+                variables: { job_id: job_id },
+                fetchPolicy: "no-cache",
+            },
         );
         return { data, loading, error };
     }
     catch (error) {
-        console.log(error);
+        return { error };
     }
 }
 

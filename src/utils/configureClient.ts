@@ -109,7 +109,18 @@ const link = process.browser
 export default withApollo(
   ({ initialState }) =>
     new ApolloClient({
+      ssrMode: typeof window === "undefined",
       link: concat(authMiddleware, link),
       cache: new InMemoryCache().restore(initialState || {}),
+      defaultOptions: {
+        watchQuery: {
+          fetchPolicy: 'no-cache',
+          errorPolicy: 'ignore',
+        },
+        query: {
+          fetchPolicy: 'no-cache',
+          errorPolicy: 'all',
+        },
+      }
     })
 );

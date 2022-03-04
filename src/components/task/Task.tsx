@@ -4,7 +4,7 @@ import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout, Input, DatePi
 import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
-import { SubscribeTaskList, StopAllJob, RetryAllJob } from './graphql';
+import { SubscribeTaskJobList, StopAllJob, RetryAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps } from './interface';
 import Meta from './Meta';
@@ -12,21 +12,25 @@ import { GetTagLine } from "../dashboard/graphql";
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import moment from 'moment';
+import { getQueryVariable } from '../../utils/helper';
 
 const { confirm } = Modal;
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
-
+    let task_name = router.query["task_name"];
+    if (!task_name) {
+        task_name = getQueryVariable("task_name") || null;
+    }
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
     const [jobStatus, setJobStatus] = useState<string[]>([]);
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         loading: false,
         page: 1,
         limit: 10,
-        taskName: props.taskName,
+        taskName: task_name as string,
         search: null,
         status: jobStatus,
         startDate: null,
@@ -37,7 +41,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const { stopAllJob } = StopAllJob();
     const { retryAllJob } = RetryAllJob();
     const dataTagline = GetTagLine();
-    const { data, loading, error } = SubscribeTaskList(paramsTaskList);
+    const { data, loading, error } = SubscribeTaskJobList(paramsTaskList);
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -49,8 +53,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
         })
     }
     const meta = data?.listen_task_job_detail?.meta;
-
-
     if (meta?.is_close_session) {
         Modal.error({
             title: 'Session expired, refresh page',
@@ -101,6 +103,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         defaultSort: "desc",
         defaultOrder: "",
         params: paramsTaskList,
+        showJobId: getQueryVariable("job_id"),
     };
 
     const propsModal: ModalProps = {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, Button, Divider, Spin, } from 'antd';
+import { Modal, Button, Divider, Spin, Tooltip, Tag, } from 'antd';
 import { ViewJobDetailProps } from './interface';
 import { GetDetailJob } from './graphql';
 import { Row, Col } from 'antd';
@@ -20,7 +20,7 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
                 content: (
                     <p>{error.message}</p>
                 ),
-                onOk() { },
+                onOk() { destroyModal() },
                 maskClosable: true,
             })
         }
@@ -105,30 +105,39 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
         }
     ]
 
+    const destroyModal = () => {
+        window.history.replaceState(null, '', window.location.href.replace(`&job_id=${props?.param?.job_id}`, ""));
+        props.setParam({ job_id: null, visible: false });
+        Modal.destroyAll();
+    }
+
     return (
 
         <Modal title="Job Detail"
             visible={props?.param?.visible}
-            onOk={() => {
-                props.setParam({ job_id: null, visible: false });
-            }}
-            onCancel={() => {
-                props.setParam({ job_id: null, visible: false })
-            }}
+            onOk={destroyModal}
+            onCancel={destroyModal}
             width={1000}
             footer={[
-                <Button type="primary" onClick={() => {
-                    props.setParam({ job_id: null, visible: false });
-                }}>OK</Button>,
+                <Button type="primary" onClick={destroyModal}>OK</Button>,
             ]}
         >
             {isLoading ? (
                 <Row justify="center"><Spin size="large" tip="Loading..." /></Row>
-            ) : (
+            ) : detailJob?.id ? (
                 <>
                     <Row>
                         <Col span={6}><b>ID</b></Col>
-                        <Col span={18}>{detailJob?.id}</Col>
+                        <Col span={15}>{detailJob?.id}</Col>
+                        <Col span={3}>
+                            <Tooltip title="copy full link url">
+                                <Tag style={{
+                                    cursor: 'pointer'
+                                }} color="geekblue" onClick={() => { navigator.clipboard.writeText(window.location.href) }}>
+                                    copy link url
+                                </Tag>
+                            </Tooltip>
+                        </Col>
                     </Row>
                     <Divider orientation="left" />
                     <Row>
@@ -221,7 +230,11 @@ const ViewJobDetail = (props: ViewJobDetailProps) => {
                             />
                         </Col>
                     </Row>
-                </>)}
+                </>) : (
+                <>
+                    <p>Job not found</p>
+                </>
+            )}
         </Modal>
 
     );

@@ -1,5 +1,5 @@
 import Table, { ColumnProps } from 'antd/lib/table';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Space, Button, Input, Modal, Typography } from 'antd';
 import {
     SyncOutlined,
@@ -25,6 +25,9 @@ const TableComponent = (props: TableProps) => {
     const [searchValue, setSearchValue] = useState<string>(props.params.search);
 
     const showModalJobDetail = (job_id: string) => {
+        if (!window.location.href.includes(`&job_id=${job_id}`)) {
+            window.history.replaceState(null, '', window.location.href + `&job_id=${job_id}`);
+        }
         setModalViewJobDetail({
             visible: true, job_id: job_id
         });
@@ -286,6 +289,12 @@ const TableComponent = (props: TableProps) => {
             endDate: props.params.endDate,
         });
     };
+
+    useEffect(() => {
+        if (props.showJobId && props.showJobId != "") {
+            showModalJobDetail(props.showJobId);
+        }
+    }, []);
 
     return (
         <div>
