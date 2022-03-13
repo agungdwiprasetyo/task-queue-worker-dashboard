@@ -34,20 +34,11 @@ export interface ITaskListParam {
     page: number;
     limit: number;
     taskName: string;
+    jobId: string;
     search: string;
     status: string[];
     startDate: string;
     endDate: string;
-}
-
-export interface ViewJobDetailProps {
-    param: IJobDetailParam;
-    setParam: Dispatch<SetStateAction<IJobDetailParam>>;
-}
-
-export interface IJobDetailParam {
-    job_id: string;
-    visible: boolean;
 }
 
 export interface IJobDetail {

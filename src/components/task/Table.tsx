@@ -1,42 +1,29 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React, { useState, useEffect } from 'react';
-import { Space, Button, Input, Modal, Typography } from 'antd';
+import { Space, Button, Input, Modal, Typography, Tooltip } from 'antd';
 import {
     SyncOutlined,
     StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
-import { TableProps, ViewJobDetailProps, IJobDetailParam } from './interface';
+import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
 import Highlighter from 'react-highlight-words';
 import JSONPretty from 'react-json-pretty';
-import ViewJobDetail from './ViewJobDetail';
 import Moment from 'react-moment';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { useRouter } from 'next/router';
 
 const { Paragraph } = Typography;
 
 const TableComponent = (props: TableProps) => {
+    const router = useRouter();
+
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
     const { deleteJob } = DeleteJobGraphQL();
 
-    const [modalViewJobDetail, setModalViewJobDetail] = useState<IJobDetailParam>(null);
-
     const [searchValue, setSearchValue] = useState<string>(props.params.search);
 
-    const showModalJobDetail = (job_id: string) => {
-        if (!window.location.href.includes(`&job_id=${job_id}`)) {
-            window.history.replaceState(null, '', window.location.href + `&job_id=${job_id}`);
-        }
-        setModalViewJobDetail({
-            visible: true, job_id: job_id
-        });
-    };
-
-    const propsModal: ViewJobDetailProps = {
-        param: modalViewJobDetail,
-        setParam: setModalViewJobDetail,
-    }
 
     const showAlertDeleteJob = (jobId: string) => {
         Modal.confirm({
@@ -57,7 +44,7 @@ const TableComponent = (props: TableProps) => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }}>
                 <Input.Search allowClear
-                    placeholder={`Search ${dataIndex}`}
+                    placeholder={`Find ${dataIndex}`}
                     value={selectedKeys[0]}
                     onChange={e => {
                         setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -69,7 +56,8 @@ const TableComponent = (props: TableProps) => {
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
-                            search: selectedKeys[0],
+                            search: props.params.search,
+                            jobId: selectedKeys[0],
                             status: props.params.status,
                             startDate: props.params.startDate,
                             endDate: props.params.endDate,
@@ -82,7 +70,8 @@ const TableComponent = (props: TableProps) => {
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
-                            search: value,
+                            search: props.params.search,
+                            jobId: value,
                             status: props.params.status,
                             startDate: props.params.startDate,
                             endDate: props.params.endDate,
@@ -97,29 +86,6 @@ const TableComponent = (props: TableProps) => {
             record[dataIndex]
                 ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
                 : '',
-        render: (args: string) => {
-            return (
-                <Paragraph copyable={{ text: args }}>
-                    <pre onClick={() => Modal.info({
-                        title: 'Arguments:',
-                        content: (
-                            <Paragraph copyable={{ text: args }}><JSONPretty id="json-pretty" data={args} /></Paragraph>
-                        ),
-                        onOk() { },
-                        onCancel() { },
-                        maskClosable: true,
-                        width: 1000
-                    })}>
-                        <Highlighter
-                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                            searchWords={[props.params.search]}
-                            autoEscape
-                            textToHighlight={args.length > 100 ? `${args.slice(0, 100)} ...(more)` : args}
-                        />
-                    </pre>
-                </Paragraph>
-            );
-        },
     })
 
     const columns: Array<ColumnProps<any>> = [
@@ -127,11 +93,19 @@ const TableComponent = (props: TableProps) => {
             dataIndex: 'id',
             key: 'id',
             title: 'Job ID',
-            width: 100,
+            width: 130,
+            ...getColumnSearchProps('id'),
             render: (id: string) => {
                 return (
                     <>
-                        <a onClick={() => { showModalJobDetail(id) }}>{id}</a>
+                        <Tooltip title="View job detail">
+                            <a onClick={() => {
+                                router.push({
+                                    pathname: "/job",
+                                    query: { id: id }
+                                })
+                            }}>{id}</a>
+                        </Tooltip>
                     </>
                 )
             }
@@ -141,25 +115,47 @@ const TableComponent = (props: TableProps) => {
             key: 'args',
             title: 'Arguments',
             width: 250,
-            ...getColumnSearchProps('args'),
+            render: (args: string) => {
+                return (
+                    <Paragraph copyable={{ text: args }}>
+                        <pre onClick={() => Modal.info({
+                            title: 'Arguments:',
+                            content: (
+                                <Paragraph copyable={{ text: args }}><JSONPretty id="json-pretty" data={args} /></Paragraph>
+                            ),
+                            onOk() { },
+                            onCancel() { },
+                            maskClosable: true,
+                            width: 1000
+                        })}>
+                            <Highlighter
+                                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                                searchWords={[props.params.search]}
+                                autoEscape
+                                textToHighlight={args.length > 100 ? `${args.slice(0, 100)} ...(more)` : args}
+                            />
+                        </pre>
+                    </Paragraph>
+                );
+            },
         },
         {
             dataIndex: 'retries',
             key: 'retries',
             title: 'Retries',
-            width: 80,
+            width: 70,
         },
         {
             dataIndex: 'max_retry',
             key: 'max_retry',
             title: 'Max Retry',
-            width: 80,
+            width: 70,
         },
         {
             dataIndex: 'created_at',
             key: 'created_at',
             title: 'Created At',
-            width: 150,
+            width: 120,
             render: (date: string) => {
                 return (
                     <>
@@ -177,7 +173,7 @@ const TableComponent = (props: TableProps) => {
             render: (error: string) => {
                 if (!error) { return "" };
                 return (
-                    <Paragraph copyable={{ text: error }}>
+                    <Paragraph>
                         <pre onClick={() => Modal.info({
                             title: 'Error:',
                             content: (
@@ -243,7 +239,7 @@ const TableComponent = (props: TableProps) => {
                                 }}>Retry<span>&nbsp;&nbsp;</span></Button>
 
                         }
-                        <Button danger type="primary" size="small"
+                        <Button danger size="small"
                             disabled={status == "QUEUEING" || status == "RETRYING"}
                             icon={<DeleteOutlined />}
                             onClick={() => {
@@ -285,16 +281,11 @@ const TableComponent = (props: TableProps) => {
             taskName: props.params.taskName,
             search: props.params.search ? props.params.search : searchValue,
             status: statusList,
+            jobId: props.params.jobId,
             startDate: props.params.startDate,
             endDate: props.params.endDate,
         });
     };
-
-    useEffect(() => {
-        if (props.showJobId && props.showJobId != "") {
-            showModalJobDetail(props.showJobId);
-        }
-    }, []);
 
     return (
         <div>
@@ -309,7 +300,6 @@ const TableComponent = (props: TableProps) => {
                 }}
                 scroll={{ x: 560 }}
             />
-            <ViewJobDetail {...propsModal} />
         </div>
     );
 };

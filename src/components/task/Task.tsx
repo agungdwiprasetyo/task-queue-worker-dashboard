@@ -31,6 +31,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         page: 1,
         limit: 10,
         taskName: task_name as string,
+        jobId: null,
         search: null,
         status: jobStatus,
         startDate: null,
@@ -40,7 +41,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
     const { retryAllJob } = RetryAllJob();
-    const dataTagline = GetTagLine();
     const { data, loading, error } = SubscribeTaskJobList(paramsTaskList);
     if (error) {
         Modal.error({
@@ -52,7 +52,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
             maskClosable: true,
         })
     }
-    const meta = data?.listen_task_job_detail?.meta;
+    const meta = data?.listen_task_job_list?.meta;
     if (meta?.is_close_session) {
         Modal.error({
             title: 'Session expired, refresh page',
@@ -95,7 +95,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     }
 
     const propsTable: TableProps = {
-        data: data?.listen_task_job_detail?.data,
+        data: data?.listen_task_job_list?.data,
         meta: meta,
         setLoadData: setParamsTaskList,
         setJobStatus: setJobStatus,
@@ -112,16 +112,13 @@ const TaskComponent = (props: ITaskComponentProps) => {
         setVisible: setModalAddJobVisible,
     }
 
-    const propsFooter: IFooterComponentProps = {
-        serverStartedAt: dataTagline?.tagline?.start_at,
-        version: dataTagline?.tagline?.version,
-        buildNumber: dataTagline?.tagline?.build_number,
-    }
+    const propsFooter: IFooterComponentProps = null;
 
     const [form] = Form.useForm();
     const onApplyFilter = () => {
         form.validateFields().then(values => {
             let startDate, endDate: string;
+            console.log(values.status);
             if (values?.dateRange?.length == 2) {
                 startDate = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
                 endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
@@ -132,7 +129,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
                 limit: paramsTaskList.limit,
                 taskName: paramsTaskList.taskName,
                 search: values?.search,
-                status: values?.status ? [values?.status] : [],
+                jobId: null,
+                status: values?.status ? values?.status : [],
                 startDate: startDate,
                 endDate: endDate
             })
@@ -228,10 +226,11 @@ const TaskComponent = (props: ITaskComponentProps) => {
                         <Form
                             form={form} layout="inline" name="formFilterJob">
                             <Form.Item name="search" label="Search:">
-                                <Input allowClear placeholder="Search args..." />
+                                <Input.Search allowClear placeholder="Search args..." onSearch={onApplyFilter} />
                             </Form.Item>
                             <Form.Item name="status" label="Status:">
-                                <Select
+                                <Select style={{ minWidth: 200, maxWidth: 200 }}
+                                    mode="multiple"
                                     allowClear
                                     placeholder="Select status"
                                 >

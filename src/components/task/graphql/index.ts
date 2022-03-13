@@ -1,11 +1,10 @@
 import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
-import LISTEN_JOB_TASK from './graphql_listen_task';
+import LISTEN_JOB_LIST from './graphql_listen_job_list';
 import RETRY_JOB from './graphql_retry_job';
 import STOP_JOB from './graphql_stop_job';
 import ADD_JOB from './graphql_add_job';
 import STOP_ALL_JOB from './graphql_stop_all';
 import RETRY_ALL_JOB from './graphql_retry_all_job';
-import GET_JOB_DETAIL from './graphql_get_job_detail';
 import { ITaskListParam } from '../interface';
 import DELETE_JOB from 'src/components/task/graphql/graphql_delete_job';
 
@@ -24,15 +23,16 @@ export const SubscribeTaskJobList = (params: ITaskListParam) => {
         if (!params.taskName || params.taskName == "") {
             return {};
         }
-        const { data, loading, error } = useSubscription(LISTEN_JOB_TASK, {
+        const { data, loading, error } = useSubscription(LISTEN_JOB_LIST, {
             variables: {
-                "taskName": params.taskName,
+                "task_name": params.taskName,
                 "page": params.page,
                 "limit": params.limit,
                 "search": params.search,
                 "status": params.status,
-                "startDate": params.startDate,
-                "endDate": params.endDate,
+                "start_date": params.startDate,
+                "end_date": params.endDate,
+                "job_id": params.jobId,
             }
         });
         return { data, loading, error };
@@ -79,22 +79,6 @@ export const RetryAllJob = () => {
     }
     catch (error) {
         console.log(error);
-    }
-}
-
-export const GetDetailJob = (job_id: string) => {
-    try {
-        const { loading, error, data } = useQuery(
-            GET_JOB_DETAIL,
-            {
-                variables: { job_id: job_id },
-                fetchPolicy: "no-cache",
-            },
-        );
-        return { data, loading, error };
-    }
-    catch (error) {
-        return { error };
     }
 }
 

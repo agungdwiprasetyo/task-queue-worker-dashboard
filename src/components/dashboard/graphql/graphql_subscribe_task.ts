@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 const SUBSCRIBE_TASK = gql`
 subscription {
-  listen_task {
+  listen_task_dashboard {
     meta {
       page limit total_pages total_records is_close_session
       total_client_subscriber

@@ -38,6 +38,7 @@ const getHost = (isWebsocket: boolean) => {
   }
   let host = window.location.host;
   let path = window.location.pathname.replace("/task", "");
+  path = path.replace("/job", "");
   if (path == "/") path = "";
   return `${protocol}//${host}${path}`;
 }
@@ -95,16 +96,14 @@ export const destroyToken = async () => {
   }
 };
 
-const link = process.browser
-  ? split(
-    ({ query }) => {
-      const { kind, operation }: Definintion = getMainDefinition(query);
-      return kind === 'OperationDefinition' && operation === 'subscription';
-    },
-    webSocketLink,
-    httpLink
-  )
-  : httpLink;
+const link = process.browser ? split(
+  ({ query }) => {
+    const { kind, operation }: Definintion = getMainDefinition(query);
+    return kind === 'OperationDefinition' && operation === 'subscription';
+  },
+  webSocketLink,
+  httpLink
+) : httpLink;
 
 export default withApollo(
   ({ initialState }) =>

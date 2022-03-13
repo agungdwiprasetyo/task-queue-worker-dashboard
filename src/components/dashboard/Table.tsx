@@ -47,11 +47,11 @@ export const TableComponent = (props: TableProps) => {
             render: (total_jobs: number, row: any) => {
                 return (
                     <Space>
-                        <Tag className={row?.detail?.queueing > 0 ? "fade-in-default" : "fade-out"} icon={<ClockCircleOutlined />} color="default">Queueing: {row?.detail?.queueing}</Tag>
-                        <Tag className={row?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"} icon={<SyncOutlined spin={row?.detail?.retrying != 0} />} color="geekblue">Running: {row?.detail?.retrying}</Tag>
-                        <Tag icon={<CheckCircleOutlined />} color="green">Success: {row?.detail?.success}</Tag>
-                        <Tag className={row?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"} icon={<CloseCircleOutlined />} color="error">Failure: {row?.detail?.failure}</Tag>
-                        <Tag icon={<StopOutlined />} color="warning">Stopped: {row?.detail?.stopped}</Tag>
+                        <Tag className={row?.detail?.queueing > 0 ? "fade-in-default" : "fade-out"} icon={<ClockCircleOutlined />} color="default">Queueing: <b>{row?.detail?.queueing}</b></Tag>
+                        <Tag className={row?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"} icon={<SyncOutlined spin={row?.detail?.retrying != 0} />} color="geekblue">Running: <b>{row?.detail?.retrying}</b></Tag>
+                        <Tag icon={<CheckCircleOutlined />} color="green">Success: <b>{row?.detail?.success}</b></Tag>
+                        <Tag className={row?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"} icon={<CloseCircleOutlined />} color="error">Failure: <b>{row?.detail?.failure}</b></Tag>
+                        <Tag icon={<StopOutlined />} color="warning">Stopped: <b>{row?.detail?.stopped}</b></Tag>
                     </Space>
                 )
             },

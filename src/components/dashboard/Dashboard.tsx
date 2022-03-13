@@ -22,7 +22,7 @@ const DashboardComponent = (props: any) => {
     const { retryAllJob } = RetryAllJob();
     const { clearClient } = ClearAllClientSubscriber();
 
-    const dataTagline = GetTagLine();
+    const dataTagline = GetTagLine({ pollInterval: 20000 });
     const memStats = dataTagline?.tagline?.memory_statistics;
 
     const content = {
@@ -35,7 +35,7 @@ const DashboardComponent = (props: any) => {
         console.log(params)
     }
 
-    const meta = data?.listen_task?.meta;
+    const meta = data?.listen_task_dashboard?.meta;
     if (meta?.is_close_session) {
         Modal.error({
             title: 'Session expired, refresh page',
@@ -50,7 +50,7 @@ const DashboardComponent = (props: any) => {
     }
 
     const propsTable: TableProps = {
-        data: data?.listen_task?.data,
+        data: data?.listen_task_dashboard?.data,
         retryAllJob: retryAllJob,
         loading: loading,
         defaultOrder: "",
@@ -73,7 +73,7 @@ const DashboardComponent = (props: any) => {
                         <pre>{dataTagline?.tagline?.tagline}</pre>
                         <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
                         <pre>
-                            <Space>Total Client Subscriber:<b>{data?.listen_task?.meta?.total_client_subscriber}</b>
+                            <Space>Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
                                 <Tooltip title="close all client subscriber session"><Tag style={{
                                     cursor: 'pointer'
                                 }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>

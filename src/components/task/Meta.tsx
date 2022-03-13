@@ -22,8 +22,9 @@ const Meta = (props: MetaProps) => {
             page: props.params.page,
             limit: props.params.limit,
             taskName: props.params.taskName,
-            search: null,
+            search: props.params.search,
             status: status ? [status] : [],
+            jobId: props.params.jobId,
             startDate: props.params.startDate,
             endDate: props.params.endDate
         });

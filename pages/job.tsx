@@ -1,23 +1,23 @@
 import React from 'react';
 import { withAuthSync } from '../src/utils/auth';
-import TaskComponent from '../src/components/task/Task';
-import { ITaskComponentProps } from '../src/components/task/interface';
+import JobComponent from '../src/components/job/Job';
+import { IJobComponentProps } from '../src/components/job/interface';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-const Task = (props: any) => {
+const Job = (props: any) => {
 
   const router = useRouter();
-  const { task_name } = router.query;
+  const { id } = router.query;
 
-  const taskComponentProps: ITaskComponentProps = {
-    taskName: task_name as string,
+  const taskComponentProps: IJobComponentProps = {
+    id: id as string,
   }
 
   return (
     <>
       <Head>
-        <title>Detail Task</title>
+        <title>Detail Job</title>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ffffff" />
         <meta
@@ -26,9 +26,9 @@ const Task = (props: any) => {
         />
       </Head>
 
-      <TaskComponent {...taskComponentProps} />
+      <JobComponent {...taskComponentProps} />
     </>
   );
 };
 
-export default withAuthSync(Task);
+export default withAuthSync(Job);

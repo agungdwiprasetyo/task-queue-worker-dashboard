@@ -24,9 +24,9 @@ export const SubscribeTaskList = () => {
 	}
 };
 
-export const GetTagLine = () => {
+export const GetTagLine = (opts: any) => {
 	try {
-		const { data } = useQuery(TAGLINE);
+		const { data } = useQuery(TAGLINE, { ...opts });
 		return data;
 	}
 	catch (error) {
