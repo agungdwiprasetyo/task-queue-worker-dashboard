@@ -225,7 +225,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                         <Form
                             form={form} layout="inline" name="formFilterJob">
                             <Form.Item name="search" label="Search:">
-                                <Input.Search allowClear placeholder="Search args..." onSearch={onApplyFilter} />
+                                <Input.Search allowClear placeholder="Search args/error..." onSearch={onApplyFilter} />
                             </Form.Item>
                             <Form.Item name="status" label="Status:">
                                 <Select

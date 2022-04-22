@@ -120,7 +120,9 @@ const TableComponent = (props: TableProps) => {
                         <pre onClick={() => Modal.info({
                             title: 'Arguments:',
                             content: (
-                                <Paragraph copyable={{ text: args }}><JSONPretty id="json-pretty" data={args} /></Paragraph>
+                                <Paragraph copyable={{ text: args }}>
+                                    <JSONPretty id="json-pretty" data={args} />
+                                </Paragraph>
                             ),
                             onOk() { },
                             onCancel() { },
@@ -176,11 +178,27 @@ const TableComponent = (props: TableProps) => {
                         <pre onClick={() => Modal.info({
                             title: 'Error:',
                             content: (
-                                <Paragraph copyable={{ text: error }}><JSONPretty id="json-pretty" data={error} /></Paragraph>
+                                <Paragraph copyable={{ text: error }}>
+                                    <pre>
+                                        <Highlighter
+                                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                                            searchWords={[props.params.search]}
+                                            autoEscape
+                                            textToHighlight={error}
+                                        />
+                                    </pre>
+                                </Paragraph>
                             ),
                             onOk() { },
                             maskClosable: true,
-                        })}>{error.length > 30 ? `${error.slice(0, 30)} ...(more)` : error}</pre>
+                        })}>
+                            <Highlighter
+                                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                                searchWords={[props.params.search]}
+                                autoEscape
+                                textToHighlight={error.length > 70 ? `${error.slice(0, 70)} ...(more)` : error}
+                            />
+                        </pre>
                     </Paragraph>
                 );
             }
