@@ -13,7 +13,13 @@ const ModalAddJob = (props: ModalProps) => {
         props.setVisible(false);
     };
     const onCreate = (values: any) => {
-        addJob({ variables: { taskName: props.taskName, maxRetry: values?.max_retry, args: values?.args } });
+        addJob({
+            variables: {
+                param: {
+                    task_name: props.taskName, max_retry: values?.max_retry, args: values?.args
+                }
+            }
+        });
         props.setVisible(false);
     }
 

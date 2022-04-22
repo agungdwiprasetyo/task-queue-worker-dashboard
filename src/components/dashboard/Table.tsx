@@ -1,24 +1,65 @@
 import Table, { ColumnProps } from 'antd/lib/table';
-import React from 'react';
+import React, { useState } from 'react';
 import { Task, TableProps } from './interface';
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 import { useRouter } from 'next/router';
 import { Tag, Space } from 'antd';
+import Highlighter from 'react-highlight-words';
 import {
     CheckCircleOutlined,
     SyncOutlined,
     CloseCircleOutlined,
     ClockCircleOutlined,
-    StopOutlined
+    StopOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
+
+
+    const [state, setState] = useState("");
+
+    const getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }}>
+                <Input.Search allowClear
+                    placeholder={`Search Task Name`}
+                    value={selectedKeys[0]}
+                    onChange={e => { setSelectedKeys(e.target.value ? [e.target.value] : []); }}
+                    onSearch={value => {
+                        if (value) {
+                            confirm();
+                            setState(selectedKeys[0]);
+                        } else {
+                            clearFilters();
+                            setState("");
+                        }
+                    }}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+            </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        onFilter: (value, record) =>
+            record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
+        render: text =>
+            <Highlighter
+                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                searchWords={[state]}
+                autoEscape
+                textToHighlight={text ? text.toString() : ''}
+            />
+    })
+
     const columns: Array<ColumnProps<Task>> = [
         {
             dataIndex: 'name',
             key: 'name',
             title: 'Task Name',
+            ...getColumnSearchProps('name'),
         },
         {
             dataIndex: 'module_name',
@@ -106,7 +147,11 @@ export const TableComponent = (props: TableProps) => {
                 loading={props.loading}
                 onChange={handleOnChange}
                 scroll={{ x: 560 }}
-                pagination={false}
+                pagination={{
+                    defaultPageSize: 7,
+                    hideOnSinglePage: true,
+                    showTotal: (n) => { return (<>Total <b>{n}</b> tasks</>); }
+                }}
             />
         </div>
     );

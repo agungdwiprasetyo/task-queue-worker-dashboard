@@ -71,7 +71,7 @@ const JobComponent = (props: IJobComponentProps) => {
             render: (text: string, row: any) => {
                 const start = new Date(row?.start_at).getTime();
                 const end = new Date(row?.end_at).getTime();
-                return `${(end - start) / 1000} s`;
+                return `${(end - start) / 1000} s`.replace(".", ",");
             },
         },
         {
@@ -161,7 +161,6 @@ const JobComponent = (props: IJobComponentProps) => {
                                                 }}>STOP<span>&nbsp;&nbsp;</span></Button>
                                                 :
                                                 <Button icon={<SyncOutlined />} type="primary" size="middle" onClick={() => {
-                                                    console.log("retry hahah")
                                                     retryJob({ variables: { jobId: detailJob?.id } });
                                                 }}>RETRY<span>&nbsp;</span></Button>
 
@@ -288,7 +287,7 @@ const JobComponent = (props: IJobComponentProps) => {
                                     <Table
                                         columns={columns}
                                         dataSource={detailJob?.retry_histories}
-                                        pagination={{ defaultPageSize: 10, hideOnSinglePage: true }}
+                                        pagination={{ defaultPageSize: 10, showTotal: (n) => { return (<>Total <b>{n}</b> histories</>); } }}
                                     />
                                 </Col>
                             </Row>

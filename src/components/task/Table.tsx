@@ -24,7 +24,6 @@ const TableComponent = (props: TableProps) => {
 
     const [searchValue, setSearchValue] = useState<string>(props.params.search);
 
-
     const showAlertDeleteJob = (jobId: string) => {
         Modal.confirm({
             title: `Are you sure to delete this job?`,
@@ -117,7 +116,7 @@ const TableComponent = (props: TableProps) => {
             width: 250,
             render: (args: string) => {
                 return (
-                    <Paragraph copyable={{ text: args }}>
+                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: args }}>
                         <pre onClick={() => Modal.info({
                             title: 'Arguments:',
                             content: (

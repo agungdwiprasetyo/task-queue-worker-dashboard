@@ -8,7 +8,6 @@ import { SubscribeTaskJobList, StopAllJob, RetryAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps } from './interface';
 import Meta from './Meta';
-import { GetTagLine } from "../dashboard/graphql";
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import moment from 'moment';
@@ -229,7 +228,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                 <Input.Search allowClear placeholder="Search args..." onSearch={onApplyFilter} />
                             </Form.Item>
                             <Form.Item name="status" label="Status:">
-                                <Select style={{ minWidth: 200, maxWidth: 200 }}
+                                <Select
+                                    style={{ minWidth: 150, maxWidth: 100 }}
                                     mode="multiple"
                                     allowClear
                                     placeholder="Select status"
@@ -248,6 +248,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                         defaultValue: [moment().startOf('day'), moment().endOf('day')],
                                     }}
                                     format="YYYY-MM-DDTHH:mm:ssZ"
+                                    style={{ minWidth: 300, maxWidth: 300 }}
                                 />
                             </Form.Item>
                             <Form.Item>

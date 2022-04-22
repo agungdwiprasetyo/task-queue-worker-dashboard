@@ -6,8 +6,8 @@ import CLEAR_CLIENT_SUBSCRIBERS from './clear_all_client_subscriber';
 
 export const CleanJobGraphQL = () => {
 	try {
-		const [cleanJob, { }] = useMutation(CLEAN_JOB);
-		return { cleanJob };
+		const [cleanJob, { loading, error }] = useMutation(CLEAN_JOB);
+		return { cleanJob, loading, error };
 	}
 	catch (error) {
 		console.log(error);

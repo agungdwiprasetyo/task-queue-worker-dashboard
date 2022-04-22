@@ -10,8 +10,8 @@ import DELETE_JOB from 'src/components/task/graphql/graphql_delete_job';
 
 export const RetryJobGraphQL = () => {
     try {
-        const [retryJob, { }] = useMutation(RETRY_JOB);
-        return { retryJob };
+        const [retryJob, { loading, error }] = useMutation(RETRY_JOB);
+        return { retryJob, loading, error };
     }
     catch (error) {
         console.log(error);
@@ -44,8 +44,8 @@ export const SubscribeTaskJobList = (params: ITaskListParam) => {
 
 export const StopJobGraphQL = () => {
     try {
-        const [stopJob, { }] = useMutation(STOP_JOB);
-        return { stopJob };
+        const [stopJob, { loading, error }] = useMutation(STOP_JOB);
+        return { stopJob, loading, error };
     }
     catch (error) {
         console.log(error);
@@ -54,7 +54,7 @@ export const StopJobGraphQL = () => {
 
 export const AddJob = () => {
     try {
-        const [addJob, { }] = useMutation(ADD_JOB);
+        const [addJob, { loading, error }] = useMutation(ADD_JOB);
         return { addJob };
     }
     catch (error) {
@@ -64,8 +64,8 @@ export const AddJob = () => {
 
 export const StopAllJob = () => {
     try {
-        const [stopAllJob, { }] = useMutation(STOP_ALL_JOB);
-        return { stopAllJob };
+        const [stopAllJob, { loading, error }] = useMutation(STOP_ALL_JOB);
+        return { stopAllJob, loading, error };
     }
     catch (error) {
         console.log(error);
@@ -74,8 +74,8 @@ export const StopAllJob = () => {
 
 export const RetryAllJob = () => {
     try {
-        const [retryAllJob, { }] = useMutation(RETRY_ALL_JOB);
-        return { retryAllJob };
+        const [retryAllJob, { loading, error }] = useMutation(RETRY_ALL_JOB);
+        return { retryAllJob, loading, error };
     }
     catch (error) {
         console.log(error);
@@ -84,8 +84,8 @@ export const RetryAllJob = () => {
 
 export const DeleteJobGraphQL = () => {
     try {
-        const [deleteJob, { }] = useMutation(DELETE_JOB);
-        return { deleteJob };
+        const [deleteJob, { loading, error }] = useMutation(DELETE_JOB);
+        return { deleteJob, loading, error };
     }
     catch (error) {
         console.log(error);
