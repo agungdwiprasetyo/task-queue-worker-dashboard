@@ -1,12 +1,15 @@
 import { Dispatch, SetStateAction } from 'react';
+import { FilterPagination } from '../../utils/helper';
 
 export interface Task {
     name: string
     total_jobs: string
 }
 
-export interface TableProps {
+export interface TableProps extends FilterPagination {
     retryAllJob: any;
+    cleanJob: any;
+    stopAllJob: any;
     loading: boolean;
     data: any;
     defaultSort: any;

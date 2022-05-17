@@ -1,8 +1,12 @@
 import gql from 'graphql-tag';
 
 const SUBSCRIBE_TASK = gql`
-subscription {
-  listen_task_dashboard {
+subscription ($page: Int!, $limit: Int!, $search: String) {
+  listen_task_dashboard (
+    page: $page, 
+    limit: $limit, 
+    search: $search
+  ) {
     meta {
       page limit total_pages total_records is_close_session
       total_client_subscriber

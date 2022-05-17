@@ -1,14 +1,16 @@
 import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graphql';
-import { RetryAllJob } from '../task/graphql';
+import { StopAllJob, RetryAllJob } from '../task/graphql';
+import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
 import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
+import { getQueryVariable } from '../../utils/helper';
 
 const DashboardComponent = (props: any) => {
-    const { data, loading, error } = SubscribeTaskList();
+    const { data, loading, error } = SubscribeTaskList(1, 10, null);
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -20,7 +22,13 @@ const DashboardComponent = (props: any) => {
         })
     }
     const { retryAllJob } = RetryAllJob();
+    const { cleanJob } = CleanJobGraphQL();
+    const { stopAllJob } = StopAllJob();
     const { clearClient } = ClearAllClientSubscriber();
+
+    const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
+    const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
+    const search = getQueryVariable("search") || "";
 
     const dataTagline = GetTagLine({ pollInterval: 20000 });
     const memStats = dataTagline?.tagline?.memory_statistics;
@@ -32,7 +40,7 @@ const DashboardComponent = (props: any) => {
     };
 
     const loadData = (params: any) => {
-        console.log(params)
+        // console.log(params)
     }
 
     const meta = data?.listen_task_dashboard?.meta;
@@ -51,11 +59,16 @@ const DashboardComponent = (props: any) => {
 
     const propsTable: TableProps = {
         data: data?.listen_task_dashboard?.data,
-        retryAllJob: retryAllJob,
         loading: loading,
         defaultOrder: "",
         defaultSort: "desc",
+        retryAllJob: retryAllJob,
+        cleanJob: cleanJob,
+        stopAllJob: stopAllJob,
         loadData: loadData,
+        page: page,
+        limit: limit,
+        search: search
     };
 
     const propsFooter: IFooterComponentProps = {
@@ -73,7 +86,8 @@ const DashboardComponent = (props: any) => {
                         <pre>{dataTagline?.tagline?.tagline}</pre>
                         <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
                         <pre>
-                            <Space>Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
+                            <Space>
+                                Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
                                 <Tooltip title="close all client subscriber session"><Tag style={{
                                     cursor: 'pointer'
                                 }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>

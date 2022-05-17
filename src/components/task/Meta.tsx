@@ -17,9 +17,9 @@ const Meta = (props: MetaProps) => {
 
     const onTagClicked = (status: string) => {
         props.setJobStatus(status ? [status] : [])
-        props.setLoadData({
+        props.setParam({
             loading: props.params.loading,
-            page: props.params.page,
+            page: 1,
             limit: props.params.limit,
             taskName: props.params.taskName,
             search: props.params.search,
@@ -27,7 +27,7 @@ const Meta = (props: MetaProps) => {
             jobId: props.params.jobId,
             startDate: props.params.startDate,
             endDate: props.params.endDate
-        });
+        })
     }
 
     return (
@@ -45,7 +45,7 @@ const Meta = (props: MetaProps) => {
             </Tag>
             <Tag style={pointerHover}
                 className={props?.meta?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"}
-                icon={<SyncOutlined spin={props?.meta?.detail?.retrying != 0} />}
+                icon={<SyncOutlined spin={props?.meta?.detail?.retrying != undefined && props?.meta?.detail?.retrying !== 0} />}
                 color="geekblue" onClick={() => { onTagClicked('RETRYING') }}>
                 <b>Running: {props?.meta?.detail?.retrying}</b>
             </Tag>

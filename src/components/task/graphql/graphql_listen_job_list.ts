@@ -8,13 +8,13 @@ subscription ($task_name: String!, $page: Int!, $limit: Int!, $search: String, $
         page: $page, 
         limit: $limit, 
         search: $search, 
-        status: $status, 
+        statuses: $status, 
         start_date: $start_date, 
         end_date: $end_date,
         job_id: $job_id
     ) {
         meta {
-            page limit total_pages total_records is_close_session detail {
+            page limit total_pages total_records is_close_session is_loading detail {
                 failure retrying success queueing stopped
             }
         }

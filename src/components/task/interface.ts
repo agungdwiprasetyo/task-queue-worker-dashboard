@@ -14,6 +14,7 @@ export interface TableProps {
     showJobId: string | null;
     setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
     setJobStatus: Dispatch<SetStateAction<string[]>>;
+    setParam?: any;
 }
 
 export interface ModalProps {
@@ -27,6 +28,7 @@ export interface MetaProps {
     meta: any;
     setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
     setJobStatus: Dispatch<SetStateAction<string[]>>;
+    setParam?: any;
 }
 
 export interface ITaskListParam {

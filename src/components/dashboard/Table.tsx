@@ -1,7 +1,7 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React, { useState } from 'react';
 import { Task, TableProps } from './interface';
-import { Button, Input } from 'antd';
+import { Button, Col, Dropdown, Input, Menu, Modal, Row, Tooltip } from 'antd';
 import { useRouter } from 'next/router';
 import { Tag, Space } from 'antd';
 import Highlighter from 'react-highlight-words';
@@ -11,55 +11,89 @@ import {
     CloseCircleOutlined,
     ClockCircleOutlined,
     StopOutlined,
-    SearchOutlined
+    ClearOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
+import { FilterPagination } from '../../utils/helper';
+
+const { confirm } = Modal;
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
 
+    let searchFilterValue = [];
+    if (props.search != "") {
+        searchFilterValue = [props.search]
+    }
+    const [filterValueState, setFilterValueState] = useState(searchFilterValue);
+    const [searchState, setSearchState] = useState(searchFilterValue.length > 0);
+    const [filterPagination, setFlterPagination] = useState<FilterPagination>({
+        page: props.page, limit: props.limit, search: props.search,
+    });
 
-    const [state, setState] = useState("");
+    const showAlertConfirm = (title: string, taskName: string, action: string) => {
+        confirm({
+            title: title,
+            icon: <ExclamationCircleOutlined />,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                if (action === "CLEAN") {
+                    props.cleanJob({ variables: { taskName: taskName } });
+                } else if (action === "STOP") {
+                    props.stopAllJob({ variables: { taskName: taskName } });
+                }
+            },
+            onCancel() {
+            },
+        });
+    }
 
-    const getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
-                <Input.Search allowClear
-                    placeholder={`Search Task Name`}
-                    value={selectedKeys[0]}
-                    onChange={e => { setSelectedKeys(e.target.value ? [e.target.value] : []); }}
-                    onSearch={value => {
-                        if (value) {
-                            confirm();
-                            setState(selectedKeys[0]);
-                        } else {
-                            clearFilters();
-                            setState("");
-                        }
-                    }}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
-                />
-            </div>
-        ),
-        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    const filterColumnProps = dataIndex => ({
         onFilter: (value, record) =>
-            record[dataIndex]
-                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-                : '',
+            searchState ? record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : ''
+                : record[dataIndex] ? record[dataIndex] == value : '',
         render: text =>
             <Highlighter
                 highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[state]}
+                searchWords={filterValueState}
                 autoEscape
                 textToHighlight={text ? text.toString() : ''}
             />
     })
+
+    const getFilterValues = (source) => {
+        let res = [];
+        source?.forEach(el => {
+            res.push({
+                text: el.name,
+                value: el.name,
+            })
+        });
+        return res;
+    }
+
+    const changeFilterPagination = (filter: FilterPagination) => {
+        setFlterPagination(filter)
+
+        router.push({
+            pathname: "",
+            query: { page: filter.page, limit: filter.limit, search: encodeURIComponent(filter.search) }
+        },
+            undefined,
+            { shallow: true }
+        )
+    }
 
     const columns: Array<ColumnProps<Task>> = [
         {
             dataIndex: 'name',
             key: 'name',
             title: 'Task Name',
-            ...getColumnSearchProps('name'),
+            filteredValue: filterValueState,
+            filters: getFilterValues(props.data),
+            ...filterColumnProps('name'),
         },
         {
             dataIndex: 'module_name',
@@ -104,12 +138,49 @@ export const TableComponent = (props: TableProps) => {
             render: (name: string) => {
                 return (
                     <Space>
-                        <Button type="primary" size="large" onClick={() => {
+                        <Dropdown.Button type="primary" size="large" onClick={() => {
                             router.push({
                                 pathname: "/task",
                                 query: { task_name: name }
                             })
-                        }}>View Jobs</Button>
+                        }} overlay={(
+                            <Menu>
+                                <Menu.Item>
+                                    <Tooltip title="Retry all failure and stopped job" placement="left">
+                                        <Button icon={<SyncOutlined />} size="middle"
+                                            onClick={() => {
+                                                props.retryAllJob({ variables: { taskName: name } });
+                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Menu.Item>
+                                <Menu.Item>
+                                    <Tooltip title="Stop all running and queued job" placement="left">
+                                        <Button icon={<StopOutlined />} danger size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    `Are you sure stop all running and queued job in task "${name}"?`,
+                                                    name,
+                                                    "STOP"
+                                                );
+                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Menu.Item>
+                                <Menu.Item>
+                                    <Tooltip title="Clear all success, failure, and stopped job" placement="left">
+                                        <Button icon={<ClearOutlined />} danger size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
+                                                    name,
+                                                    "CLEAN"
+                                                );
+                                            }}>Clear Job</Button>
+                                    </Tooltip>
+                                </Menu.Item>
+                            </Menu>
+                        )}>
+                            View Jobs
+                        </Dropdown.Button>
                     </Space>
                 )
             },
@@ -119,6 +190,19 @@ export const TableComponent = (props: TableProps) => {
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {
         const { current, pageSize } = pagination;
         const { field, order } = sorter;
+
+        if (filters?.name != null && filters?.name != "") {
+            if (!searchState) {
+                setSearchState(false)
+                setFilterValueState(filters?.name)
+            }
+        } else {
+            setFilterValueState([])
+        }
+
+        changeFilterPagination({
+            page: current, limit: pageSize, search: filterPagination.search
+        })
 
         let orderBy: string = '';
         const sortBy: string = field || props.defaultSort;
@@ -140,20 +224,51 @@ export const TableComponent = (props: TableProps) => {
     };
 
     return (
-        <div className="ic-table">
-            <Table
-                columns={columns}
-                dataSource={props.data}
-                loading={props.loading}
-                onChange={handleOnChange}
-                scroll={{ x: 560 }}
-                pagination={{
-                    defaultPageSize: 7,
-                    hideOnSinglePage: true,
-                    showTotal: (n) => { return (<>Total <b>{n}</b> tasks</>); }
-                }}
-            />
-        </div>
+        <>
+            <Row justify="end">
+                <Input.Search allowClear
+                    placeholder={`Search Task...`}
+                    defaultValue={filterPagination.search}
+                    onSearch={value => {
+                        if (value != "") {
+                            setSearchState(true)
+                            setFilterValueState([value])
+                        } else {
+                            setSearchState(false)
+                            setFilterValueState([])
+                        }
+                        changeFilterPagination({
+                            page: filterPagination.page,
+                            limit: filterPagination.limit,
+                            search: value
+                        })
+                    }}
+                    style={{ width: 250, marginBottom: 8, display: 'block' }}
+                />
+            </Row>
+            <Row>
+                <Col span={24}>
+                    <div className="ic-table">
+                        <Table
+                            columns={columns}
+                            dataSource={props.data}
+                            loading={props.loading}
+                            onChange={handleOnChange}
+                            scroll={{ x: 560 }}
+                            pagination={{
+                                defaultCurrent: filterPagination.page,
+                                defaultPageSize: filterPagination.limit,
+                                pageSizeOptions: ['7', '14', '28', '56'],
+                                showSizeChanger: true,
+                                showTotal: (total, range) => {
+                                    return (<h4>{range[0]}-{range[1]} of <b>{total}</b> tasks</h4>)
+                                }
+                            }}
+                        />
+                    </div>
+                </Col>
+            </Row>
+        </>
     );
 };
 

@@ -19,22 +19,26 @@ const { Content } = Layout;
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
-    let task_name = router.query["task_name"];
-    if (!task_name) {
-        task_name = getQueryVariable("task_name") || null;
-    }
+
+    const task_name = getQueryVariable("task_name");
+    const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
+    const search = getQueryVariable("search") || null;
+    const statuses = getQueryVariable("statuses") != "" ? getQueryVariable("statuses").split(",") : [];
+    const start_date = getQueryVariable("start_date") || "";
+    const end_date = getQueryVariable("end_date") || "";
+
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
-    const [jobStatus, setJobStatus] = useState<string[]>([]);
+    const [jobStatus, setJobStatus] = useState<string[]>(statuses);
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         loading: false,
-        page: 1,
+        page: page,
         limit: 10,
-        taskName: task_name as string,
+        taskName: task_name,
         jobId: null,
-        search: null,
+        search: search,
         status: jobStatus,
-        startDate: null,
-        endDate: null
+        startDate: start_date != "" ? start_date : null,
+        endDate: end_date != "" ? end_date : null
     });
 
     const { cleanJob } = CleanJobGraphQL();
@@ -68,22 +72,49 @@ const TaskComponent = (props: ITaskComponentProps) => {
     }
 
     const showAlertConfirm = (title: string, taskName: string, action: string) => {
+        const actionMap = {
+            CLEAN: cleanJob,
+            STOP: stopAllJob
+        }
         confirm({
             title: title,
             icon: <ExclamationCircleOutlined />,
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
-            onOk() {
-                if (action === "CLEAN") {
-                    cleanJob({ variables: { taskName: taskName } });
-                } else if (action === "STOP") {
-                    stopAllJob({ variables: { taskName: taskName } });
-                }
-            },
+            onOk() { actionMap[action]({ variables: { taskName: taskName } }) },
             onCancel() {
             },
         });
+    }
+
+    const onChangeParam = (param: ITaskListParam) => {
+        let queryParam = {
+            task_name: param.taskName
+        }
+        if (param.page > 0) {
+            queryParam["page"] = param.page
+        }
+        if (param.search && param.search != "") {
+            queryParam["search"] = encodeURI(param.search)
+        }
+        if (param.startDate && param.startDate != "") {
+            queryParam["start_date"] = param.startDate
+        }
+        if (param.endDate && param.endDate != "") {
+            queryParam["end_date"] = param.endDate
+        }
+        if (param.status.length > 0) {
+            queryParam["statuses"] = param.status?.join(",")
+        }
+        router.push({
+            pathname: "/task",
+            query: queryParam
+        },
+            undefined,
+            { shallow: true }
+        )
+        setParamsTaskList(param)
     }
 
     const propsMeta: MetaProps = {
@@ -91,6 +122,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         meta: meta,
         setLoadData: setParamsTaskList,
         setJobStatus: setJobStatus,
+        setParam: onChangeParam,
     }
 
     const propsTable: TableProps = {
@@ -103,6 +135,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         defaultOrder: "",
         params: paramsTaskList,
         showJobId: getQueryVariable("job_id"),
+        setParam: onChangeParam,
     };
 
     const propsModal: ModalProps = {
@@ -117,12 +150,12 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const onApplyFilter = () => {
         form.validateFields().then(values => {
             let startDate, endDate: string;
-            console.log(values.status);
             if (values?.dateRange?.length == 2) {
                 startDate = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
                 endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
             }
-            setParamsTaskList({
+
+            const param: ITaskListParam = {
                 loading: paramsTaskList.loading,
                 page: 1,
                 limit: paramsTaskList.limit,
@@ -132,7 +165,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
                 status: values?.status ? values?.status : [],
                 startDate: startDate,
                 endDate: endDate
-            })
+            }
+            onChangeParam(param)
+
         }).catch(info => {
             console.log('Validate Failed:', info);
         });
@@ -172,12 +207,14 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             <Row justify="end" gutter={[48, 16]}>
                                 <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                        disabled={loading || meta?.is_loading}
                                         icon={<PlusOutlined />}
                                         size="middle"
                                         type="primary"
                                         onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
                                     <Tooltip title="Retry all failure and stopped job">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            disabled={loading || meta?.is_loading}
                                             icon={<SyncOutlined />}
                                             size="middle"
                                             type="primary"
@@ -191,6 +228,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                 <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
                                     <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            disabled={loading || meta?.is_loading}
                                             icon={<ClearOutlined />}
                                             danger
                                             size="middle"
@@ -204,6 +242,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                     </Tooltip>
                                     <Tooltip title="Stop all running and queued job" placement="bottom">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            disabled={loading || meta?.is_loading}
                                             icon={<StopOutlined />}
                                             danger
                                             size="middle"
@@ -225,7 +264,10 @@ const TaskComponent = (props: ITaskComponentProps) => {
                         <Form
                             form={form} layout="inline" name="formFilterJob">
                             <Form.Item name="search" label="Search:">
-                                <Input.Search allowClear placeholder="Search args/error..." onSearch={onApplyFilter} />
+                                <Input.Search allowClear
+                                    placeholder="Search args/error..."
+                                    onSearch={onApplyFilter}
+                                />
                             </Form.Item>
                             <Form.Item name="status" label="Status:">
                                 <Select

@@ -291,29 +291,31 @@ const TableComponent = (props: TableProps) => {
             statusList = props.params.status;
         }
 
-        props.setLoadData({
+        props.setParam({
             loading: props.params.loading,
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
-            search: props.params.search ? props.params.search : searchValue,
+            search: searchValue,
             status: statusList,
             jobId: props.params.jobId,
             startDate: props.params.startDate,
             endDate: props.params.endDate,
-        });
+        })
     };
 
     return (
-        <div>
+        <div className="ic-table">
             <Table
                 columns={columns}
                 dataSource={props.data}
-                loading={props.loading}
+                loading={props.loading || props.meta?.is_loading}
                 onChange={handleOnChange}
                 pagination={{
                     current: props?.meta?.page,
                     total: props?.meta?.total_records,
+                    showSizeChanger: false,
+                    showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> jobs</>) }
                 }}
                 scroll={{ x: 560 }}
             />

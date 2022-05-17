@@ -19,4 +19,5 @@ yarn-debug.log*
 yarn-error.log*
 out/
 external/test/
+external/assets_dashboard_build.go
 pkg/mod/

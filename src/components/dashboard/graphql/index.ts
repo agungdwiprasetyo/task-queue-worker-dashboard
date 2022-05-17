@@ -14,9 +14,13 @@ export const CleanJobGraphQL = () => {
 	}
 }
 
-export const SubscribeTaskList = () => {
+export const SubscribeTaskList = (page, limit: number, search: string) => {
 	try {
-		const { data, loading, error } = useSubscription(SUBSCRIBE_TASK);
+		const { data, loading, error } = useSubscription(SUBSCRIBE_TASK, {
+			variables: {
+				page: page, limit: limit, search: search
+			}
+		});
 		return { data, loading, error };
 	}
 	catch (error) {
