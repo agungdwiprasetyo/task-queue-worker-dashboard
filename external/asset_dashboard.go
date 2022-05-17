@@ -6,6 +6,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/shurcooL/vfsgen"
 )
@@ -27,13 +29,66 @@ import (
 // /static and assets_vfsdata.go.
 
 func main() {
+	filename := "assets_dashboard_build.go"
 	err := vfsgen.Generate(http.Dir("out"), vfsgen.Options{
 		PackageName:  "dashboard",
 		BuildTags:    "!dev",
 		VariableName: "Dashboard",
-		Filename:     "assets_dashboard_build.go",
+		Filename:     filename,
 	})
 	if err != nil {
 		log.Fatalln("generate dashboard", err)
+	}
+
+	fl, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	flStr := string(fl)
+	idx := strings.Index(flStr, `fs["/"].(*vfsgen۰DirInfo)`)
+	idx = idx - 5
+
+	flStr = flStr[:idx] + `
+		"/task": &vfsgen۰DirInfo{
+			name:    "/task",
+			modTime: time.Date(2022, 3, 3, 17, 9, 34, 687442386, time.UTC),
+		},
+		"/job": &vfsgen۰DirInfo{
+			name:    "/job",
+			modTime: time.Date(2022, 3, 3, 17, 9, 34, 687442386, time.UTC),
+		},` + flStr[idx:]
+
+	idx = strings.Index(flStr, `return fs`)
+	idx = idx - 2
+
+	flStr = flStr[:idx] + `	fs["/task"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
+		fs["/404.html"].(os.FileInfo),
+		fs["/404.html.html"].(os.FileInfo),
+		fs["/_next"].(os.FileInfo),
+		fs["/icon-192.png"].(os.FileInfo),
+		fs["/icon-512.png"].(os.FileInfo),
+		fs["/index.html"].(os.FileInfo),
+		fs["/job.html"].(os.FileInfo),
+		fs["/manifest.json"].(os.FileInfo),
+		fs["/task.html"].(os.FileInfo),
+	}
+	fs["/job"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
+		fs["/404.html"].(os.FileInfo),
+		fs["/404.html.html"].(os.FileInfo),
+		fs["/_next"].(os.FileInfo),
+		fs["/icon-192.png"].(os.FileInfo),
+		fs["/icon-512.png"].(os.FileInfo),
+		fs["/index.html"].(os.FileInfo),
+		fs["/job.html"].(os.FileInfo),
+		fs["/manifest.json"].(os.FileInfo),
+		fs["/task.html"].(os.FileInfo),
+	}
+	fs["/task/index.html"] = fs["/task.html"]
+	fs["/job/index.html"] = fs["/job.html"]
+` + flStr[idx:]
+
+	if err := os.WriteFile(filename, []byte(flStr), 0644); err != nil {
+		panic(err)
 	}
 }
