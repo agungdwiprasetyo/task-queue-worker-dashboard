@@ -15,6 +15,7 @@ export interface TableProps extends FilterPagination {
     defaultSort: any;
     defaultOrder: any;
     loadData: any;
+    metaTagline?: any;
 }
 
 export interface ModalConfirmProps {

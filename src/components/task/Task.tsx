@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout, Input, DatePicker, Select, Form } from 'antd';
+import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
 import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
 import ModalAddJob from './AddJob';
 import { SubscribeTaskJobList, StopAllJob, RetryAllJob } from './graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
-import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps } from './interface';
+import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps, IFormFilterProps } from './interface';
 import Meta from './Meta';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
-import moment from 'moment';
 import { getQueryVariable } from '../../utils/helper';
-
-const { confirm } = Modal;
-
-const { Content } = Layout;
+import FormFilter from 'src/components/task/FormFilter';
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
@@ -40,6 +36,10 @@ const TaskComponent = (props: ITaskComponentProps) => {
         startDate: start_date != "" ? start_date : null,
         endDate: end_date != "" ? end_date : null
     });
+
+    const [isFilterActive, setIsFilterActive] = useState(
+        (search != null && search !== "") || jobStatus.length > 0
+    );
 
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
@@ -76,7 +76,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
             CLEAN: cleanJob,
             STOP: stopAllJob
         }
-        confirm({
+        Modal.confirm({
             title: title,
             icon: <ExclamationCircleOutlined />,
             okText: 'Yes',
@@ -123,6 +123,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         setLoadData: setParamsTaskList,
         setJobStatus: setJobStatus,
         setParam: onChangeParam,
+        setIsFilterActive: setIsFilterActive,
     }
 
     const propsTable: TableProps = {
@@ -146,39 +147,17 @@ const TaskComponent = (props: ITaskComponentProps) => {
 
     const propsFooter: IFooterComponentProps = null;
 
-    const [form] = Form.useForm();
-    const onApplyFilter = () => {
-        form.validateFields().then(values => {
-            let startDate, endDate: string;
-            if (values?.dateRange?.length == 2) {
-                startDate = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
-                endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
-            }
-
-            const param: ITaskListParam = {
-                loading: paramsTaskList.loading,
-                page: 1,
-                limit: paramsTaskList.limit,
-                taskName: paramsTaskList.taskName,
-                search: values?.search,
-                jobId: null,
-                status: values?.status ? values?.status : [],
-                startDate: startDate,
-                endDate: endDate
-            }
-            onChangeParam(param)
-
-        }).catch(info => {
-            console.log('Validate Failed:', info);
-        });
+    const propsFormFilter: IFormFilterProps = {
+        params: paramsTaskList,
+        isFilterActive: isFilterActive,
+        setIsFilterActive: setIsFilterActive,
+        setParam: onChangeParam,
     }
-
-    const { Option } = Select;
 
     return (
         <>
             <Layout style={{ minHeight: "88vh" }}>
-                <Content style={{ padding: '10px 50px' }}>
+                <Layout.Content style={{ padding: '10px 50px' }}>
                     <Row>
                         <Col span={24}>
                             <div className="text-center">
@@ -215,7 +194,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                     <Tooltip title="Retry all failure and stopped job">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                             disabled={loading || meta?.is_loading}
-                                            icon={<SyncOutlined />}
+                                            icon={<SyncOutlined spin={loading || meta?.is_loading} />}
                                             size="middle"
                                             type="primary"
                                             onClick={() => {
@@ -257,52 +236,11 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                 </Space>
                             </Row>
                         </Col>
-                        <Divider orientation="left" />
                     </Row>
 
                     <Row justify="center">
-                        <Form
-                            form={form} layout="inline" name="formFilterJob">
-                            <Form.Item name="search" label="Search:">
-                                <Input.Search allowClear
-                                    placeholder="Search args/error..."
-                                    onSearch={onApplyFilter}
-                                />
-                            </Form.Item>
-                            <Form.Item name="status" label="Status:">
-                                <Select
-                                    style={{ minWidth: 150, maxWidth: 100 }}
-                                    mode="multiple"
-                                    allowClear
-                                    placeholder="Select status"
-                                >
-                                    <Option value='SUCCESS' >Success</Option>
-                                    <Option value='RETRYING' >Running/Retrying</Option>
-                                    <Option value='QUEUEING' >Queueing</Option>
-                                    <Option value='FAILURE' >Failure</Option>
-                                    <Option value='STOPPED' >Stopped</Option>
-                                </Select>
-                            </Form.Item>
-                            <Form.Item name="dateRange" label="Created At:">
-                                <DatePicker.RangePicker
-                                    showTime={{
-                                        format: 'HH:mm:ss',
-                                        defaultValue: [moment().startOf('day'), moment().endOf('day')],
-                                    }}
-                                    format="YYYY-MM-DDTHH:mm:ssZ"
-                                    style={{ minWidth: 300, maxWidth: 300 }}
-                                />
-                            </Form.Item>
-                            <Form.Item>
-                                <Button type="ghost" size="middle" onClick={() => { onApplyFilter() }}>Apply Filter</Button>
-                            </Form.Item>
-                            <Form.Item>
-                                <Button type="link" size="middle" onClick={() => {
-                                    form.resetFields();
-                                    onApplyFilter();
-                                }}>Clear Filter</Button>
-                            </Form.Item>
-                        </Form>
+                        <Divider orientation="left" />
+                        <FormFilter {...propsFormFilter} />
                     </Row>
                     <Row>
                         <Divider orientation="left" />
@@ -311,7 +249,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             <TableComponent {...propsTable} />
                         </Col>
                     </Row>
-                </Content>
+                </Layout.Content>
             </Layout>
             <FooterComponent {...propsFooter} />
         </>

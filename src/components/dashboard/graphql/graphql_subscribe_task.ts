@@ -12,7 +12,7 @@ subscription ($page: Int!, $limit: Int!, $search: String) {
       total_client_subscriber
     }
     data {
-      name module_name total_jobs detail {
+      name module_name total_jobs is_loading detail {
         failure retrying success queueing stopped
       }
     }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Router from 'next/router';
+// import Router from 'next/router';
 import nextCookie from 'next-cookies';
 import { setTokenInRequest } from './configureClient';
 
@@ -29,9 +29,7 @@ export const withAuthSync = WrappedComponent =>
     static async getInitialProps(ctx) {
       const { token, userId } = auth(ctx);
       await setTokenInRequest(token);
-      const componentProps =
-        WrappedComponent.getInitialProps &&
-        (await WrappedComponent.getInitialProps(ctx));
+      const componentProps = WrappedComponent.getInitialProps && (await WrappedComponent.getInitialProps(ctx));
 
       return { ...componentProps, token, userId };
     }

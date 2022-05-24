@@ -12,7 +12,9 @@ import {
     ClockCircleOutlined,
     StopOutlined,
     ClearOutlined,
-    ExclamationCircleOutlined
+    ExclamationCircleOutlined,
+    MoreOutlined,
+    LoadingOutlined
 } from '@ant-design/icons';
 import { FilterPagination } from '../../utils/helper';
 
@@ -26,6 +28,7 @@ export const TableComponent = (props: TableProps) => {
         searchFilterValue = [props.search]
     }
     const [filterValueState, setFilterValueState] = useState(searchFilterValue);
+    const [filterModuleState, setFilterModuleState] = useState([]);
     const [searchState, setSearchState] = useState(searchFilterValue.length > 0);
     const [filterPagination, setFlterPagination] = useState<FilterPagination>({
         page: props.page, limit: props.limit, search: props.search,
@@ -50,28 +53,15 @@ export const TableComponent = (props: TableProps) => {
         });
     }
 
-    const filterColumnProps = dataIndex => ({
-        onFilter: (value, record) =>
-            searchState ? record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : ''
-                : record[dataIndex] ? record[dataIndex] == value : '',
-        render: text =>
-            <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={filterValueState}
-                autoEscape
-                textToHighlight={text ? text.toString() : ''}
-            />
-    })
-
-    const getFilterValues = (source) => {
+    const getFilterValues = (source, key) => {
         let res = [];
         source?.forEach(el => {
             res.push({
-                text: el.name,
-                value: el.name,
+                text: el[key],
+                value: el[key],
             })
         });
-        return res;
+        return res.filter((v, i, a) => a.findIndex(v2 => (v2.value === v.value)) === i);
     }
 
     const changeFilterPagination = (filter: FilterPagination) => {
@@ -86,19 +76,36 @@ export const TableComponent = (props: TableProps) => {
         )
     }
 
+    const onFilterName = (value, record): boolean => searchState ?
+        record["name"] ? record["name"].toString().toLowerCase().includes(value.toLowerCase()) : ''
+        : record["name"] ? record["name"] == value : false
+
     const columns: Array<ColumnProps<Task>> = [
         {
             dataIndex: 'name',
             key: 'name',
             title: 'Task Name',
             filteredValue: filterValueState,
-            filters: getFilterValues(props.data),
-            ...filterColumnProps('name'),
+            filters: getFilterValues(props.data, 'name'),
+            onFilter: onFilterName,
+            render: (text) => {
+                return (
+                    <Highlighter
+                        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                        searchWords={filterValueState}
+                        autoEscape
+                        textToHighlight={text ? text.toString() : ''}
+                    />
+                )
+            },
         },
         {
             dataIndex: 'module_name',
             key: 'module_name',
             title: 'Module Name',
+            filteredValue: filterModuleState,
+            filters: getFilterValues(props.data, 'module_name'),
+            onFilter: (value, record) => record['module_name'] == value,
             render: (module_name: number) => {
                 return (
                     <div><b>{module_name}</b></div>
@@ -135,54 +142,59 @@ export const TableComponent = (props: TableProps) => {
             dataIndex: 'name',
             key: 'action',
             title: '',
-            render: (name: string) => {
-                return (
-                    <Space>
-                        <Dropdown.Button type="primary" size="large" onClick={() => {
-                            router.push({
-                                pathname: "/task",
-                                query: { task_name: name }
-                            })
-                        }} overlay={(
-                            <Menu>
-                                <Menu.Item>
-                                    <Tooltip title="Retry all failure and stopped job" placement="left">
-                                        <Button icon={<SyncOutlined />} size="middle"
-                                            onClick={() => {
-                                                props.retryAllJob({ variables: { taskName: name } });
-                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <Tooltip title="Stop all running and queued job" placement="left">
-                                        <Button icon={<StopOutlined />} danger size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    `Are you sure stop all running and queued job in task "${name}"?`,
-                                                    name,
-                                                    "STOP"
-                                                );
-                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <Tooltip title="Clear all success, failure, and stopped job" placement="left">
-                                        <Button icon={<ClearOutlined />} danger size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
-                                                    name,
-                                                    "CLEAN"
-                                                );
-                                            }}>Clear Job</Button>
-                                    </Tooltip>
-                                </Menu.Item>
-                            </Menu>
-                        )}>
-                            View Jobs
-                        </Dropdown.Button>
-                    </Space>
-                )
+            render: (name: string, row: any) => {
+                if (props.metaTagline?.config?.with_persistent) {
+                    return (
+                        <Space>
+                            <Dropdown.Button type="primary" size="large"
+                                icon={row?.is_loading ? <LoadingOutlined spin={row?.is_loading} /> : <MoreOutlined />}
+                                disabled={row?.is_loading}
+                                onClick={() => {
+                                    router.push({
+                                        pathname: "/task",
+                                        query: { task_name: name }
+                                    })
+                                }} overlay={(
+                                    <Menu>
+                                        <Menu.Item>
+                                            <Tooltip title="Retry all failure and stopped job" placement="left">
+                                                <Button icon={<SyncOutlined />} size="middle"
+                                                    onClick={() => {
+                                                        props.retryAllJob({ variables: { taskName: name } });
+                                                    }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                            </Tooltip>
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Tooltip title="Stop all running and queued job" placement="left">
+                                                <Button icon={<StopOutlined />} danger size="middle"
+                                                    onClick={() => {
+                                                        showAlertConfirm(
+                                                            `Are you sure stop all running and queued job in task "${name}"?`,
+                                                            name,
+                                                            "STOP"
+                                                        );
+                                                    }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
+                                            </Tooltip>
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            <Tooltip title="Clear all success, failure, and stopped job" placement="left">
+                                                <Button icon={<ClearOutlined />} danger size="middle"
+                                                    onClick={() => {
+                                                        showAlertConfirm(
+                                                            `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
+                                                            name,
+                                                            "CLEAN"
+                                                        );
+                                                    }}>Clear Job</Button>
+                                            </Tooltip>
+                                        </Menu.Item>
+                                    </Menu>
+                                )}>
+                                {row?.is_loading ? "Processing..." : "View Jobs"}
+                            </Dropdown.Button>
+                        </Space>
+                    )
+                }
             },
         },
     ];
@@ -200,6 +212,7 @@ export const TableComponent = (props: TableProps) => {
             setFilterValueState([])
         }
 
+        setFilterModuleState(filters?.module_name)
         changeFilterPagination({
             page: current, limit: pageSize, search: filterPagination.search
         })
@@ -261,7 +274,18 @@ export const TableComponent = (props: TableProps) => {
                                 pageSizeOptions: ['7', '14', '28', '56'],
                                 showSizeChanger: true,
                                 showTotal: (total, range) => {
-                                    return (<h4>{range[0]}-{range[1]} of <b>{total}</b> tasks</h4>)
+                                    return (
+                                        <Space>
+                                            <h4>Total all jobs: <b>{props.data?.reduce((n, { total_jobs }) => n + total_jobs, 0)}</b>,</h4>
+                                            <h4>Queueing: <b>{props.data?.reduce((n, { detail }) => n + detail?.queueing, 0)}</b>,</h4>
+                                            <h4>Running: <b>{props.data?.reduce((n, { detail }) => n + detail?.retrying, 0)}</b>,</h4>
+                                            <h4>Success: <b>{props.data?.reduce((n, { detail }) => n + detail?.success, 0)}</b>,</h4>
+                                            <h4>Failure: <b>{props.data?.reduce((n, { detail }) => n + detail?.failure, 0)}</b>,</h4>
+                                            <h4>Stopped: <b>{props.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}</b></h4>
+                                            <h4>|</h4>
+                                            <h4>Showing {range[0]}-{range[1]} of <b>{total}</b> tasks</h4>
+                                        </Space>
+                                    )
                                 }
                             }}
                         />

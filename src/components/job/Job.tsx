@@ -287,7 +287,10 @@ const JobComponent = (props: IJobComponentProps) => {
                                     <Table
                                         columns={columns}
                                         dataSource={detailJob?.retry_histories}
-                                        pagination={{ defaultPageSize: 10, showTotal: (n) => { return (<>Total <b>{n}</b> histories</>); } }}
+                                        pagination={{
+                                            defaultPageSize: 10,
+                                            showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> histories</>) }
+                                        }}
                                     />
                                 </Col>
                             </Row>

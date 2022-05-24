@@ -30,7 +30,7 @@ const DashboardComponent = (props: any) => {
     const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
     const search = getQueryVariable("search") || "";
 
-    const dataTagline = GetTagLine({ pollInterval: 20000 });
+    const dataTagline = GetTagLine({ pollInterval: 10000 });
     const memStats = dataTagline?.tagline?.memory_statistics;
 
     const content = {
@@ -68,13 +68,15 @@ const DashboardComponent = (props: any) => {
         loadData: loadData,
         page: page,
         limit: limit,
-        search: search
+        search: search,
+        metaTagline: dataTagline?.tagline
     };
 
     const propsFooter: IFooterComponentProps = {
         serverStartedAt: dataTagline?.tagline?.start_at,
         version: dataTagline?.tagline?.version,
         buildNumber: dataTagline?.tagline?.build_number,
+        go_version: dataTagline?.tagline?.go_version,
     }
 
     return (
@@ -84,7 +86,7 @@ const DashboardComponent = (props: any) => {
                     <div className="text-center mb-5">
                         <pre>{dataTagline?.tagline?.banner}</pre>
                         <pre>{dataTagline?.tagline?.tagline}</pre>
-                        <pre>Memory Alloc: <b>{memStats?.alloc}</b>, Total Alloc: <b>{memStats?.total_alloc}</b>, Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
+                        <pre>Memory Alloc: <b>{memStats?.alloc}</b> | Total Alloc: <b>{memStats?.total_alloc}</b> | Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
                         <pre>
                             <Space>
                                 Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>

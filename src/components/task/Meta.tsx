@@ -17,6 +17,7 @@ const Meta = (props: MetaProps) => {
 
     const onTagClicked = (status: string) => {
         props.setJobStatus(status ? [status] : [])
+        props.setIsFilterActive(status != null && status != "")
         props.setParam({
             loading: props.params.loading,
             page: 1,
