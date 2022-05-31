@@ -103,22 +103,40 @@ const JobComponent = (props: IJobComponentProps) => {
             render: (text: string) => {
                 if (!text) { return (<></>) };
                 return (
-                    <Paragraph>
-                        <JSONPretty id="json-pretty" data={text} />
+                    <Paragraph style={{ cursor: 'pointer' }}>
+                        <pre onClick={() => Modal.info({
+                            title: 'Error:',
+                            content: (
+                                <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
+                            ),
+                            onOk() { },
+                            maskClosable: true,
+                            width: 1000
+                        })}>{text.length > 70 ? `${text.slice(0, 70)} ...(more)` : text}
+                        </pre>
                     </Paragraph>
                 )
             },
         },
         {
-            title: 'Error Stack',
+            title: 'Error Line',
             dataIndex: 'error_stack',
             key: 'error_stack',
             ellipsis: true,
             render: (text: string) => {
                 if (!text) { return (<></>) };
                 return (
-                    <Paragraph>
-                        <JSONPretty id="json-pretty" data={text} />
+                    <Paragraph style={{ cursor: 'pointer' }}>
+                        <pre onClick={() => Modal.info({
+                            title: 'Error:',
+                            content: (
+                                <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
+                            ),
+                            onOk() { },
+                            maskClosable: true,
+                            width: 1000
+                        })}>{text.length > 50 ? `${text.slice(0, 50)} ...(more)` : text}
+                        </pre>
                     </Paragraph>
                 );
             },

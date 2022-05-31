@@ -174,7 +174,7 @@ const TableComponent = (props: TableProps) => {
             render: (error: string) => {
                 if (!error) { return "" };
                 return (
-                    <Paragraph>
+                    <Paragraph style={{ cursor: 'pointer' }}>
                         <pre onClick={() => Modal.info({
                             title: 'Error:',
                             content: (
@@ -191,6 +191,7 @@ const TableComponent = (props: TableProps) => {
                             ),
                             onOk() { },
                             maskClosable: true,
+                            width: 1000
                         })}>
                             <Highlighter
                                 highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
