@@ -22,8 +22,6 @@ const TableComponent = (props: TableProps) => {
     const { stopJob } = StopJobGraphQL();
     const { deleteJob } = DeleteJobGraphQL();
 
-    const [searchValue, setSearchValue] = useState<string>(props.params.search);
-
     const showAlertDeleteJob = (jobId: string) => {
         Modal.confirm({
             title: `Are you sure to delete this job?`,
@@ -47,10 +45,9 @@ const TableComponent = (props: TableProps) => {
                     value={selectedKeys[0]}
                     onChange={e => {
                         setSelectedKeys(e.target.value ? [e.target.value] : [])
-                        setSearchValue(e.target.value);
                     }}
                     onPressEnter={() => {
-                        props.setLoadData({
+                        props.setParam({
                             loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
@@ -64,7 +61,7 @@ const TableComponent = (props: TableProps) => {
                     }}
                     onSearch={value => {
                         if (value === "") { value = null }
-                        props.setLoadData({
+                        props.setParam({
                             loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
@@ -271,18 +268,18 @@ const TableComponent = (props: TableProps) => {
 
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {
         const { current, pageSize } = pagination;
-        const { field, order } = sorter;
+        // const { field, order } = sorter;
 
-        let orderBy: string = '';
-        const sortBy: string = field || props.defaultSort;
+        // let orderBy: string = '';
+        // const sortBy: string = field || props.defaultSort;
 
-        if (!order && props.defaultOrder) {
-            orderBy = props.defaultOrder;
-        }
+        // if (!order && props.defaultOrder) {
+        //     orderBy = props.defaultOrder;
+        // }
 
-        if (order) {
-            orderBy = order.replace('end', '');
-        }
+        // if (order) {
+        //     orderBy = order.replace('end', '');
+        // }
 
         let statusList = [];
         if (filters?.status) {
@@ -297,7 +294,7 @@ const TableComponent = (props: TableProps) => {
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,
-            search: searchValue,
+            search: props.params.search,
             status: statusList,
             jobId: props.params.jobId,
             startDate: props.params.startDate,

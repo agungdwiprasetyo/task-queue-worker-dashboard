@@ -14,10 +14,6 @@ const FormFilter = (props: IFormFilterProps) => {
                 endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
             }
 
-            props.setIsFilterActive((values?.search !== undefined && values?.search !== "") ||
-                (startDate !== undefined && endDate !== undefined) ||
-                values?.status?.length > 0)
-
             const param: ITaskListParam = {
                 loading: props.params.loading,
                 page: 1,

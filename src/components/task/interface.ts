@@ -28,7 +28,6 @@ export interface MetaProps {
     meta: any;
     setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
     setJobStatus: Dispatch<SetStateAction<string[]>>;
-    setIsFilterActive: Dispatch<SetStateAction<boolean>>;
     setParam?: any;
 }
 
@@ -68,6 +67,5 @@ export interface IJobRetryHistory {
 export interface IFormFilterProps {
     params: ITaskListParam;
     isFilterActive: boolean;
-    setIsFilterActive: Dispatch<SetStateAction<boolean>>;
     setParam?: any;
 }

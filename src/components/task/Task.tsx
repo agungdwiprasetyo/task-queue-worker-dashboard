@@ -22,6 +22,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const statuses = getQueryVariable("statuses") != "" ? getQueryVariable("statuses").split(",") : [];
     const start_date = getQueryVariable("start_date") || "";
     const end_date = getQueryVariable("end_date") || "";
+    const job_id = getQueryVariable("job_id") || null;
 
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
     const [jobStatus, setJobStatus] = useState<string[]>(statuses);
@@ -30,7 +31,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         page: page,
         limit: 10,
         taskName: task_name,
-        jobId: null,
+        jobId: job_id,
         search: search,
         status: jobStatus,
         startDate: start_date != "" ? start_date : null,
@@ -38,7 +39,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     });
 
     const [isFilterActive, setIsFilterActive] = useState(
-        (search != null && search !== "") || jobStatus.length > 0
+        (search != null && search !== "") || jobStatus.length > 0 || (job_id != null && job_id !== "")
     );
 
     const { cleanJob } = CleanJobGraphQL();
@@ -107,6 +108,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
         if (param.status.length > 0) {
             queryParam["statuses"] = param.status?.join(",")
         }
+        if (param.jobId && param.jobId != "") {
+            queryParam["job_id"] = param.jobId
+        }
         router.push({
             pathname: "/task",
             query: queryParam
@@ -115,6 +119,12 @@ const TaskComponent = (props: ITaskComponentProps) => {
             { shallow: true }
         )
         setParamsTaskList(param)
+        setIsFilterActive(
+            (param.search !== undefined && param.search !== "") ||
+            (param.startDate !== undefined && param.endDate !== undefined) ||
+            param.status?.length > 0 ||
+            (param.jobId != null && param.jobId !== "")
+        )
     }
 
     const propsMeta: MetaProps = {
@@ -123,7 +133,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
         setLoadData: setParamsTaskList,
         setJobStatus: setJobStatus,
         setParam: onChangeParam,
-        setIsFilterActive: setIsFilterActive,
     }
 
     const propsTable: TableProps = {
@@ -150,7 +159,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const propsFormFilter: IFormFilterProps = {
         params: paramsTaskList,
         isFilterActive: isFilterActive,
-        setIsFilterActive: setIsFilterActive,
         setParam: onChangeParam,
     }
 
@@ -242,6 +250,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                         <Divider orientation="left" />
                         <FormFilter {...propsFormFilter} />
                     </Row>
+
                     <Row>
                         <Divider orientation="left" />
                         <Col span={24}>
