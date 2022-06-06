@@ -29,6 +29,7 @@ const ModalAddJob = (props: ModalProps) => {
             title={modalTitle}
             visible={props.visible}
             onCancel={handleCancel}
+            width={1000}
             onOk={() => {
                 form
                     .validateFields()
@@ -47,7 +48,7 @@ const ModalAddJob = (props: ModalProps) => {
                     <InputNumber min={1} />
                 </Form.Item>
                 <Form.Item name="args" label="Argument / message:" rules={[{ required: true }]}>
-                    <Input.TextArea rows={7} />
+                    <Input.TextArea rows={15} />
                 </Form.Item>
             </Form>
         </Modal>

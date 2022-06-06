@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { Modal, Button, Divider, Spin, Tooltip, Tag, Layout, Space } from 'antd';
+import { Modal, Button, Divider, Spin, Tooltip, Tag, Layout, Space, BackTop } from 'antd';
 import { IJobComponentProps } from './interface';
 import { SubscribeJobDetail } from './graphql';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from '../task/graphql';
@@ -10,10 +10,11 @@ import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import Table, { ColumnProps } from 'antd/lib/table';
-import { LeftOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
+import { LeftOutlined, StopOutlined, SyncOutlined, UpOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
+import moment from 'moment';
 
 const JobComponent = (props: IJobComponentProps) => {
     const router = useRouter();
@@ -69,9 +70,9 @@ const JobComponent = (props: IJobComponentProps) => {
             dataIndex: '',
             key: '',
             render: (text: string, row: any) => {
-                const start = new Date(row?.start_at).getTime();
-                const end = new Date(row?.end_at).getTime();
-                return `${(end - start) / 1000} s`.replace(".", ",");
+                const start = moment(new Date(row?.start_at));
+                const end = moment(new Date(row?.end_at));
+                return moment.duration(end.diff(start)).toISOString().replace(".", ",").replace("PT", "").toLowerCase();
             },
         },
         {
@@ -128,7 +129,7 @@ const JobComponent = (props: IJobComponentProps) => {
                 return (
                     <Paragraph style={{ cursor: 'pointer' }}>
                         <pre onClick={() => Modal.info({
-                            title: 'Error:',
+                            title: 'Error Line:',
                             content: (
                                 <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
                             ),
@@ -332,6 +333,18 @@ const JobComponent = (props: IJobComponentProps) => {
                     )}
                 </Layout.Content>
             </Layout>
+            <BackTop>
+                <UpOutlined style={{
+                    height: 40,
+                    width: 40,
+                    lineHeight: '40px',
+                    borderRadius: 4,
+                    backgroundColor: '#1088e9',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontSize: 17,
+                }} />
+            </BackTop>
             <FooterComponent {...propsFooter} />
         </>
     );

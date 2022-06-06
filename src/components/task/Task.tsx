@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
 import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps,
 import Meta from './Meta';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
-import { getQueryVariable } from '../../utils/helper';
+import { getQueryVariable, setQueryVariable } from '../../utils/helper';
 import FormFilter from 'src/components/task/FormFilter';
 
 const TaskComponent = (props: ITaskComponentProps) => {
@@ -25,22 +25,16 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const job_id = getQueryVariable("job_id") || null;
 
     const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
-    const [jobStatus, setJobStatus] = useState<string[]>(statuses);
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
-        loading: false,
         page: page,
         limit: 10,
         taskName: task_name,
         jobId: job_id,
         search: search,
-        status: jobStatus,
+        status: statuses,
         startDate: start_date != "" ? start_date : null,
         endDate: end_date != "" ? end_date : null
     });
-
-    const [isFilterActive, setIsFilterActive] = useState(
-        (search != null && search !== "") || jobStatus.length > 0 || (job_id != null && job_id !== "")
-    );
 
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
@@ -111,35 +105,20 @@ const TaskComponent = (props: ITaskComponentProps) => {
         if (param.jobId && param.jobId != "") {
             queryParam["job_id"] = param.jobId
         }
-        router.push({
-            pathname: "/task",
-            query: queryParam
-        },
-            undefined,
-            { shallow: true }
-        )
-        setParamsTaskList(param)
-        setIsFilterActive(
-            (param.search !== undefined && param.search !== "") ||
-            (param.startDate !== undefined && param.endDate !== undefined) ||
-            param.status?.length > 0 ||
-            (param.jobId != null && param.jobId !== "")
-        )
+        window.history.replaceState(null, "", `task?${setQueryVariable(queryParam)}`)
+        setParamsTaskList(param);
     }
 
     const propsMeta: MetaProps = {
+        loading: loading,
         params: paramsTaskList,
         meta: meta,
-        setLoadData: setParamsTaskList,
-        setJobStatus: setJobStatus,
         setParam: onChangeParam,
     }
 
     const propsTable: TableProps = {
         data: data?.listen_task_job_list?.data,
         meta: meta,
-        setLoadData: setParamsTaskList,
-        setJobStatus: setJobStatus,
         loading: loading,
         defaultSort: "desc",
         defaultOrder: "",
@@ -157,8 +136,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const propsFooter: IFooterComponentProps = null;
 
     const propsFormFilter: IFormFilterProps = {
+        totalRecords: meta?.total_records,
         params: paramsTaskList,
-        isFilterActive: isFilterActive,
         setParam: onChangeParam,
     }
 
@@ -202,7 +181,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                     <Tooltip title="Retry all failure and stopped job">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                             disabled={loading || meta?.is_loading}
-                                            icon={<SyncOutlined spin={loading || meta?.is_loading} />}
+                                            icon={<SyncOutlined />}
                                             size="middle"
                                             type="primary"
                                             onClick={() => {

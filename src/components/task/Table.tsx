@@ -1,5 +1,5 @@
 import Table, { ColumnProps } from 'antd/lib/table';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Space, Button, Input, Modal, Typography, Tooltip } from 'antd';
 import {
     SyncOutlined,
@@ -8,10 +8,10 @@ import {
 import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
 import Highlighter from 'react-highlight-words';
-import JSONPretty from 'react-json-pretty';
 import Moment from 'react-moment';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import { useRouter } from 'next/router';
+import { toPrettyJSON } from '../../utils/helper';
 
 const { Paragraph } = Typography;
 
@@ -48,7 +48,6 @@ const TableComponent = (props: TableProps) => {
                     }}
                     onPressEnter={() => {
                         props.setParam({
-                            loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
@@ -62,7 +61,6 @@ const TableComponent = (props: TableProps) => {
                     onSearch={value => {
                         if (value === "") { value = null }
                         props.setParam({
-                            loading: props.params.loading,
                             page: 1,
                             limit: props?.meta?.limit,
                             taskName: props.params.taskName,
@@ -118,7 +116,14 @@ const TableComponent = (props: TableProps) => {
                             title: 'Arguments:',
                             content: (
                                 <Paragraph copyable={{ text: args }}>
-                                    <JSONPretty id="json-pretty" data={args} />
+                                    <pre>
+                                        <Highlighter
+                                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                                            searchWords={[props.params.search]}
+                                            autoEscape
+                                            textToHighlight={toPrettyJSON(args)}
+                                        />
+                                    </pre>
                                 </Paragraph>
                             ),
                             onOk() { },
@@ -181,7 +186,7 @@ const TableComponent = (props: TableProps) => {
                                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                                             searchWords={[props.params.search]}
                                             autoEscape
-                                            textToHighlight={error}
+                                            textToHighlight={toPrettyJSON(error)}
                                         />
                                     </pre>
                                 </Paragraph>
@@ -219,13 +224,6 @@ const TableComponent = (props: TableProps) => {
             key: 'status',
             title: 'Status',
             width: 100,
-            filters: [
-                { text: 'Success', value: 'SUCCESS' },
-                { text: 'Running/Retrying', value: 'RETRYING' },
-                { text: 'Queueing', value: 'QUEUEING' },
-                { text: 'Failure', value: 'FAILURE' },
-                { text: 'Stopped', value: 'STOPPED' },
-            ],
             render: (status: string, row: any) => {
                 const statusProps: StatusLayoutProps = {
                     status: status, retry: row?.retries
@@ -284,13 +282,11 @@ const TableComponent = (props: TableProps) => {
         let statusList = [];
         if (filters?.status) {
             statusList = statusList.concat(filters?.status);
-            props.setJobStatus(statusList);
         } else {
             statusList = props.params.status;
         }
 
         props.setParam({
-            loading: props.params.loading,
             page: current,
             limit: pageSize,
             taskName: props.params.taskName,

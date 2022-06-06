@@ -12,8 +12,6 @@ export interface TableProps {
     defaultOrder: any;
     params: ITaskListParam;
     showJobId: string | null;
-    setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
-    setJobStatus: Dispatch<SetStateAction<string[]>>;
     setParam?: any;
 }
 
@@ -24,15 +22,13 @@ export interface ModalProps {
 }
 
 export interface MetaProps {
+    loading: boolean;
     params: ITaskListParam;
     meta: any;
-    setLoadData: Dispatch<SetStateAction<ITaskListParam>>;
-    setJobStatus: Dispatch<SetStateAction<string[]>>;
     setParam?: any;
 }
 
 export interface ITaskListParam {
-    loading: boolean;
     page: number;
     limit: number;
     taskName: string;
@@ -54,7 +50,7 @@ export interface IJobDetail {
     trace_id: string;
     retry_histories: IJobRetryHistory[];
     status: string;
-    created_at; string;
+    created_at: string;
 }
 
 export interface IJobRetryHistory {
@@ -65,7 +61,8 @@ export interface IJobRetryHistory {
 }
 
 export interface IFormFilterProps {
+    totalRecords: number;
     params: ITaskListParam;
-    isFilterActive: boolean;
     setParam?: any;
+    setLoadData?: Dispatch<SetStateAction<ITaskListParam>>;
 }

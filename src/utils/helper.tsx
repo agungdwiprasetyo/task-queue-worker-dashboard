@@ -47,6 +47,23 @@ export const getQueryVariable = (variable) => {
     return "";
 }
 
+export const setQueryVariable = (obj): string => {
+    var str = [];
+    for (var p in obj)
+        if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+    return str.join("&");
+}
+
+export const toPrettyJSON = (obj): string => {
+    try {
+        return JSON.stringify(JSON.parse(obj), null, 2)
+    } catch (error) {
+        return obj
+    }
+}
+
 export const getWindowDimensions = () => {
     const { innerWidth: width, innerHeight: height } = window;
     return {
