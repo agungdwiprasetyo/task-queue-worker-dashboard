@@ -275,16 +275,7 @@ export const TableComponent = (props: TableProps) => {
                                 showSizeChanger: true,
                                 showTotal: (total, range) => {
                                     return (
-                                        <Space>
-                                            <h4>Total all jobs: <b>{props.data?.reduce((n, { total_jobs }) => n + total_jobs, 0)}</b>,</h4>
-                                            <h4>Queueing: <b>{props.data?.reduce((n, { detail }) => n + detail?.queueing, 0)}</b>,</h4>
-                                            <h4>Running: <b>{props.data?.reduce((n, { detail }) => n + detail?.retrying, 0)}</b>,</h4>
-                                            <h4>Success: <b>{props.data?.reduce((n, { detail }) => n + detail?.success, 0)}</b>,</h4>
-                                            <h4>Failure: <b>{props.data?.reduce((n, { detail }) => n + detail?.failure, 0)}</b>,</h4>
-                                            <h4>Stopped: <b>{props.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}</b></h4>
-                                            <h4>|</h4>
-                                            <h4>Showing {range[0]}-{range[1]} of <b>{total}</b> tasks</h4>
-                                        </Space>
+                                        <h4>Showing {range[0]}-{range[1]} of <b>{total}</b> tasks</h4>
                                     )
                                 }
                             }}

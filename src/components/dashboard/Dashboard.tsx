@@ -3,11 +3,12 @@ import { StopAllJob, RetryAllJob } from '../task/graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip, Row, Col } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
 import { getQueryVariable } from '../../utils/helper';
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 
 const DashboardComponent = (props: any) => {
     const { data, loading, error } = SubscribeTaskList(1, 10, null);
@@ -82,21 +83,59 @@ const DashboardComponent = (props: any) => {
     return (
         <Layout>
             <Content style={{ minHeight: "88vh" }}>
-                <div>
-                    <div className="text-center mb-5">
-                        <pre>{dataTagline?.tagline?.banner}</pre>
-                        <pre>{dataTagline?.tagline?.tagline}</pre>
-                        <pre>Memory Alloc: <b>{memStats?.alloc}</b> | Total Alloc: <b>{memStats?.total_alloc}</b> | Num Goroutines: <b>{memStats?.num_goroutines}</b></pre>
-                        <pre>
+                <Row justify="center">
+                    <Col span={24}>
+                        <div className="text-center mb-5">
+                            <pre>{dataTagline?.tagline?.banner}</pre>
+                            <pre>{dataTagline?.tagline?.tagline}</pre>
+                            <pre>
+                                Memory Alloc: <b>{memStats?.alloc}</b> |
+                                Total Alloc: <b>{memStats?.total_alloc}</b> |
+                                Num Goroutines: <b>{memStats?.num_goroutines}</b>
+                            </pre>
+                            <pre>
+                                <Space>
+                                    Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
+                                    <Tooltip title="close all client subscriber session"><Tag style={{
+                                        cursor: 'pointer'
+                                    }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
+                                </Space>
+                            </pre>
+                        </div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col span={24} >
+                        <div className="text-center" style={{ transform: "scale(1.1)" }}>
                             <Space>
-                                Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
-                                <Tooltip title="close all client subscriber session"><Tag style={{
-                                    cursor: 'pointer'
-                                }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
+                                <Tag key={"all_job"} icon={<CheckCircleOutlined />} color="magenta">
+                                    Total All Jobs:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { total_jobs }) => n + total_jobs, 0)}</b>
+                                </Tag>
+                                <Tag key={"queueing"} icon={<ClockCircleOutlined />} color="default">
+                                    All Queued:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.queueing, 0)}</b>
+                                </Tag>
+                                <Tag key={"retrying"} color="geekblue" icon={<SyncOutlined />} >
+                                    All Running:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.retrying, 0)}</b>
+                                </Tag>
+                                <Tag key={"success"} icon={<CheckCircleOutlined />} color="green">
+                                    All Succeeded:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.success, 0)}</b>
+                                </Tag>
+                                <Tag key={"failure"} icon={<CloseCircleOutlined />} color="error">
+                                    All Failed:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.failure, 0)}</b>
+                                </Tag>
+                                <Tag key={"stopped"} icon={<StopOutlined />} color="warning">
+                                    All Stopped:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}</b>
+                                </Tag>
                             </Space>
-                        </pre>
-                    </div>
-                </div>
+                        </div>
+                    </Col>
+                </Row>
                 <div style={content}>
                     <div className="text-center mb-5">
                         <TableComponent {...propsTable} />

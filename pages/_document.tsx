@@ -16,7 +16,9 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head />
+        <Head>
+          <link rel="shortcut icon" href="https://storage.googleapis.com/agungdp/static/logo/golang.png" />
+        </Head>
         <body>
           <Main />
           <NextScript />
