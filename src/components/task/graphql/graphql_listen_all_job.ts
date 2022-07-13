@@ -1,18 +1,8 @@
 import gql from 'graphql-tag';
 
-const LISTEN_JOB_LIST = gql`
-subscription ($task_name: String!, $page: Int!, $limit: Int!, $search: String, $status: [String!]!, 
-    $start_date: String, $end_date: String, $job_id: String) {
-    listen_task_job_list(
-        task_name: $task_name, 
-        page: $page, 
-        limit: $limit, 
-        search: $search, 
-        statuses: $status, 
-        start_date: $start_date, 
-        end_date: $end_date,
-        job_id: $job_id
-    ) {
+const LISTEN_ALL_JOB = gql`
+subscription ($filter: GetAllJobInputResolver) {
+    listen_all_job: listen_all_job(filter: $filter) {
         meta {
             page limit total_pages total_records is_close_session is_loading detail {
                 failure retrying success queueing stopped
@@ -20,6 +10,7 @@ subscription ($task_name: String!, $page: Int!, $limit: Int!, $search: String, $
         }
         data {
             id
+            task_name
             args: arguments
             retries
             max_retry
@@ -34,4 +25,4 @@ subscription ($task_name: String!, $page: Int!, $limit: Int!, $search: String, $
     }
 }`;
 
-export default LISTEN_JOB_LIST;
+export default LISTEN_ALL_JOB;

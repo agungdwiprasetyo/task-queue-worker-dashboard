@@ -2,7 +2,8 @@ import gql from 'graphql-tag';
 
 const LISTEN_JOB_DETAIL = gql`
 subscription ($job_id: String!) {
-    listen_job_detail(job_id: $job_id) {
+    listen_detail_job(job_id: $job_id) {
+        is_close_session
         id
         task_name
         arguments

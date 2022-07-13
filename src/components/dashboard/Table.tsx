@@ -34,7 +34,7 @@ export const TableComponent = (props: TableProps) => {
         page: props.page, limit: props.limit, search: props.search,
     });
 
-    const showAlertConfirm = (title: string, taskName: string, action: string) => {
+    const showAlertConfirm = (title: string, task_name: string, action: string) => {
         confirm({
             title: title,
             icon: <ExclamationCircleOutlined />,
@@ -43,9 +43,9 @@ export const TableComponent = (props: TableProps) => {
             cancelText: 'No',
             onOk() {
                 if (action === "CLEAN") {
-                    props.cleanJob({ variables: { taskName: taskName } });
+                    props.cleanJob({ variables: { task_name: task_name } });
                 } else if (action === "STOP") {
-                    props.stopAllJob({ variables: { taskName: taskName } });
+                    props.stopAllJob({ variables: { task_name: task_name } });
                 }
             },
             onCancel() {
@@ -143,58 +143,56 @@ export const TableComponent = (props: TableProps) => {
             key: 'action',
             title: '',
             render: (name: string, row: any) => {
-                if (props.metaTagline?.config?.with_persistent) {
-                    return (
-                        <Space>
-                            <Dropdown.Button type="primary" size="large"
-                                icon={row?.is_loading ? <LoadingOutlined spin={row?.is_loading} /> : <MoreOutlined />}
-                                disabled={row?.is_loading}
-                                onClick={() => {
-                                    router.push({
-                                        pathname: "/task",
-                                        query: { task_name: name }
-                                    })
-                                }} overlay={(
-                                    <Menu>
-                                        <Menu.Item>
-                                            <Tooltip title="Retry all failure and stopped job" placement="left">
-                                                <Button icon={<SyncOutlined />} size="middle"
-                                                    onClick={() => {
-                                                        props.retryAllJob({ variables: { taskName: name } });
-                                                    }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                            </Tooltip>
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            <Tooltip title="Stop all running and queued job" placement="left">
-                                                <Button icon={<StopOutlined />} danger size="middle"
-                                                    onClick={() => {
-                                                        showAlertConfirm(
-                                                            `Are you sure stop all running and queued job in task "${name}"?`,
-                                                            name,
-                                                            "STOP"
-                                                        );
-                                                    }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
-                                            </Tooltip>
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            <Tooltip title="Clear all success, failure, and stopped job" placement="left">
-                                                <Button icon={<ClearOutlined />} danger size="middle"
-                                                    onClick={() => {
-                                                        showAlertConfirm(
-                                                            `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
-                                                            name,
-                                                            "CLEAN"
-                                                        );
-                                                    }}>Clear Job</Button>
-                                            </Tooltip>
-                                        </Menu.Item>
-                                    </Menu>
-                                )}>
-                                {row?.is_loading ? "Processing..." : "View Jobs"}
-                            </Dropdown.Button>
-                        </Space>
-                    )
-                }
+                return (
+                    <Space>
+                        <Dropdown.Button type="primary" size="large"
+                            icon={row?.is_loading ? <LoadingOutlined spin={row?.is_loading} /> : <MoreOutlined />}
+                            disabled={row?.is_loading || !props.metaTagline?.config?.with_persistent}
+                            onClick={() => {
+                                router.push({
+                                    pathname: "/task",
+                                    query: { task_name: name }
+                                })
+                            }} overlay={(
+                                <Menu>
+                                    <Menu.Item>
+                                        <Tooltip title="Retry all failure and stopped job" placement="left">
+                                            <Button icon={<SyncOutlined />} size="middle"
+                                                onClick={() => {
+                                                    props.retryAllJob({ variables: { task_name: name } });
+                                                }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                        </Tooltip>
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Tooltip title="Stop all running and queued job" placement="left">
+                                            <Button icon={<StopOutlined />} danger size="middle"
+                                                onClick={() => {
+                                                    showAlertConfirm(
+                                                        `Are you sure stop all running and queued job in task "${name}"?`,
+                                                        name,
+                                                        "STOP"
+                                                    );
+                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
+                                        </Tooltip>
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Tooltip title="Clear all success, failure, and stopped job" placement="left">
+                                            <Button icon={<ClearOutlined />} danger size="middle"
+                                                onClick={() => {
+                                                    showAlertConfirm(
+                                                        `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
+                                                        name,
+                                                        "CLEAN"
+                                                    );
+                                                }}>Clear Job</Button>
+                                        </Tooltip>
+                                    </Menu.Item>
+                                </Menu>
+                            )}>
+                            {row?.is_loading ? "Processing..." : "View Jobs"}
+                        </Dropdown.Button>
+                    </Space>
+                )
             },
         },
     ];

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
-import LISTEN_JOB_LIST from './graphql_listen_job_list';
+import LISTEN_ALL_JOB from './graphql_listen_all_job';
 import RETRY_JOB from './graphql_retry_job';
 import STOP_JOB from './graphql_stop_job';
 import ADD_JOB from './graphql_add_job';
@@ -20,20 +20,8 @@ export const RetryJobGraphQL = () => {
 
 export const SubscribeTaskJobList = (params: ITaskListParam) => {
     try {
-        if (!params.taskName || params.taskName == "") {
-            return {};
-        }
-        const { data, loading, error } = useSubscription(LISTEN_JOB_LIST, {
-            variables: {
-                "task_name": params.taskName,
-                "page": params.page,
-                "limit": params.limit,
-                "search": params.search,
-                "status": params.status,
-                "start_date": params.startDate,
-                "end_date": params.endDate,
-                "job_id": params.jobId,
-            }
+        const { data, loading, error } = useSubscription(LISTEN_ALL_JOB, {
+            variables: { filter: params }
         });
         return { data, loading, error };
     }

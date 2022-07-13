@@ -64,6 +64,14 @@ export const toPrettyJSON = (obj): string => {
     }
 }
 
+export const toMinifyJSON = (obj): string => {
+    try {
+        return JSON.stringify(JSON.parse(obj))
+    } catch (error) {
+        return obj
+    }
+}
+
 export const getWindowDimensions = () => {
     const { innerWidth: width, innerHeight: height } = window;
     return {

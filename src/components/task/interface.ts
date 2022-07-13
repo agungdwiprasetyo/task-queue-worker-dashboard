@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 export interface ITaskComponentProps {
-    taskName: string;
+    task_name: string;
 }
 
 export interface TableProps {
@@ -12,11 +12,12 @@ export interface TableProps {
     defaultOrder: any;
     params: ITaskListParam;
     showJobId: string | null;
-    setParam?: any;
+    task_name_param?: string;
+    setParam?: Dispatch<SetStateAction<ITaskListParam>>;
 }
 
 export interface ModalProps {
-    taskName: string;
+    task_name: string;
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
 }
@@ -31,12 +32,12 @@ export interface MetaProps {
 export interface ITaskListParam {
     page: number;
     limit: number;
-    taskName: string;
-    jobId: string;
+    task_name: string;
     search: string;
-    status: string[];
-    startDate: string;
-    endDate: string;
+    statuses: string[];
+    start_date: string;
+    end_date: string;
+    job_id: string;
 }
 
 export interface IJobDetail {

@@ -7,51 +7,47 @@ const FormFilter = (props: IFormFilterProps) => {
 
     const [isFilterActive, setIsFilterActive] = useState(
         (props.params?.search?.length > 0) ||
-        (props.params?.startDate?.length > 0 && props.params?.endDate?.length > 0) ||
-        (props.params?.status?.length > 0) ||
-        (props.params?.jobId?.length > 0)
+        (props.params?.start_date?.length > 0 && props.params?.end_date?.length > 0) ||
+        (props.params?.statuses?.length > 0) ||
+        (props.params?.job_id?.length > 0)
     );
 
     useEffect(() => {
         setIsFilterActive(
             (props.params?.search?.length > 0) ||
-            (props.params?.startDate?.length > 0 && props.params?.endDate?.length > 0) ||
-            (props.params?.status?.length > 0) ||
-            (props.params?.jobId?.length > 0)
+            (props.params?.start_date?.length > 0 && props.params?.end_date?.length > 0) ||
+            (props.params?.statuses?.length > 0) ||
+            (props.params?.job_id?.length > 0)
         )
     }, [props.params])
 
     const [form] = Form.useForm();
     const onApplyFilter = () => {
         form.validateFields().then(values => {
-            let startDate, endDate: string;
+            let start_date, end_date: string;
             if (values?.dateRange?.length == 2) {
-                startDate = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
-                endDate = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
+                start_date = values?.dateRange[0].format("YYYY-MM-DDTHH:mm:ssZ");
+                end_date = values?.dateRange[1].format("YYYY-MM-DDTHH:mm:ssZ")
             }
 
             const param: ITaskListParam = {
                 page: 1,
                 limit: props.params.limit,
-                taskName: props.params.taskName,
+                task_name: props.params.task_name,
                 search: values?.search,
-                jobId: null,
-                status: values?.status ? values?.status : [],
-                startDate: startDate,
-                endDate: endDate
+                job_id: null,
+                statuses: values?.status ? values?.status : [],
+                start_date: start_date,
+                end_date: end_date
             }
             props.setParam(param)
             setIsFilterActive(
                 (param.search?.length > 0) ||
-                (param.startDate?.length > 0 && param.endDate?.length > 0) ||
-                (param.status?.length > 0) ||
-                (param.jobId?.length > 0)
+                (param.start_date?.length > 0 && param.end_date?.length > 0) ||
+                (param.statuses?.length > 0) ||
+                (param.job_id?.length > 0)
             )
         });
-    }
-
-    const getFilterWording = (obj) => {
-        console.log(obj?.search)
     }
 
     return (
@@ -95,31 +91,29 @@ const FormFilter = (props: IFormFilterProps) => {
                 </Form.Item>
             </Form>
             {isFilterActive ?
-                <>
-                    <Row>
-                        <Col span={18}>
-                            <div style={{ marginTop: "5px" }}>
-                                <b>{props.totalRecords}</b> results for <b>{
-                                    props.params?.status?.length > 0 ? props.params?.status?.join(", ") : "ALL"
-                                }</b> status {
-                                    props.params?.search?.length > 0 ? <>matching <b>{props.params?.search}</b></> : ""
-                                } {
-                                    (props.params?.startDate?.length > 0 && props.params?.endDate?.length > 0) ?
-                                        <>when created at between <b>{props.params?.startDate}</b> and <b>{props.params?.endDate}</b></>
-                                        : ""
-                                }
-                            </div>
-                        </Col>
-                        <Col span={3} offset={3} className="text-center">
-                            <Button type="link" size="middle" onClick={() => {
-                                form.resetFields();
-                                onApplyFilter();
-                            }}>
-                                Clear Filter
-                            </Button>
-                        </Col>
-                    </Row>
-                </>
+                <Row>
+                    <Col span={18}>
+                        <div style={{ marginTop: "5px" }}>
+                            <b>{props.totalRecords}</b> results for <b>{
+                                props.params?.statuses?.length > 0 ? props.params?.statuses?.join(", ") : "ALL"
+                            }</b> status {
+                                props.params?.search?.length > 0 ? <>matching <b>{props.params?.search}</b></> : ""
+                            } {
+                                (props.params?.start_date?.length > 0 && props.params?.end_date?.length > 0) ?
+                                    <>when created at between <b>{props.params?.start_date}</b> and <b>{props.params?.end_date}</b></>
+                                    : ""
+                            }
+                        </div>
+                    </Col>
+                    <Col span={3} offset={3} className="text-center">
+                        <Button type="link" size="middle" onClick={() => {
+                            form.resetFields();
+                            onApplyFilter();
+                        }}>
+                            Clear Filter
+                        </Button>
+                    </Col>
+                </Row>
                 : <></>}
         </Space>
     )

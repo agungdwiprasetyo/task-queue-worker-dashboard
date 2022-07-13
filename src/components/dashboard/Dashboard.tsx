@@ -1,9 +1,10 @@
+import { useRouter } from 'next/router';
 import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graphql';
 import { StopAllJob, RetryAllJob } from '../task/graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip, Row, Col } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip, Row, Col, notification } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
@@ -11,6 +12,8 @@ import { getQueryVariable } from '../../utils/helper';
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 
 const DashboardComponent = (props: any) => {
+    const router = useRouter();
+
     const { data, loading, error } = SubscribeTaskList(1, 10, null);
     if (error) {
         Modal.error({
@@ -31,7 +34,7 @@ const DashboardComponent = (props: any) => {
     const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
     const search = getQueryVariable("search") || "";
 
-    const dataTagline = GetTagLine({ pollInterval: 10000 });
+    const dataTagline = GetTagLine({ pollInterval: 15000 });
     const memStats = dataTagline?.tagline?.memory_statistics;
 
     const content = {
@@ -46,15 +49,8 @@ const DashboardComponent = (props: any) => {
 
     const meta = data?.listen_task_dashboard?.meta;
     if (meta?.is_close_session) {
-        Modal.error({
-            title: 'Session expired, refresh page',
-            content: (
-                <p>Please refresh page</p>
-            ),
-            onOk() {
-                location.reload();
-            },
-            maskClosable: true,
+        router.push({
+            pathname: "/expired"
         })
     }
 
@@ -78,6 +74,28 @@ const DashboardComponent = (props: any) => {
         version: dataTagline?.tagline?.version,
         buildNumber: dataTagline?.tagline?.build_number,
         go_version: dataTagline?.tagline?.go_version,
+    }
+
+    if (dataTagline?.tagline?.dependency_health?.persistent) {
+        notification.error({
+            message: "Dependency Error!",
+            description: dataTagline?.tagline?.dependency_health?.persistent,
+            duration: 10
+        })
+    }
+    if (dataTagline?.tagline?.dependency_health?.queue) {
+        notification.error({
+            message: "Dependency Error!",
+            description: dataTagline?.tagline?.dependency_health?.queue,
+            duration: 10
+        })
+    }
+
+    const onTagClicked = (status: string) => {
+        router.push({
+            pathname: "/task",
+            query: { statuses: status }
+        })
     }
 
     return (
@@ -106,31 +124,37 @@ const DashboardComponent = (props: any) => {
                 </Row>
                 <Row>
                     <Col span={24} >
-                        <div className="text-center" style={{ transform: "scale(1.1)" }}>
+                        <div className="text-center" style={{ fontWeight: "bold" }}>
                             <Space>
-                                <Tag key={"all_job"} icon={<CheckCircleOutlined />} color="magenta">
-                                    Total All Jobs:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { total_jobs }) => n + total_jobs, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"all_job"} icon={<CheckCircleOutlined />} color="magenta"
+                                    onClick={() => { onTagClicked("") }}>
+                                    Total All Jobs:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { total_jobs }) => n + total_jobs, 0)}
                                 </Tag>
-                                <Tag key={"queueing"} icon={<ClockCircleOutlined />} color="default">
-                                    All Queued:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.queueing, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"queueing"} icon={<ClockCircleOutlined />} color="default"
+                                    onClick={() => { onTagClicked("QUEUEING") }}>
+                                    All Queued:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.queueing, 0)}
                                 </Tag>
-                                <Tag key={"retrying"} color="geekblue" icon={<SyncOutlined />} >
-                                    All Running:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.retrying, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"retrying"} color="geekblue" icon={<SyncOutlined />}
+                                    onClick={() => { onTagClicked("RETRYING") }}>
+                                    All Running:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.retrying, 0)}
                                 </Tag>
-                                <Tag key={"success"} icon={<CheckCircleOutlined />} color="green">
-                                    All Succeeded:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.success, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"success"} icon={<CheckCircleOutlined />} color="green"
+                                    onClick={() => { onTagClicked("SUCCESS") }}>
+                                    All Succeeded:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.success, 0)}
                                 </Tag>
-                                <Tag key={"failure"} icon={<CloseCircleOutlined />} color="error">
-                                    All Failed:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.failure, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"failure"} icon={<CloseCircleOutlined />} color="error"
+                                    onClick={() => { onTagClicked("FAILURE") }}>
+                                    All Failed:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.failure, 0)}
                                 </Tag>
-                                <Tag key={"stopped"} icon={<StopOutlined />} color="warning">
-                                    All Stopped:  <b>{props.loading ? <LoadingOutlined spin={true} /> :
-                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}</b>
+                                <Tag style={{ cursor: 'pointer' }} key={"stopped"} icon={<StopOutlined />} color="warning"
+                                    onClick={() => { onTagClicked("STOPPED") }}>
+                                    All Stopped:  {props.loading ? <LoadingOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}
                                 </Tag>
                             </Space>
                         </div>

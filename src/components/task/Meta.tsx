@@ -19,49 +19,49 @@ const Meta = (props: MetaProps) => {
         props.setParam({
             page: 1,
             limit: props.params.limit,
-            taskName: props.params.taskName,
+            task_name: props.params.task_name,
             search: props.params.search,
-            status: status ? [status] : [],
-            jobId: props.params.jobId,
-            startDate: props.params.startDate,
-            endDate: props.params.endDate
+            statuses: status ? [status] : [],
+            job_id: props.params.job_id,
+            start_date: props.params.start_date,
+            end_date: props.params.end_date
         })
     }
 
     return (
-        <div className="text-center" style={{ transform: "scale(1.1)" }}>
+        <div className="text-center" >
             <Tag style={pointerHover} key={"all_job"}
                 icon={<CheckCircleOutlined />} color="magenta"
                 onClick={() => { onTagClicked(null) }}>
                 <b>Total Jobs: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.total_records}</b>
             </Tag>
             <Tag style={pointerHover} key={"queueing"}
-                className={props.params?.status.includes("QUEUEING") ? "shadow-default" :
+                className={props.params?.statuses?.includes("QUEUEING") ? "shadow-default" :
                     props?.meta?.detail?.queueing > 0 ? "fade-in-default" : "fade-out"}
                 icon={<ClockCircleOutlined />} color="default"
                 onClick={() => { onTagClicked('QUEUEING') }}>
                 <b>Queueing: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.queueing}</b>
             </Tag>
             <Tag style={pointerHover} key={"retrying"}
-                className={props.params?.status.includes("RETRYING") ? "shadow-running" :
+                className={props.params?.statuses?.includes("RETRYING") ? "shadow-running" :
                     props?.meta?.detail?.retrying > 0 ? "fade-in-running" : "fade-out"}
                 icon={<SyncOutlined spin={props?.meta?.detail?.retrying != undefined && props?.meta?.detail?.retrying !== 0} />}
                 color="geekblue" onClick={() => { onTagClicked('RETRYING') }}>
                 <b>Running: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.retrying}</b>
             </Tag>
-            <Tag style={pointerHover} className={props.params?.status.includes("SUCCESS") ? "shadow-success" : ""} key={"success"}
+            <Tag style={pointerHover} className={props.params?.statuses?.includes("SUCCESS") ? "shadow-success" : ""} key={"success"}
                 icon={<CheckCircleOutlined />} color="green"
                 onClick={() => { onTagClicked('SUCCESS') }}>
                 <b>Success: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.success}</b>
             </Tag>
             <Tag style={pointerHover} key={"failure"}
-                className={props.params?.status.includes("FAILURE") ? "shadow-failure" :
+                className={props.params?.statuses?.includes("FAILURE") ? "shadow-failure" :
                     props?.meta?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"}
                 icon={<CloseCircleOutlined />} color="error"
                 onClick={() => { onTagClicked('FAILURE') }}>
                 <b>Failure: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.failure}</b>
             </Tag>
-            <Tag style={pointerHover} className={props.params?.status.includes("STOPPED") ? "shadow-stopped" : ""} key={"stopped"}
+            <Tag style={pointerHover} className={props.params?.statuses?.includes("STOPPED") ? "shadow-stopped" : ""} key={"stopped"}
                 icon={<StopOutlined />} color="warning"
                 onClick={() => { onTagClicked('STOPPED') }}>
                 <b>Stopped: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.stopped}</b>

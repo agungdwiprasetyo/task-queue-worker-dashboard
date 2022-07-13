@@ -37,7 +37,12 @@ const JobComponent = (props: IJobComponentProps) => {
             maskClosable: true,
         })
     }
-    const detailJob = data?.listen_job_detail;
+    const detailJob = data?.listen_detail_job;
+    if (detailJob?.is_close_session) {
+        router.push({
+            pathname: "/expired"
+        })
+    }
 
     const statusProps: StatusLayoutProps = {
         status: detailJob?.status,

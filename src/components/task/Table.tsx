@@ -1,5 +1,5 @@
-import Table, { ColumnProps } from 'antd/lib/table';
-import React from 'react';
+import Table, { ColumnProps, ColumnsType } from 'antd/lib/table';
+import React, { useEffect } from 'react';
 import { Space, Button, Input, Modal, Typography, Tooltip } from 'antd';
 import {
     SyncOutlined,
@@ -22,7 +22,7 @@ const TableComponent = (props: TableProps) => {
     const { stopJob } = StopJobGraphQL();
     const { deleteJob } = DeleteJobGraphQL();
 
-    const showAlertDeleteJob = (jobId: string) => {
+    const showAlertDeleteJob = (job_id: string) => {
         Modal.confirm({
             title: `Are you sure to delete this job?`,
             icon: <ExclamationCircleOutlined />,
@@ -30,7 +30,7 @@ const TableComponent = (props: TableProps) => {
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-                deleteJob({ variables: { jobId: jobId } });
+                deleteJob({ variables: { job_id: job_id } });
             },
             onCancel() {
             },
@@ -50,12 +50,12 @@ const TableComponent = (props: TableProps) => {
                         props.setParam({
                             page: 1,
                             limit: props?.meta?.limit,
-                            taskName: props.params.taskName,
+                            task_name: props.params.task_name,
                             search: props.params.search,
-                            jobId: selectedKeys[0],
-                            status: props.params.status,
-                            startDate: props.params.startDate,
-                            endDate: props.params.endDate,
+                            job_id: selectedKeys[0],
+                            statuses: props.params.statuses,
+                            start_date: props.params.start_date,
+                            end_date: props.params.end_date,
                         });
                     }}
                     onSearch={value => {
@@ -63,12 +63,12 @@ const TableComponent = (props: TableProps) => {
                         props.setParam({
                             page: 1,
                             limit: props?.meta?.limit,
-                            taskName: props.params.taskName,
+                            task_name: props.params.task_name,
                             search: props.params.search,
-                            jobId: value,
-                            status: props.params.status,
-                            startDate: props.params.startDate,
-                            endDate: props.params.endDate,
+                            job_id: value,
+                            statuses: props.params.statuses,
+                            start_date: props.params.start_date,
+                            end_date: props.params.end_date,
                         });
                     }}
                     style={{ width: 188, marginBottom: 8, display: 'block' }}
@@ -82,12 +82,13 @@ const TableComponent = (props: TableProps) => {
                 : '',
     })
 
-    const columns: Array<ColumnProps<any>> = [
+    let columns: ColumnsType<any> = [
         {
             dataIndex: 'id',
             key: 'id',
             title: 'Job ID',
             width: 130,
+            fixed: 'left',
             ...getColumnSearchProps('id'),
             render: (id: string) => {
                 return (
@@ -111,11 +112,11 @@ const TableComponent = (props: TableProps) => {
             width: 250,
             render: (args: string) => {
                 return (
-                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: args }}>
+                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(args) }}>
                         <pre onClick={() => Modal.info({
                             title: 'Arguments:',
                             content: (
-                                <Paragraph copyable={{ text: args }}>
+                                <Paragraph copyable={{ text: toPrettyJSON(args) }}>
                                     <pre>
                                         <Highlighter
                                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -180,7 +181,7 @@ const TableComponent = (props: TableProps) => {
                         <pre onClick={() => Modal.info({
                             title: 'Error:',
                             content: (
-                                <Paragraph copyable={{ text: error }}>
+                                <Paragraph copyable={{ text: toPrettyJSON(error) }}>
                                     <pre>
                                         <Highlighter
                                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -224,6 +225,7 @@ const TableComponent = (props: TableProps) => {
             key: 'status',
             title: 'Status',
             width: 100,
+            fixed: 'right',
             render: (status: string, row: any) => {
                 const statusProps: StatusLayoutProps = {
                     status: status, retry: row?.retries
@@ -238,17 +240,18 @@ const TableComponent = (props: TableProps) => {
             key: 'status',
             title: 'Action',
             width: 100,
+            fixed: 'right',
             render: (status: string, row: any) => {
                 return (
                     <Space direction="vertical" align="center">
                         {
                             (status == "RETRYING" || status == "QUEUEING") ?
                                 <Button icon={<StopOutlined />} type="primary" danger size="small" onClick={() => {
-                                    stopJob({ variables: { jobId: row?.id } })
+                                    stopJob({ variables: { job_id: row?.id } })
                                 }}>Stop<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                 :
                                 <Button icon={<SyncOutlined />} type="primary" size="small" onClick={() => {
-                                    retryJob({ variables: { jobId: row?.id } });
+                                    retryJob({ variables: { job_id: row?.id } });
                                 }}>Retry<span>&nbsp;&nbsp;</span></Button>
 
                         }
@@ -263,6 +266,21 @@ const TableComponent = (props: TableProps) => {
             }
         },
     ];
+
+    if (!props.task_name_param) {
+        columns.unshift(
+            {
+                dataIndex: 'task_name',
+                key: 'task_name',
+                title: 'Task Name',
+                width: 90,
+                render: (task_name: string) => {
+                    return (
+                        <b>{task_name}</b>
+                    )
+                }
+            })
+    }
 
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {
         const { current, pageSize } = pagination;
@@ -283,18 +301,18 @@ const TableComponent = (props: TableProps) => {
         if (filters?.status) {
             statusList = statusList.concat(filters?.status);
         } else {
-            statusList = props.params.status;
+            statusList = props.params.statuses;
         }
 
         props.setParam({
             page: current,
             limit: pageSize,
-            taskName: props.params.taskName,
+            task_name: props.params.task_name,
             search: props.params.search,
-            status: statusList,
-            jobId: props.params.jobId,
-            startDate: props.params.startDate,
-            endDate: props.params.endDate,
+            statuses: statusList,
+            job_id: props.params.job_id,
+            start_date: props.params.start_date,
+            end_date: props.params.end_date,
         })
     };
 
@@ -311,7 +329,7 @@ const TableComponent = (props: TableProps) => {
                     showSizeChanger: false,
                     showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> jobs</>) }
                 }}
-                scroll={{ x: 560 }}
+                scroll={{ x: 1300 }}
             />
         </div>
     );

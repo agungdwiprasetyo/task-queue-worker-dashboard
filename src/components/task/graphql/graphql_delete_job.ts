@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const DELETE_JOB = gql`
-mutation ($jobId: String!) {
-    delete_job(job_id: $jobId)
+mutation ($job_id: String!) {
+    delete_job(job_id: $job_id)
 }`;
 
 export default DELETE_JOB;

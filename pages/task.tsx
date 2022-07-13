@@ -11,7 +11,7 @@ const Task = (props: any) => {
   const { task_name } = router.query;
 
   const taskComponentProps: ITaskComponentProps = {
-    taskName: task_name as string,
+    task_name: task_name as string,
   }
 
   return (

@@ -57,6 +57,10 @@ func main() {
 		"/job": &vfsgen۰DirInfo{
 			name:    "/job",
 			modTime: time.Date(2022, 3, 3, 17, 9, 34, 687442386, time.UTC),
+		},
+		"/expired": &vfsgen۰DirInfo{
+			name:    "/expired",
+			modTime: time.Date(2022, 3, 3, 17, 9, 34, 687442386, time.UTC),
 		},` + flStr[idx:]
 
 	idx = strings.Index(flStr, `return fs`)
@@ -72,6 +76,7 @@ func main() {
 		fs["/job.html"].(os.FileInfo),
 		fs["/manifest.json"].(os.FileInfo),
 		fs["/task.html"].(os.FileInfo),
+		fs["/expired.html"].(os.FileInfo),
 	}
 	fs["/job"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
 		fs["/404.html"].(os.FileInfo),
@@ -83,9 +88,23 @@ func main() {
 		fs["/job.html"].(os.FileInfo),
 		fs["/manifest.json"].(os.FileInfo),
 		fs["/task.html"].(os.FileInfo),
+		fs["/expired.html"].(os.FileInfo),
+	}
+	fs["/expired"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
+		fs["/404.html"].(os.FileInfo),
+		fs["/404.html.html"].(os.FileInfo),
+		fs["/_next"].(os.FileInfo),
+		fs["/icon-192.png"].(os.FileInfo),
+		fs["/icon-512.png"].(os.FileInfo),
+		fs["/index.html"].(os.FileInfo),
+		fs["/job.html"].(os.FileInfo),
+		fs["/manifest.json"].(os.FileInfo),
+		fs["/task.html"].(os.FileInfo),
+		fs["/expired.html"].(os.FileInfo),
 	}
 	fs["/task/index.html"] = fs["/task.html"]
 	fs["/job/index.html"] = fs["/job.html"]
+	fs["/expired/index.html"] = fs["/expired.html"]
 ` + flStr[idx:]
 
 	if err := os.WriteFile(filename, []byte(flStr), 0644); err != nil {

@@ -19,7 +19,7 @@ export interface TableProps extends FilterPagination {
 }
 
 export interface ModalConfirmProps {
-    taskName: string;
+    task_name: string;
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
 }

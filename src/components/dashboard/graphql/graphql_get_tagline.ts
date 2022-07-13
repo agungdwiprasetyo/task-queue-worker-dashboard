@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 const TAGLINE = gql`
 query {
@@ -9,6 +9,9 @@ query {
         }
         memory_statistics {
             alloc total_alloc num_gc num_goroutines
+        }
+        dependency_health {
+            persistent queue
         }
     }
 }`;

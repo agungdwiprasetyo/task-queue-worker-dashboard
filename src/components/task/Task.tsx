@@ -28,12 +28,12 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         page: page,
         limit: 10,
-        taskName: task_name,
-        jobId: job_id,
+        task_name: task_name,
+        job_id: job_id,
         search: search,
-        status: statuses,
-        startDate: start_date != "" ? start_date : null,
-        endDate: end_date != "" ? end_date : null
+        statuses: statuses,
+        start_date: start_date != "" ? start_date : null,
+        end_date: end_date != "" ? end_date : null
     });
 
     const { cleanJob } = CleanJobGraphQL();
@@ -50,23 +50,14 @@ const TaskComponent = (props: ITaskComponentProps) => {
             maskClosable: true,
         })
     }
-    const meta = data?.listen_task_job_list?.meta;
+    const meta = data?.listen_all_job?.meta;
     if (meta?.is_close_session) {
-        Modal.error({
-            title: 'Session expired, refresh page',
-            content: (
-                <p>Please refresh page</p>
-            ),
-            onOk() {
-                router.push({
-                    pathname: "/"
-                })
-            },
-            maskClosable: true,
+        router.push({
+            pathname: "/expired"
         })
     }
 
-    const showAlertConfirm = (title: string, taskName: string, action: string) => {
+    const showAlertConfirm = (title: string, task_name: string, action: string) => {
         const actionMap = {
             CLEAN: cleanJob,
             STOP: stopAllJob
@@ -77,7 +68,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
-            onOk() { actionMap[action]({ variables: { taskName: taskName } }) },
+            onOk() { actionMap[action]({ variables: { task_name: task_name } }) },
             onCancel() {
             },
         });
@@ -85,7 +76,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
 
     const onChangeParam = (param: ITaskListParam) => {
         let queryParam = {
-            task_name: param.taskName
+            task_name: param.task_name
         }
         if (param.page > 0) {
             queryParam["page"] = param.page
@@ -93,20 +84,20 @@ const TaskComponent = (props: ITaskComponentProps) => {
         if (param.search && param.search != "") {
             queryParam["search"] = encodeURI(param.search)
         }
-        if (param.startDate && param.startDate != "") {
-            queryParam["start_date"] = param.startDate
+        if (param.start_date && param.start_date != "") {
+            queryParam["start_date"] = param.start_date
         }
-        if (param.endDate && param.endDate != "") {
-            queryParam["end_date"] = param.endDate
+        if (param.end_date && param.end_date != "") {
+            queryParam["end_date"] = param.end_date
         }
-        if (param.status.length > 0) {
-            queryParam["statuses"] = param.status?.join(",")
+        if (param.statuses?.length > 0) {
+            queryParam["statuses"] = param.statuses?.join(",")
         }
-        if (param.jobId && param.jobId != "") {
-            queryParam["job_id"] = param.jobId
+        if (param.job_id && param.job_id != "") {
+            queryParam["job_id"] = param.job_id
         }
-        window.history.replaceState(null, "", `task?${setQueryVariable(queryParam)}`)
         setParamsTaskList(param);
+        window.history.replaceState(null, "", `task?${setQueryVariable(queryParam)}`);
     }
 
     const propsMeta: MetaProps = {
@@ -117,18 +108,19 @@ const TaskComponent = (props: ITaskComponentProps) => {
     }
 
     const propsTable: TableProps = {
-        data: data?.listen_task_job_list?.data,
+        data: data?.listen_all_job?.data,
         meta: meta,
         loading: loading,
         defaultSort: "desc",
         defaultOrder: "",
         params: paramsTaskList,
         showJobId: getQueryVariable("job_id"),
+        task_name_param: props.task_name,
         setParam: onChangeParam,
     };
 
     const propsModal: ModalProps = {
-        taskName: paramsTaskList.taskName,
+        task_name: paramsTaskList.task_name,
         visible: modalAddJobVisible,
         setVisible: setModalAddJobVisible,
     }
@@ -148,7 +140,11 @@ const TaskComponent = (props: ITaskComponentProps) => {
                     <Row>
                         <Col span={24}>
                             <div className="text-center">
-                                <h3>Task Name:</h3> <h2><pre><b>{props.taskName}</b></pre></h2>
+                                {props.task_name ?
+                                    (<><h3>Task Name:</h3> <h2><pre><b>{props.task_name}</b></pre></h2></>)
+                                    :
+                                    (<h1><pre><b>All Task</b></pre></h1>)
+                                }
                             </div>
                         </Col>
                     </Row>
@@ -169,60 +165,63 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                 })
                             }}>Back to dashboard</Button>
                         </Col>
-                        <Col span={9}>
-                            <Row justify="end" gutter={[48, 16]}>
-                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                        disabled={loading || meta?.is_loading}
-                                        icon={<PlusOutlined />}
-                                        size="middle"
-                                        type="primary"
-                                        onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                                    <Tooltip title="Retry all failure and stopped job">
+                        {props.task_name ?
+                            <Col span={9}>
+                                <Row justify="end" gutter={[48, 16]}>
+                                    <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                             disabled={loading || meta?.is_loading}
-                                            icon={<SyncOutlined />}
+                                            icon={<PlusOutlined />}
                                             size="middle"
                                             type="primary"
-                                            onClick={() => {
-                                                retryAllJob({ variables: { taskName: paramsTaskList.taskName } });
-                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Space>
-                            </Row>
-                            <Row justify="end" gutter={48}>
-                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                    <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
-                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                            disabled={loading || meta?.is_loading}
-                                            icon={<ClearOutlined />}
-                                            danger
-                                            size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    "Are you sure clear all success, failure, and stopped job in this task?",
-                                                    paramsTaskList.taskName,
-                                                    "CLEAN"
-                                                );
-                                            }}>Clear Job</Button>
-                                    </Tooltip>
-                                    <Tooltip title="Stop all running and queued job" placement="bottom">
-                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                            disabled={loading || meta?.is_loading}
-                                            icon={<StopOutlined />}
-                                            danger
-                                            size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    "Are you sure stop all running and queued job in this task?",
-                                                    paramsTaskList.taskName,
-                                                    "STOP"
-                                                );
-                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Space>
-                            </Row>
-                        </Col>
+                                            onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
+                                        <Tooltip title="Retry all failure and stopped job">
+                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                                disabled={loading || meta?.is_loading}
+                                                icon={<SyncOutlined />}
+                                                size="middle"
+                                                type="primary"
+                                                onClick={() => {
+                                                    retryAllJob({ variables: { task_name: paramsTaskList.task_name } });
+                                                }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                        </Tooltip>
+                                    </Space>
+                                </Row>
+                                <Row justify="end" gutter={48}>
+                                    <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                                        <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
+                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                                disabled={loading || meta?.is_loading}
+                                                icon={<ClearOutlined />}
+                                                danger
+                                                size="middle"
+                                                onClick={() => {
+                                                    showAlertConfirm(
+                                                        "Are you sure clear all success, failure, and stopped job in this task?",
+                                                        paramsTaskList.task_name,
+                                                        "CLEAN"
+                                                    );
+                                                }}>Clear Job</Button>
+                                        </Tooltip>
+                                        <Tooltip title="Stop all running and queued job" placement="bottom">
+                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                                disabled={loading || meta?.is_loading}
+                                                icon={<StopOutlined />}
+                                                danger
+                                                size="middle"
+                                                onClick={() => {
+                                                    showAlertConfirm(
+                                                        "Are you sure stop all running and queued job in this task?",
+                                                        paramsTaskList.task_name,
+                                                        "STOP"
+                                                    );
+                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
+                                        </Tooltip>
+                                    </Space>
+                                </Row>
+                            </Col>
+                            : ""
+                        }
                     </Row>
 
                     <Row justify="center">
