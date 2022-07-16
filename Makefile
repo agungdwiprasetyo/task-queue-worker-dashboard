@@ -10,6 +10,8 @@ build:
 	cp assets_dashboard_build.go /opt/assets_dashboard_build.go
 	# cp assets_dashboard_build.go ${CANDI_REPO_PATH}/candi/codebase/app/task_queue_worker/dashboard/assets_dashboard_build.go
 
+	git config --global user.email "agungdwiprasetyo22@gmail.com"
+	git config --global user.name "agungdwiprasetyo"
 	git clone https://github.com/golangid/candi-plugin
 	cd candi-plugin && \
 	cp /opt/assets_dashboard_build.go task-queue-worker/assets_dashboard_build.go && \
