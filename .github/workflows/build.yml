@@ -34,6 +34,7 @@ jobs:
         with:
           go-version: 1.18
 
+      - name: Build Dashboard
       - run: |
           node -v
           npm -v
@@ -51,12 +52,12 @@ jobs:
 
       - name: Push Go Code
         run: |
-          cp -RT /opt/assets_dashboard_build.go candi-plugin/task-queue-worker/assets_dashboard_build.go
+          cp -RT /opt/assets_dashboard_build.go candi-plugin/task-queue-worker/dashboard/assets_dashboard_build.go
           cd candi-plugin
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "task queue worker: update dashboard"
+          git commit -m "task queue worker: update dashboard\nhttps://github.com/agungdwiprasetyo/task-queue-worker-dashboard/commit/${GITHUB_SHA}"
           git push https://$USERNAME:$REPO_KEY@github.com/golangid/candi-plugin.git
         env:
           REPO_KEY: ${{secrets.TOKEN}}
