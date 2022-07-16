@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-const TAGLINE = gql`
+const DASHBOARD = gql`
 query {
-    tagline {
+    dashboard {
         version go_version banner tagline start_at build_number
         config {
             with_persistent
@@ -16,4 +16,4 @@ query {
     }
 }`;
 
-export default TAGLINE;
+export default DASHBOARD;

@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
-import { SubscribeTaskList, GetTagLine, ClearAllClientSubscriber } from './graphql';
+import { SubscribeTaskList, GetDashboard, ClearAllClientSubscriber } from './graphql';
 import { StopAllJob, RetryAllJob } from '../task/graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip, Row, Col, notification } from 'antd';
+import { Modal, Layout, Tag, Space, Tooltip, Row, Col, notification, Skeleton } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
@@ -34,8 +34,9 @@ const DashboardComponent = (props: any) => {
     const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
     const search = getQueryVariable("search") || "";
 
-    const dataTagline = GetTagLine({ pollInterval: 15000 });
-    const memStats = dataTagline?.tagline?.memory_statistics;
+    const dashboardData = GetDashboard({ pollInterval: 15000 });
+    const dataDashboard = dashboardData?.data;
+    const memStats = dataDashboard?.dashboard?.memory_statistics;
 
     const content = {
         marginTop: '30px',
@@ -66,27 +67,27 @@ const DashboardComponent = (props: any) => {
         page: page,
         limit: limit,
         search: search,
-        metaTagline: dataTagline?.tagline
+        metaTagline: dataDashboard?.dashboard
     };
 
     const propsFooter: IFooterComponentProps = {
-        serverStartedAt: dataTagline?.tagline?.start_at,
-        version: dataTagline?.tagline?.version,
-        buildNumber: dataTagline?.tagline?.build_number,
-        go_version: dataTagline?.tagline?.go_version,
+        serverStartedAt: dataDashboard?.dashboard?.start_at,
+        version: dataDashboard?.dashboard?.version,
+        buildNumber: dataDashboard?.dashboard?.build_number,
+        go_version: dataDashboard?.dashboard?.go_version,
     }
 
-    if (dataTagline?.tagline?.dependency_health?.persistent) {
+    if (dataDashboard?.dashboard?.dependency_health?.persistent) {
         notification.error({
             message: "Dependency Error!",
-            description: dataTagline?.tagline?.dependency_health?.persistent,
+            description: dataDashboard?.dashboard?.dependency_health?.persistent,
             duration: 10
         })
     }
-    if (dataTagline?.tagline?.dependency_health?.queue) {
+    if (dataDashboard?.dashboard?.dependency_health?.queue) {
         notification.error({
             message: "Dependency Error!",
-            description: dataTagline?.tagline?.dependency_health?.queue,
+            description: dataDashboard?.dashboard?.dependency_health?.queue,
             duration: 10
         })
     }
@@ -100,25 +101,33 @@ const DashboardComponent = (props: any) => {
 
     return (
         <Layout>
-            <Content style={{ minHeight: "88vh" }}>
+            <Content style={{ minHeight: "87vh" }}>
                 <Row justify="center">
                     <Col span={24}>
                         <div className="text-center mb-5">
-                            <pre>{dataTagline?.tagline?.banner}</pre>
-                            <pre>{dataTagline?.tagline?.tagline}</pre>
-                            <pre>
-                                Memory Alloc: <b>{memStats?.alloc}</b> |
-                                Total Alloc: <b>{memStats?.total_alloc}</b> |
-                                Num Goroutines: <b>{memStats?.num_goroutines}</b>
-                            </pre>
-                            <pre>
-                                <Space>
-                                    Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
-                                    <Tooltip title="close all client subscriber session"><Tag style={{
-                                        cursor: 'pointer'
-                                    }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
-                                </Space>
-                            </pre>
+                            {dashboardData.loading ? (
+                                <div style={{ width: "50%", margin: "0 auto" }}>
+                                    <Skeleton active />
+                                </div>
+                            ) : (
+                                <>
+                                    <pre>{dataDashboard?.dashboard?.banner}</pre>
+                                    <pre>{dataDashboard?.dashboard?.tagline}</pre>
+                                    <pre>
+                                        Memory Alloc: <b>{memStats?.alloc}</b> |
+                                        Total Alloc: <b>{memStats?.total_alloc}</b> |
+                                        Num Goroutines: <b>{memStats?.num_goroutines}</b>
+                                    </pre>
+                                    <pre>
+                                        <Space>
+                                            Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
+                                            <Tooltip title="close all client subscriber session"><Tag style={{
+                                                cursor: 'pointer'
+                                            }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
+                                        </Space>
+                                    </pre>
+                                </>
+                            )}
                         </div>
                     </Col>
                 </Row>

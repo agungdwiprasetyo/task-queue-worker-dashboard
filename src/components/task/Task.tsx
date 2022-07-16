@@ -12,6 +12,7 @@ import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { getQueryVariable, setQueryVariable } from '../../utils/helper';
 import FormFilter from 'src/components/task/FormFilter';
+import { Content } from 'antd/lib/layout/layout';
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
@@ -75,8 +76,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
     }
 
     const onChangeParam = (param: ITaskListParam) => {
-        let queryParam = {
-            task_name: param.task_name
+        let queryParam = {}
+        if (param.task_name && param.task_name != "") {
+            queryParam["task_name"] = param.task_name
         }
         if (param.page > 0) {
             queryParam["page"] = param.page
@@ -134,112 +136,110 @@ const TaskComponent = (props: ITaskComponentProps) => {
     }
 
     return (
-        <>
-            <Layout style={{ minHeight: "88vh" }}>
-                <Layout.Content style={{ padding: '10px 50px' }}>
-                    <Row>
-                        <Col span={24}>
-                            <div className="text-center">
-                                {props.task_name ?
-                                    (<><h3>Task Name:</h3> <h2><pre><b>{props.task_name}</b></pre></h2></>)
-                                    :
-                                    (<h1><pre><b>All Task</b></pre></h1>)
-                                }
-                            </div>
-                        </Col>
-                    </Row>
+        <Layout>
+            <Content style={{ minHeight: "87vh", padding: '10px 50px' }}>
+                <Row>
+                    <Col span={24}>
+                        <div className="text-center">
+                            {props.task_name ?
+                                (<><h3>Task Name:</h3> <h2><pre><b>{props.task_name}</b></pre></h2></>)
+                                :
+                                (<h1><pre><b>All Task</b></pre></h1>)
+                            }
+                        </div>
+                    </Col>
+                </Row>
 
-                    <Row>
-                        <Divider orientation="left" />
-                        <Col span={24}>
-                            <Meta {...propsMeta} />
-                        </Col>
-                    </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={24}>
+                        <Meta {...propsMeta} />
+                    </Col>
+                </Row>
 
-                    <Row>
-                        <Divider orientation="left" />
-                        <Col span={14}>
-                            <Button icon={<LeftOutlined />} size="middle" onClick={() => {
-                                router.push({
-                                    pathname: "/",
-                                })
-                            }}>Back to dashboard</Button>
-                        </Col>
-                        {props.task_name ?
-                            <Col span={9}>
-                                <Row justify="end" gutter={[48, 16]}>
-                                    <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={14}>
+                        <Button icon={<LeftOutlined />} size="middle" onClick={() => {
+                            router.push({
+                                pathname: "/",
+                            })
+                        }}>Back to dashboard</Button>
+                    </Col>
+                    {props.task_name ?
+                        <Col span={9}>
+                            <Row justify="end" gutter={[48, 16]}>
+                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                        disabled={loading || meta?.is_loading}
+                                        icon={<PlusOutlined />}
+                                        size="middle"
+                                        type="primary"
+                                        onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
+                                    <Tooltip title="Retry all failure and stopped job">
                                         <Button style={{ marginBottom: "2px", marginTop: "2px" }}
                                             disabled={loading || meta?.is_loading}
-                                            icon={<PlusOutlined />}
+                                            icon={<SyncOutlined />}
                                             size="middle"
                                             type="primary"
-                                            onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                                        <Tooltip title="Retry all failure and stopped job">
-                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                                disabled={loading || meta?.is_loading}
-                                                icon={<SyncOutlined />}
-                                                size="middle"
-                                                type="primary"
-                                                onClick={() => {
-                                                    retryAllJob({ variables: { task_name: paramsTaskList.task_name } });
-                                                }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                        </Tooltip>
-                                    </Space>
-                                </Row>
-                                <Row justify="end" gutter={48}>
-                                    <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                        <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
-                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                                disabled={loading || meta?.is_loading}
-                                                icon={<ClearOutlined />}
-                                                danger
-                                                size="middle"
-                                                onClick={() => {
-                                                    showAlertConfirm(
-                                                        "Are you sure clear all success, failure, and stopped job in this task?",
-                                                        paramsTaskList.task_name,
-                                                        "CLEAN"
-                                                    );
-                                                }}>Clear Job</Button>
-                                        </Tooltip>
-                                        <Tooltip title="Stop all running and queued job" placement="bottom">
-                                            <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                                disabled={loading || meta?.is_loading}
-                                                icon={<StopOutlined />}
-                                                danger
-                                                size="middle"
-                                                onClick={() => {
-                                                    showAlertConfirm(
-                                                        "Are you sure stop all running and queued job in this task?",
-                                                        paramsTaskList.task_name,
-                                                        "STOP"
-                                                    );
-                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
-                                        </Tooltip>
-                                    </Space>
-                                </Row>
-                            </Col>
-                            : ""
-                        }
-                    </Row>
-
-                    <Row justify="center">
-                        <Divider orientation="left" />
-                        <FormFilter {...propsFormFilter} />
-                    </Row>
-
-                    <Row>
-                        <Divider orientation="left" />
-                        <Col span={24}>
-                            <ModalAddJob {...propsModal} />
-                            <TableComponent {...propsTable} />
+                                            onClick={() => {
+                                                retryAllJob({ variables: { task_name: paramsTaskList.task_name } });
+                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Space>
+                            </Row>
+                            <Row justify="end" gutter={48}>
+                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                                    <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
+                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            disabled={loading || meta?.is_loading}
+                                            icon={<ClearOutlined />}
+                                            danger
+                                            size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    "Are you sure clear all success, failure, and stopped job in this task?",
+                                                    paramsTaskList.task_name,
+                                                    "CLEAN"
+                                                );
+                                            }}>Clear Job</Button>
+                                    </Tooltip>
+                                    <Tooltip title="Stop all running and queued job" placement="bottom">
+                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
+                                            disabled={loading || meta?.is_loading}
+                                            icon={<StopOutlined />}
+                                            danger
+                                            size="middle"
+                                            onClick={() => {
+                                                showAlertConfirm(
+                                                    "Are you sure stop all running and queued job in this task?",
+                                                    paramsTaskList.task_name,
+                                                    "STOP"
+                                                );
+                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
+                                    </Tooltip>
+                                </Space>
+                            </Row>
                         </Col>
-                    </Row>
-                </Layout.Content>
-            </Layout>
+                        : ""
+                    }
+                </Row>
+
+                <Row justify="center">
+                    <Divider orientation="left" />
+                    <FormFilter {...propsFormFilter} />
+                </Row>
+
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={24}>
+                        <ModalAddJob {...propsModal} />
+                        <TableComponent {...propsTable} />
+                    </Col>
+                </Row>
+            </Content>
             <FooterComponent {...propsFooter} />
-        </>
+        </Layout>
     );
 };
 
