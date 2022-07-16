@@ -22,11 +22,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
       - run: |
           node -v
           npm -v
           npm install -g yarn@1.22.19
           yarn install
-          yarn run build
-          yarn run export
-          tar czf dashboard.tar.gz external/out
+          make build
+          make push
