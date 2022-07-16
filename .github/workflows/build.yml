@@ -57,7 +57,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "task queue worker: update dashboard\nhttps://github.com/agungdwiprasetyo/task-queue-worker-dashboard/commit/${GITHUB_SHA}"
+          git commit -m "task queue worker: update dashboard" -m "https://github.com/agungdwiprasetyo/task-queue-worker-dashboard/commit/${GITHUB_SHA}"
           git push https://$USERNAME:$REPO_KEY@github.com/golangid/candi-plugin.git
         env:
           REPO_KEY: ${{secrets.TOKEN}}
