@@ -75,6 +75,7 @@ const DashboardComponent = (props: any) => {
         version: dataDashboard?.dashboard?.version,
         buildNumber: dataDashboard?.dashboard?.build_number,
         go_version: dataDashboard?.dashboard?.go_version,
+        loading: dashboardData.loading
     }
 
     if (dataDashboard?.dashboard?.dependency_health?.persistent) {

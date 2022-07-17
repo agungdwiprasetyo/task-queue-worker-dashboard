@@ -4,4 +4,5 @@ export interface IFooterComponentProps {
     version: string;
     go_version: string;
     buildNumber: string;
+    loading?: boolean;
 }
