@@ -162,9 +162,7 @@ const TableComponent = (props: TableProps) => {
             width: 120,
             render: (date: string) => {
                 return (
-                    <>
-                        <Moment format="DD MMMM YYYY, HH:mm:ssZ">{date}</Moment>
-                    </>
+                    <Moment format="DD MMMM YYYY, HH:mm:ssZ">{date}</Moment>
                 )
             }
         },
@@ -214,9 +212,7 @@ const TableComponent = (props: TableProps) => {
             width: 100,
             render: (trace_id: string) => {
                 return (
-                    <>
-                        <a href={trace_id} target="blank">{trace_id}</a>
-                    </>
+                    <a href={trace_id} target="blank">{trace_id}</a>
                 );
             }
         },
@@ -248,10 +244,22 @@ const TableComponent = (props: TableProps) => {
                             (status == "RETRYING" || status == "QUEUEING") ?
                                 <Button icon={<StopOutlined />} type="primary" danger size="small" onClick={() => {
                                     stopJob({ variables: { job_id: row?.id } })
+                                    if (props.meta?.is_freeze_broadcast) {
+                                        router.push({
+                                            pathname: "/job",
+                                            query: { id: row.id }
+                                        })
+                                    }
                                 }}>Stop<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                 :
                                 <Button icon={<SyncOutlined />} type="primary" size="small" onClick={() => {
                                     retryJob({ variables: { job_id: row?.id } });
+                                    if (props.meta?.is_freeze_broadcast) {
+                                        router.push({
+                                            pathname: "/job",
+                                            query: { id: row.id }
+                                        })
+                                    }
                                 }}>Retry<span>&nbsp;&nbsp;</span></Button>
 
                         }

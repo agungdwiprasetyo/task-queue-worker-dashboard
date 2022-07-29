@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const GET_JOB_DETAIL = gql`
-query ($job_id: String!) {
-  get_job_detail(job_id: $job_id) {
+query ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
+  get_detail_job(job_id: $job_id, filter: $filter) {
     id
     task_name
     arguments
@@ -11,18 +11,23 @@ query ($job_id: String!) {
     interval
     error
     trace_id
-    retry_histories {
-      status
-      trace_id
-      error
-      start_at
-      end_at
-      error_stack
-    }
     status
     created_at
     finished_at
     next_retry_at
+    meta {
+        is_close_session
+        page
+        total_history
+    }
+    retry_histories {
+        status
+        trace_id
+        error
+        start_at
+        end_at
+        error_stack
+    }
   }
 }
 `;

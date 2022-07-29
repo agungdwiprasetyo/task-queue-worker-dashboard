@@ -21,3 +21,5 @@ out/
 external/test/
 external/assets_dashboard_build.go
 pkg/mod/
+
+.vscode

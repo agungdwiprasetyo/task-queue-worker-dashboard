@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Modal, Button, Divider, Spin, Tooltip, Tag, Layout, Space, BackTop } from 'antd';
-import { IJobComponentProps } from './interface';
+import { IFilterJobHistoryParam, IJobComponentProps } from './interface';
 import { SubscribeJobDetail } from './graphql';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from '../task/graphql';
 import { Row, Col } from 'antd';
@@ -9,7 +9,7 @@ import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
-import Table, { ColumnProps } from 'antd/lib/table';
+import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
 import { LeftOutlined, StopOutlined, SyncOutlined, UpOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
 import { IFooterComponentProps } from 'src/components/footer/interface';
@@ -28,7 +28,12 @@ const JobComponent = (props: IJobComponentProps) => {
         jobId = getQueryVariable("id") || "";
     }
 
-    const { data, loading, error } = SubscribeJobDetail(jobId);
+    const divRef = useRef(null);
+    const [paramJobHistory, setParamJobHistory] = useState<IFilterJobHistoryParam>({
+        page: 1, limit: 10
+    });
+
+    const { data, loading, error } = SubscribeJobDetail(jobId, paramJobHistory);
     if (error) {
         Modal.error({
             title: 'Error get job detail data',
@@ -39,7 +44,7 @@ const JobComponent = (props: IJobComponentProps) => {
         })
     }
     const detailJob = data?.listen_detail_job;
-    if (detailJob?.is_close_session) {
+    if (detailJob?.meta?.is_close_session) {
         router.push({
             pathname: "/expired"
         })
@@ -107,45 +112,35 @@ const JobComponent = (props: IJobComponentProps) => {
             title: 'Error',
             dataIndex: 'error',
             key: 'error',
-            render: (text: string) => {
+            render: (text: string, row: any) => {
                 if (!text) { return (<></>) };
                 return (
-                    <Paragraph style={{ cursor: 'pointer' }}>
-                        <pre onClick={() => Modal.info({
-                            title: 'Error:',
-                            content: (
-                                <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
-                            ),
-                            onOk() { },
-                            maskClosable: true,
-                            width: 1000
-                        })}>{text.length > 70 ? `${text.slice(0, 70)} ...(more)` : text}
-                        </pre>
-                    </Paragraph>
+                    <>
+                        <Paragraph style={{ cursor: 'pointer' }}>
+                            <pre onClick={() => Modal.info({
+                                title: 'Error:',
+                                content: (
+                                    <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
+                                ),
+                                onOk() { },
+                                maskClosable: true,
+                                width: 1000
+                            })}>{text.length > 70 ? `${text.slice(0, 70)} ...(more)` : text}
+                            </pre>
+                        </Paragraph>
+                        {row.error_stack ? (
+                            <a onClick={() => Modal.info({
+                                title: 'Error Line:',
+                                content: (
+                                    <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={row.error_stack} /></Paragraph>
+                                ),
+                                onOk() { },
+                                maskClosable: true,
+                                width: 1000
+                            })}>View Error Line</a>
+                        ) : ""}
+                    </>
                 )
-            },
-        },
-        {
-            title: 'Error Line',
-            dataIndex: 'error_stack',
-            key: 'error_stack',
-            ellipsis: true,
-            render: (text: string) => {
-                if (!text) { return (<></>) };
-                return (
-                    <Paragraph style={{ cursor: 'pointer' }}>
-                        <pre onClick={() => Modal.info({
-                            title: 'Error Line:',
-                            content: (
-                                <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
-                            ),
-                            onOk() { },
-                            maskClosable: true,
-                            width: 1000
-                        })}>{text.length > 50 ? `${text.slice(0, 50)} ...(more)` : text}
-                        </pre>
-                    </Paragraph>
-                );
             },
         }
     ]
@@ -181,11 +176,11 @@ const JobComponent = (props: IJobComponentProps) => {
                                     {
                                         (detailJob?.status == "RETRYING" || detailJob?.status == "QUEUEING") ?
                                             <Button icon={<StopOutlined />} type="primary" danger size="middle" onClick={() => {
-                                                stopJob({ variables: { jobId: detailJob?.id } })
+                                                stopJob({ variables: { job_id: detailJob?.id } })
                                             }}>STOP<span>&nbsp;&nbsp;</span></Button>
                                             :
                                             <Button icon={<SyncOutlined />} type="primary" size="middle" onClick={() => {
-                                                retryJob({ variables: { jobId: detailJob?.id } });
+                                                retryJob({ variables: { job_id: detailJob?.id } });
                                             }}>RETRY<span>&nbsp;</span></Button>
 
                                     }
@@ -303,19 +298,31 @@ const JobComponent = (props: IJobComponentProps) => {
                         </Row>
                         <Row>
                             <Divider orientation="left" />
-                            <Col><b>Retry Histories</b></Col>
+                            <Col><b>Retry Histories (Total: {detailJob?.meta?.total_history})</b></Col>
                         </Row>
                         <Row>
                             <Divider orientation="left" />
                             <Col span={24}>
-                                <Table
-                                    columns={columns}
-                                    dataSource={detailJob?.retry_histories}
-                                    pagination={{
-                                        defaultPageSize: 10,
-                                        showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> histories</>) }
-                                    }}
-                                />
+                                <div className="ic-table" ref={divRef}>
+                                    <Table
+                                        columns={columns}
+                                        dataSource={detailJob?.retry_histories}
+                                        onChange={(pagination: TablePaginationConfig) => {
+                                            const { current, pageSize } = pagination;
+                                            setParamJobHistory({
+                                                page: current, limit: pageSize
+                                            });
+                                            divRef.current.scrollIntoView({ behavior: 'smooth' });
+                                        }}
+                                        pagination={{
+                                            current: detailJob?.meta?.page,
+                                            total: detailJob?.meta?.total_history,
+                                            defaultPageSize: 10,
+                                            showSizeChanger: false,
+                                            showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> histories</>) }
+                                        }}
+                                    />
+                                </div>
                             </Col>
                         </Row>
                     </>) : (

@@ -8,10 +8,8 @@ export interface TableProps {
     loading: boolean;
     data: any;
     meta: any;
-    defaultSort: any;
-    defaultOrder: any;
     params: ITaskListParam;
-    showJobId: string | null;
+    show_job_id: string | null;
     task_name_param?: string;
     setParam?: Dispatch<SetStateAction<ITaskListParam>>;
 }

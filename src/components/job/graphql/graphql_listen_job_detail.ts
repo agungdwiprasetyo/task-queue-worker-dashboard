@@ -1,9 +1,8 @@
 import gql from 'graphql-tag';
 
 const LISTEN_JOB_DETAIL = gql`
-subscription ($job_id: String!) {
-    listen_detail_job(job_id: $job_id) {
-        is_close_session
+subscription ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
+    listen_detail_job(job_id: $job_id, filter: $filter) {
         id
         task_name
         arguments
@@ -12,6 +11,15 @@ subscription ($job_id: String!) {
         interval
         error
         trace_id
+        status
+        created_at
+        finished_at
+        next_retry_at
+        meta {
+            is_close_session
+            page
+            total_history
+        }
         retry_histories {
             status
             trace_id
@@ -20,10 +28,6 @@ subscription ($job_id: String!) {
             end_at
             error_stack
         }
-        status
-        created_at
-        finished_at
-        next_retry_at
   }
 }`;
 

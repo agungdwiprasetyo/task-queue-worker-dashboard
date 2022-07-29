@@ -113,10 +113,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
         data: data?.listen_all_job?.data,
         meta: meta,
         loading: loading,
-        defaultSort: "desc",
-        defaultOrder: "",
         params: paramsTaskList,
-        showJobId: getQueryVariable("job_id"),
+        show_job_id: getQueryVariable("job_id"),
         task_name_param: props.task_name,
         setParam: onChangeParam,
     };
@@ -159,15 +157,21 @@ const TaskComponent = (props: ITaskComponentProps) => {
 
                 <Row>
                     <Divider orientation="left" />
-                    <Col span={14}>
+                    <Col span={9}>
                         <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                             router.push({
                                 pathname: "/",
                             })
                         }}>Back to dashboard</Button>
                     </Col>
+                    <Col span={6}>
+                        {meta?.is_freeze_broadcast ? (
+                            <div className="text-center" style={{ color: "#f5222d" }}>Freeze Mode</div>
+                        ) : (<></>)
+                        }
+                    </Col>
                     {props.task_name ?
-                        <Col span={9}>
+                        <Col span={8}>
                             <Row justify="end" gutter={[48, 16]}>
                                 <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
                                     <Button style={{ marginBottom: "2px", marginTop: "2px" }}
