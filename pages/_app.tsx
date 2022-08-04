@@ -1,5 +1,6 @@
 import React from 'react';
 import App from 'next/app';
+import NextNProgress from 'nextjs-progressbar';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +14,7 @@ class MyApp extends App<any> {
     const { Component, pageProps, apollo } = this.props;
     return (
       <ApolloProvider client={apollo}>
+        <NextNProgress />
         <Component {...pageProps} />
         <ToastContainer
           position="top-right"

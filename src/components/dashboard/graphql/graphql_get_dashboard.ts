@@ -13,6 +13,10 @@ query {
         dependency_health {
             persistent queue
         }
+        dependency_detail {
+            persistent_type
+            queue_type
+        }
     }
 }`;
 

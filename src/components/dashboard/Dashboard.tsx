@@ -71,11 +71,15 @@ const DashboardComponent = (props: any) => {
     };
 
     const propsFooter: IFooterComponentProps = {
-        serverStartedAt: dataDashboard?.dashboard?.start_at,
+        server_started_at: dataDashboard?.dashboard?.start_at,
         version: dataDashboard?.dashboard?.version,
-        buildNumber: dataDashboard?.dashboard?.build_number,
+        build_number: dataDashboard?.dashboard?.build_number,
         go_version: dataDashboard?.dashboard?.go_version,
-        loading: dashboardData.loading
+        loading: dashboardData.loading,
+        queue: dataDashboard?.dashboard?.dependency_detail?.queue_type,
+        persistent: dataDashboard?.dashboard?.dependency_detail?.persistent_type,
+        queue_error: dataDashboard?.dashboard?.dependency_health?.queue,
+        persistent_error: dataDashboard?.dashboard?.dependency_health?.persistent,
     }
 
     if (dataDashboard?.dashboard?.dependency_health?.persistent) {
