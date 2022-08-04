@@ -39,6 +39,7 @@
     "next": "12",
     "next-cookies": "^2.0.3",
     "next-with-apollo": "^5.1.0",
+    "nextjs-progressbar": "^0.0.14",
     "react": "^17.0.2",
     "react-apollo": "^3.1.5",
     "react-bootstrap": "^1.4.0",
