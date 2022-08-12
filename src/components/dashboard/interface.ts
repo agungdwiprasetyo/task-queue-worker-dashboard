@@ -16,6 +16,7 @@ export interface TableProps extends FilterPagination {
     defaultOrder: any;
     loadData: any;
     metaTagline?: any;
+    setSearchTask?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface ModalConfirmProps {

@@ -7,9 +7,18 @@ const ExpiredPage = () => {
     const router = useRouter();
 
     return (
-        <Layout style={{ minHeight: "88vh" }}>
-            <Layout.Content style={{ padding: '10px 50px' }}>
-                <Row justify="center">
+        <Layout >
+            <Layout.Content style={{
+                width: "400px",
+                height: "350px",
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                margin: "auto"
+            }}>
+                <Row justify="center" >
                     <Space direction='vertical'>
                         <div className='text-center'>
                             <h1>Your session has expired</h1>

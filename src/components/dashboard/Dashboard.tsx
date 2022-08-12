@@ -10,11 +10,14 @@ import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
 import { getQueryVariable } from '../../utils/helper';
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import MenuOption from 'src/components/menu/MenuOption';
 
 const DashboardComponent = (props: any) => {
     const router = useRouter();
 
-    const { data, loading, error } = SubscribeTaskList(1, 10, null);
+    const [searchTask, setSearchTask] = useState(null);
+    const { data, loading, error } = SubscribeTaskList(1, 10, searchTask);
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -67,7 +70,8 @@ const DashboardComponent = (props: any) => {
         page: page,
         limit: limit,
         search: search,
-        metaTagline: dataDashboard?.dashboard
+        metaTagline: dataDashboard?.dashboard,
+        setSearchTask: setSearchTask
     };
 
     const propsFooter: IFooterComponentProps = {
@@ -108,7 +112,8 @@ const DashboardComponent = (props: any) => {
         <Layout>
             <Content style={{ minHeight: "87vh" }}>
                 <Row justify="center">
-                    <Col span={24}>
+                    <Col span={2}></Col>
+                    <Col span={20}>
                         <div className="text-center mb-5">
                             {dashboardData.loading ? (
                                 <div style={{ width: "50%", margin: "0 auto" }}>
@@ -134,6 +139,9 @@ const DashboardComponent = (props: any) => {
                                 </>
                             )}
                         </div>
+                    </Col>
+                    <Col span={2} style={{ marginTop: "10px" }}>
+                        <MenuOption />
                     </Col>
                 </Row>
                 <Row>
