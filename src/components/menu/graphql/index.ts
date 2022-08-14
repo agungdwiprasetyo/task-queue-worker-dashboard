@@ -3,6 +3,7 @@ import GET_CONFIGURATION from './graphql_get_all_configuration';
 import SET_CONFIGURATION from './graphql_set_configuration';
 import GET_ALL_ACTIVE_SUBSCRIBERS from './graphql_get_all_active_subscriber';
 import KILL_CLIENT_SUBSCRIBER from './graphql_kill_client_subscriber';
+import CLEAR_CLIENT_SUBSCRIBERS from './clear_all_client_subscriber';
 
 export const GetConfiguration = (opts: any) => {
 	try {
@@ -16,8 +17,10 @@ export const GetConfiguration = (opts: any) => {
 
 export const SetConfiguration = () => {
 	try {
-		const [setConfiguration, { loading, error }] = useMutation(SET_CONFIGURATION);
-		return { setConfiguration };
+		const [setConfiguration, { loading, error }] = useMutation(SET_CONFIGURATION, {
+			onError: (err) => { }
+		});
+		return { setConfiguration, error };
 	}
 	catch (error) {
 		console.log(error);
@@ -38,6 +41,16 @@ export const KillClientSubscriber = () => {
 	try {
 		const [killClientSubscriber, { loading, error }] = useMutation(KILL_CLIENT_SUBSCRIBER);
 		return { killClientSubscriber };
+	}
+	catch (error) {
+		console.log(error);
+	}
+}
+
+export const ClearAllClientSubscriber = () => {
+	try {
+		const [clearClient, { }] = useMutation(CLEAR_CLIENT_SUBSCRIBERS);
+		return { clearClient };
 	}
 	catch (error) {
 		console.log(error);

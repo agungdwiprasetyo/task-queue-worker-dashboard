@@ -1,11 +1,19 @@
-import { Form, Input, InputNumber, Modal, Switch, Table, Typography } from "antd";
+import { Form, Input, InputNumber, Modal, notification, Switch, Table, Typography } from "antd";
 import Paragraph from "antd/lib/typography/Paragraph";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SetConfiguration } from "src/components/menu/graphql";
 import { IConfiguration, IPropsConfiguration } from "src/components/menu/interface";
 
 export const Configuration = (props: IPropsConfiguration) => {
-    const { setConfiguration } = SetConfiguration();
+    const { setConfiguration, error } = SetConfiguration();
+    useEffect(() => {
+        if (error && error?.message != "") {
+            notification.error({
+                message: "Cannot Save",
+                description: error.message.replace("GraphQL error: ", "")
+            })
+        }
+    }, [error])
 
     const [form] = Form.useForm();
     const [editingKey, setEditingKey] = useState('');
@@ -18,7 +26,7 @@ export const Configuration = (props: IPropsConfiguration) => {
         try {
             const row = (await form.validateFields()) as IConfiguration;
             const index = props.data?.findIndex(item => key === item.key);
-            setConfiguration({
+            await setConfiguration({
                 variables: {
                     param: {
                         key: props.data[index]?.key,

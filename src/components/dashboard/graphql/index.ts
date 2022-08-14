@@ -2,7 +2,6 @@ import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import CLEAN_JOB from './graphql_clean_job';
 import SUBSCRIBE_TASK from './graphql_subscribe_task';
 import DASHBOARD from './graphql_get_dashboard';
-import CLEAR_CLIENT_SUBSCRIBERS from './clear_all_client_subscriber';
 
 export const CleanJobGraphQL = () => {
 	try {
@@ -38,12 +37,3 @@ export const GetDashboard = (opts: any) => {
 	}
 }
 
-export const ClearAllClientSubscriber = () => {
-	try {
-		const [clearClient, { }] = useMutation(CLEAR_CLIENT_SUBSCRIBERS);
-		return { clearClient };
-	}
-	catch (error) {
-		console.log(error);
-	}
-}

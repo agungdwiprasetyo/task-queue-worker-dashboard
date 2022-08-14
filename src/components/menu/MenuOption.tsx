@@ -6,7 +6,7 @@ import Configuration from "src/components/menu/Configuration";
 import { GetConfiguration, GetAllActiveSubscriber } from "src/components/menu/graphql";
 import { IPropsClientSubscriber, IPropsConfiguration } from "src/components/menu/interface";
 
-export const MenuOption = () => {
+export const MenuOption = ({ clientId }) => {
     const [configurationVisible, setConfigurationVisible] = useState(false);
     const [getConfiguration, { loading, data }] = GetConfiguration({});
     const propsConfiguration: IPropsConfiguration = {
@@ -20,6 +20,7 @@ export const MenuOption = () => {
     const [clientSubscriberVisible, setClientSubscriberVisible] = useState(false);
     const [getClientSubscriber, activeSubscriber] = GetAllActiveSubscriber({});
     const propsClientSubscriber: IPropsClientSubscriber = {
+        client_id: clientId,
         visible: clientSubscriberVisible,
         setVisible: setClientSubscriberVisible,
         data: activeSubscriber?.data?.get_all_active_subscriber,

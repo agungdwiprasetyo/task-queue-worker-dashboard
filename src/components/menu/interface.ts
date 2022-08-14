@@ -17,6 +17,7 @@ export interface IConfiguration {
 }
 
 export interface IPropsClientSubscriber {
+    client_id: string;
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
     data: [IClientSubscriber];

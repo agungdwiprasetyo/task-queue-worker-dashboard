@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { SubscribeTaskList, GetDashboard, ClearAllClientSubscriber } from './graphql';
+import { SubscribeTaskList, GetDashboard } from './graphql';
 import { StopAllJob, RetryAllJob } from '../task/graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
@@ -31,7 +31,6 @@ const DashboardComponent = (props: any) => {
     const { retryAllJob } = RetryAllJob();
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
-    const { clearClient } = ClearAllClientSubscriber();
 
     const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
     const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
@@ -129,19 +128,14 @@ const DashboardComponent = (props: any) => {
                                         Num Goroutines: <b>{memStats?.num_goroutines}</b>
                                     </pre>
                                     <pre>
-                                        <Space>
-                                            Total Client Subscriber:<b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
-                                            <Tooltip title="close all client subscriber session"><Tag style={{
-                                                cursor: 'pointer'
-                                            }} color="default" onClick={() => { clearClient() }}>clear</Tag></Tooltip>
-                                        </Space>
+                                        Total Client Subscriber: <b>{data?.listen_task_dashboard?.meta?.total_client_subscriber}</b>
                                     </pre>
                                 </>
                             )}
                         </div>
                     </Col>
                     <Col span={2} style={{ marginTop: "10px" }}>
-                        <MenuOption />
+                        <MenuOption clientId={meta?.client_id} />
                     </Col>
                 </Row>
                 <Row>

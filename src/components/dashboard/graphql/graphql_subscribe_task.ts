@@ -9,7 +9,7 @@ subscription ($page: Int!, $limit: Int!, $search: String) {
   ) {
     meta {
       page limit total_pages total_records is_close_session
-      total_client_subscriber
+      total_client_subscriber client_id
     }
     data {
       name module_name total_jobs is_loading detail {
