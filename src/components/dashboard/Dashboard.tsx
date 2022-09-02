@@ -4,7 +4,7 @@ import { StopAllJob, RetryAllJob } from '../task/graphql';
 import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
-import { Modal, Layout, Tag, Space, Tooltip, Row, Col, notification, Skeleton } from 'antd';
+import { Modal, Layout, Tag, Space, Row, Col, notification, Skeleton } from 'antd';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';

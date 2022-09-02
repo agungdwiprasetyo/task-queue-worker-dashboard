@@ -1,12 +1,17 @@
 import { CloseCircleOutlined, SyncOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Table, Tooltip } from "antd";
 import Paragraph from "antd/lib/typography/Paragraph";
+import { useEffect } from "react";
 import { ClearAllClientSubscriber, KillClientSubscriber } from "src/components/menu/graphql";
 import { IClientSubscriber, IPropsClientSubscriber } from "src/components/menu/interface";
 
 export const ClientSubscriber = (props: IPropsClientSubscriber) => {
     const { killClientSubscriber } = KillClientSubscriber();
     const { clearClient } = ClearAllClientSubscriber();
+
+    useEffect(() => {
+        props.getData();
+    }, [props.client_id])
 
     const columns = [
         {
@@ -49,8 +54,7 @@ export const ClientSubscriber = (props: IPropsClientSubscriber) => {
                 return (
                     <Row justify="center">
                         <Space>
-                            <Tooltip title={props.client_id == rows.client_id ? "it's you" : ""}
-                                placement="top">
+                            <Tooltip title={props.client_id == rows.client_id ? "it's you" : ""} placement="top">
                                 <Button disabled={props.client_id == rows.client_id} type="primary" danger size="small"
                                     icon={<CloseCircleOutlined />}
                                     onClick={() => {
