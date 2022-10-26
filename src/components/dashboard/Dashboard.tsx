@@ -12,6 +12,7 @@ import { getQueryVariable } from '../../utils/helper';
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import MenuOption from 'src/components/menu/MenuOption';
+import { IPropsMenu } from 'src/components/menu/interface';
 
 const DashboardComponent = (props: any) => {
     const router = useRouter();
@@ -107,6 +108,11 @@ const DashboardComponent = (props: any) => {
         })
     }
 
+    const propsMenu: IPropsMenu = {
+        clientId: meta?.client_id,
+        useSecondaryPersistent: dataDashboard?.dashboard?.dependency_detail?.use_secondary_persistent
+    }
+
     return (
         <Layout>
             <Content style={{ minHeight: "87vh" }}>
@@ -135,7 +141,7 @@ const DashboardComponent = (props: any) => {
                         </div>
                     </Col>
                     <Col span={2} style={{ marginTop: "10px" }}>
-                        <MenuOption clientId={meta?.client_id} />
+                        <MenuOption {...propsMenu} />
                     </Col>
                 </Row>
                 <Row>

@@ -16,6 +16,7 @@ query {
         dependency_detail {
             persistent_type
             queue_type
+            use_secondary_persistent
         }
     }
 }`;

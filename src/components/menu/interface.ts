@@ -2,6 +2,11 @@ import { QueryLazyOptions } from "@apollo/react-hooks";
 import { Dispatch, SetStateAction } from "react";
 import { OperationVariables } from "react-apollo";
 
+export interface IPropsMenu {
+    clientId: string;
+    useSecondaryPersistent: boolean;
+}
+
 export interface IPropsConfiguration {
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
