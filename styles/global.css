@@ -268,3 +268,8 @@ body {
     box-shadow: 0px -2px 15px 12px rgba(173, 198, 255, 0);
   }
 }
+
+.scrollHorizontal {
+  overflow-x: "scroll";
+  max-width: 300px;
+}

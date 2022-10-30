@@ -73,7 +73,9 @@ export const Configuration = (props: IPropsConfiguration) => {
             editable: true,
             render: (value: string) => {
                 return (
-                    <div>{value}</div>
+                    <div className="scrollHorizontal">
+                        <Paragraph><pre>{value}</pre></Paragraph>
+                    </div>
                 );
             }
         },
@@ -137,7 +139,7 @@ export const Configuration = (props: IPropsConfiguration) => {
         >
             <div className="ic-table">
                 <Form form={form} component={false}>
-                    <Table
+                    <Table className="ic-table"
                         components={{
                             body: {
                                 cell: EditableCell,
@@ -177,7 +179,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     ...restProps
 }) => {
     const inputNode = inputType === 'number' ? <InputNumber /> :
-        inputType == 'text' ? <Input /> : <Switch defaultChecked={record?.is_active} />;
+        inputType == 'text' ? <Input.TextArea /> : <Switch defaultChecked={record?.is_active} />;
 
     return (
         <td {...restProps}>

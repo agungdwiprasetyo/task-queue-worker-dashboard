@@ -1,9 +1,9 @@
-import Table, { ColumnProps, ColumnsType } from 'antd/lib/table';
-import React, { useEffect } from 'react';
-import { Space, Button, Input, Modal, Typography, Tooltip } from 'antd';
+import Table, { ColumnsType } from 'antd/lib/table';
+import React from 'react';
+import { Space, Button, Input, Modal, Typography, Tooltip, Row } from 'antd';
 import {
     SyncOutlined,
-    StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
+    StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined, LeftOutlined, RightOutlined
 } from '@ant-design/icons';
 import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
@@ -21,6 +21,7 @@ const TableComponent = (props: TableProps) => {
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
     const { deleteJob } = DeleteJobGraphQL();
+    const totalPage = Math.ceil((props?.meta?.total_records > 0 ? props?.meta?.total_records : 0) / props?.params?.limit);
 
     const showAlertDeleteJob = (job_id: string) => {
         Modal.confirm({
@@ -290,6 +291,19 @@ const TableComponent = (props: TableProps) => {
             })
     }
 
+    const onChangePage = (incrPage: number) => {
+        props.setParam({
+            page: props?.meta?.page + incrPage,
+            limit: 10,
+            task_name: props.params.task_name,
+            search: props.params.search,
+            statuses: props.params.statuses,
+            job_id: props.params.job_id,
+            start_date: props.params.start_date,
+            end_date: props.params.end_date,
+        })
+    }
+
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {
         const { current, pageSize } = pagination;
         // const { field, order } = sorter;
@@ -331,14 +345,20 @@ const TableComponent = (props: TableProps) => {
                 dataSource={props.data}
                 loading={props.loading || props.meta?.is_loading}
                 onChange={handleOnChange}
-                pagination={{
-                    current: props?.meta?.page,
-                    total: props?.meta?.total_records,
-                    showSizeChanger: false,
-                    showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> jobs</>) }
-                }}
+                pagination={false}
                 scroll={{ x: 1300 }}
             />
+            {totalPage > 0 ?
+                <Row justify="end" style={{ marginTop: "15px" }}>
+                    <Space>
+                        <span>Total <b>{props?.meta?.total_records}</b> jobs </span>
+                        <Button icon={<LeftOutlined />} onClick={() => onChangePage(-1)} disabled={props?.meta?.page === 1} />
+                        <span>page <b>{props?.meta?.page}</b> of <b>{totalPage}</b></span>
+                        <Button icon={<RightOutlined />} onClick={() => onChangePage(1)} disabled={props?.meta?.page === totalPage} />
+                    </Space>
+                </Row>
+                : ""
+            }
         </div>
     );
 };

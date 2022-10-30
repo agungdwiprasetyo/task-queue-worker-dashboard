@@ -18,7 +18,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
 
     const task_name = getQueryVariable("task_name");
-    const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
+    const page = 1;
     const search = getQueryVariable("search") || null;
     const statuses = getQueryVariable("statuses") != "" ? getQueryVariable("statuses").split(",") : [];
     const start_date = getQueryVariable("start_date") || "";
@@ -79,9 +79,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
         let queryParam = {}
         if (param.task_name && param.task_name != "") {
             queryParam["task_name"] = param.task_name
-        }
-        if (param.page > 0) {
-            queryParam["page"] = param.page
         }
         if (param.search && param.search != "") {
             queryParam["search"] = encodeURI(param.search)
@@ -231,13 +228,13 @@ const TaskComponent = (props: ITaskComponentProps) => {
 
                 <Row justify="center">
                     <Divider orientation="left" />
+                    <ModalAddJob {...propsModal} />
                     <FormFilter {...propsFormFilter} />
                 </Row>
 
-                <Row>
+                <Row justify="center">
                     <Divider orientation="left" />
                     <Col span={24}>
-                        <ModalAddJob {...propsModal} />
                         <TableComponent {...propsTable} />
                     </Col>
                 </Row>

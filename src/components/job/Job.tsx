@@ -3,12 +3,12 @@ import { useRouter } from 'next/router';
 import { Modal, Button, Divider, Spin, Tooltip, Tag, Layout, Space, BackTop } from 'antd';
 import { IFilterJobHistoryParam, IJobComponentProps } from './interface';
 import { SubscribeJobDetail } from './graphql';
-import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from '../task/graphql';
+import { RetryJobGraphQL, StopJobGraphQL } from '../task/graphql';
 import { Row, Col } from 'antd';
 import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
-import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { StatusLayout, StatusLayoutProps, toPrettyJSON } from 'src/utils/helper';
 import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
 import { LeftOutlined, StopOutlined, SyncOutlined, UpOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
@@ -278,8 +278,17 @@ const JobComponent = (props: IJobComponentProps) => {
                             <Col span={18}>
                                 {
                                     detailJob?.error ? (
-                                        <Paragraph>
-                                            <JSONPretty id="json-pretty" data={detailJob?.error} />
+                                        <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(detailJob?.error) }}>
+                                            <pre onClick={() => Modal.info({
+                                                title: 'Error:',
+                                                content: (
+                                                    <Paragraph copyable={{ text: detailJob?.error }}><JSONPretty id="json-pretty" data={detailJob?.error} /></Paragraph>
+                                                ),
+                                                onOk() { },
+                                                maskClosable: true,
+                                                width: 1000
+                                            })}>{detailJob?.error?.length > 400 ? `${detailJob?.error?.slice(0, 400)} ...(more)` : detailJob?.error}
+                                            </pre>
                                         </Paragraph>
                                     ) : ""
                                 }
@@ -290,8 +299,17 @@ const JobComponent = (props: IJobComponentProps) => {
                             <Col span={6}><b>Arguments</b></Col>
                             <Col span={18}>
                                 <pre>
-                                    <Paragraph copyable={{ text: detailJob?.arguments }}>
-                                        <JSONPretty id="json-pretty" data={detailJob?.arguments} />
+                                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(detailJob?.arguments) }}>
+                                        <pre onClick={() => Modal.info({
+                                            title: 'Arguments:',
+                                            content: (
+                                                <Paragraph copyable={{ text: detailJob?.arguments }}><JSONPretty id="json-pretty" data={detailJob?.arguments} /></Paragraph>
+                                            ),
+                                            onOk() { },
+                                            maskClosable: true,
+                                            width: 1000
+                                        })}>{detailJob?.arguments?.length > 400 ? `${detailJob?.arguments?.slice(0, 400)} ...(more)` : detailJob?.arguments}
+                                        </pre>
                                     </Paragraph>
                                 </pre>
                             </Col>

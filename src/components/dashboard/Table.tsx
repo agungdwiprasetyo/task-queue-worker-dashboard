@@ -189,7 +189,7 @@ export const TableComponent = (props: TableProps) => {
                                     </Menu.Item>
                                 </Menu>
                             )}>
-                            {row?.is_loading ? "Processing..." : "View Jobs"}
+                            {row?.is_loading ? row?.loading_message : "View Jobs"}
                         </Dropdown.Button>
                     </Space>
                 )
