@@ -5,14 +5,12 @@ import { CleanJobGraphQL } from '../dashboard/graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
 import { Modal, Layout, Tag, Space, Row, Col, notification, Skeleton } from 'antd';
-import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
-import { getQueryVariable } from '../../utils/helper';
+import { convertToByteSize, getQueryVariable } from '../../utils/helper';
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import MenuOption from 'src/components/menu/MenuOption';
-import { IPropsMenu } from 'src/components/menu/interface';
 
 const DashboardComponent = (props: any) => {
     const router = useRouter();
@@ -74,18 +72,6 @@ const DashboardComponent = (props: any) => {
         setSearchTask: setSearchTask
     };
 
-    const propsFooter: IFooterComponentProps = {
-        server_started_at: dataDashboard?.dashboard?.start_at,
-        version: dataDashboard?.dashboard?.version,
-        build_number: dataDashboard?.dashboard?.build_number,
-        go_version: dataDashboard?.dashboard?.go_version,
-        loading: dashboardData.loading,
-        queue: dataDashboard?.dashboard?.dependency_detail?.queue_type,
-        persistent: dataDashboard?.dashboard?.dependency_detail?.persistent_type,
-        queue_error: dataDashboard?.dashboard?.dependency_health?.queue,
-        persistent_error: dataDashboard?.dashboard?.dependency_health?.persistent,
-    }
-
     if (dataDashboard?.dashboard?.dependency_health?.persistent) {
         notification.error({
             message: "Dependency Error!",
@@ -108,11 +94,6 @@ const DashboardComponent = (props: any) => {
         })
     }
 
-    const propsMenu: IPropsMenu = {
-        clientId: meta?.client_id,
-        useSecondaryPersistent: dataDashboard?.dashboard?.dependency_detail?.use_secondary_persistent
-    }
-
     return (
         <Layout>
             <Content style={{ minHeight: "87vh" }}>
@@ -129,8 +110,8 @@ const DashboardComponent = (props: any) => {
                                     <pre>{dataDashboard?.dashboard?.banner}</pre>
                                     <pre>{dataDashboard?.dashboard?.tagline}</pre>
                                     <pre>
-                                        Memory Alloc: <b>{memStats?.alloc}</b> |
-                                        Total Alloc: <b>{memStats?.total_alloc}</b> |
+                                        Memory Alloc: <b>{convertToByteSize(memStats?.alloc)}</b> |
+                                        Total Alloc: <b>{convertToByteSize(memStats?.total_alloc)}</b> |
                                         Num Goroutines: <b>{memStats?.num_goroutines}</b>
                                     </pre>
                                     <pre>
@@ -141,7 +122,10 @@ const DashboardComponent = (props: any) => {
                         </div>
                     </Col>
                     <Col span={2} style={{ marginTop: "10px" }}>
-                        <MenuOption {...propsMenu} />
+                        <MenuOption
+                            clientId={meta?.client_id}
+                            useSecondaryPersistent={dataDashboard?.dashboard?.dependency_detail?.use_secondary_persistent}
+                        />
                     </Col>
                 </Row>
                 <Row>
@@ -188,7 +172,17 @@ const DashboardComponent = (props: any) => {
                     </div>
                 </div>
             </Content>
-            <FooterComponent {...propsFooter} />
+            <FooterComponent
+                server_started_at={dataDashboard?.dashboard?.start_at}
+                version={dataDashboard?.dashboard?.version}
+                build_number={dataDashboard?.dashboard?.build_number}
+                go_version={dataDashboard?.dashboard?.go_version}
+                loading={dashboardData.loading}
+                queue={dataDashboard?.dashboard?.dependency_detail?.queue_type}
+                persistent={dataDashboard?.dashboard?.dependency_detail?.persistent_type}
+                queue_error={dataDashboard?.dashboard?.dependency_health?.queue}
+                persistent_error={dataDashboard?.dashboard?.dependency_health?.persistent}
+            />
         </Layout>
     );
 };

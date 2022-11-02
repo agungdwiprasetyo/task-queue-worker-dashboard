@@ -21,6 +21,10 @@ subscription ($filter: GetAllJobInputResolver) {
             finished_at
             next_retry_at
             trace_id
+            meta {
+                is_show_more_args
+                is_show_more_error
+            }
         }
     }
 }`;

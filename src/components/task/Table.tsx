@@ -1,19 +1,18 @@
 import Table, { ColumnsType } from 'antd/lib/table';
 import React from 'react';
-import { Space, Button, Input, Modal, Typography, Tooltip, Row } from 'antd';
+import { Space, Button, Input, Modal, Tooltip, } from 'antd';
 import {
     SyncOutlined,
-    StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined, LeftOutlined, RightOutlined
+    StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
-import Highlighter from 'react-highlight-words';
 import Moment from 'react-moment';
 import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import { useRouter } from 'next/router';
-import { toPrettyJSON } from '../../utils/helper';
-
-const { Paragraph } = Typography;
+import DetailData from 'src/components/job/DetailData';
+import PaginationComponent from 'src/components/shared/PaginationComponent';
+import { GetDetailConfiguration } from 'src/components/menu/graphql';
 
 const TableComponent = (props: TableProps) => {
     const router = useRouter();
@@ -21,7 +20,7 @@ const TableComponent = (props: TableProps) => {
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
     const { deleteJob } = DeleteJobGraphQL();
-    const totalPage = Math.ceil((props?.meta?.total_records > 0 ? props?.meta?.total_records : 0) / props?.params?.limit);
+    const traceURLConfig = GetDetailConfiguration("trace_detail_url");
 
     const showAlertDeleteJob = (job_id: string) => {
         Modal.confirm({
@@ -111,36 +110,16 @@ const TableComponent = (props: TableProps) => {
             key: 'args',
             title: 'Arguments',
             width: 250,
-            render: (args: string) => {
+            render: (args: string, row: any) => {
                 return (
-                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(args) }}>
-                        <pre onClick={() => Modal.info({
-                            title: 'Arguments:',
-                            content: (
-                                <Paragraph copyable={{ text: toPrettyJSON(args) }}>
-                                    <pre>
-                                        <Highlighter
-                                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                                            searchWords={[props.params.search]}
-                                            autoEscape
-                                            textToHighlight={toPrettyJSON(args)}
-                                        />
-                                    </pre>
-                                </Paragraph>
-                            ),
-                            onOk() { },
-                            onCancel() { },
-                            maskClosable: true,
-                            width: 1000
-                        })}>
-                            <Highlighter
-                                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                                searchWords={[props.params.search]}
-                                autoEscape
-                                textToHighlight={args.length > 100 ? `${args.slice(0, 100)} ...(more)` : args}
-                            />
-                        </pre>
-                    </Paragraph>
+                    <DetailData
+                        title={"Arguments / Message:"}
+                        jobId={row?.id}
+                        initialValue={args}
+                        search={props?.params?.search}
+                        keyData={"arguments"}
+                        isShowMore={row?.meta?.is_show_more_args}
+                    />
                 );
             },
         },
@@ -173,36 +152,17 @@ const TableComponent = (props: TableProps) => {
             title: 'Error',
             width: 120,
             ellipsis: true,
-            render: (error: string) => {
+            render: (error: string, row: any) => {
                 if (!error) { return "" };
                 return (
-                    <Paragraph style={{ cursor: 'pointer' }}>
-                        <pre onClick={() => Modal.info({
-                            title: 'Error:',
-                            content: (
-                                <Paragraph copyable={{ text: toPrettyJSON(error) }}>
-                                    <pre>
-                                        <Highlighter
-                                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                                            searchWords={[props.params.search]}
-                                            autoEscape
-                                            textToHighlight={toPrettyJSON(error)}
-                                        />
-                                    </pre>
-                                </Paragraph>
-                            ),
-                            onOk() { },
-                            maskClosable: true,
-                            width: 1000
-                        })}>
-                            <Highlighter
-                                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                                searchWords={[props.params.search]}
-                                autoEscape
-                                textToHighlight={error.length > 70 ? `${error.slice(0, 70)} ...(more)` : error}
-                            />
-                        </pre>
-                    </Paragraph>
+                    <DetailData
+                        title={"Error:"}
+                        jobId={row?.id}
+                        initialValue={error}
+                        search={props?.params?.search}
+                        keyData={"error"}
+                        isShowMore={row?.meta?.is_show_more_error}
+                    />
                 );
             }
         },
@@ -212,8 +172,9 @@ const TableComponent = (props: TableProps) => {
             title: 'Trace URL',
             width: 100,
             render: (trace_id: string) => {
+                const traceURL = traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + trace_id;
                 return (
-                    <a href={trace_id} target="blank">{trace_id}</a>
+                    <a href={traceURL} target="blank">{traceURL}</a>
                 );
             }
         },
@@ -285,24 +246,17 @@ const TableComponent = (props: TableProps) => {
                 width: 90,
                 render: (task_name: string) => {
                     return (
-                        <b>{task_name}</b>
+                        <a onClick={() => {
+                            router.push({
+                                pathname: "/task",
+                                query: { task_name: task_name }
+                            })
+                        }}><b>{task_name}</b></a>
                     )
                 }
             })
     }
 
-    const onChangePage = (incrPage: number) => {
-        props.setParam({
-            page: props?.meta?.page + incrPage,
-            limit: 10,
-            task_name: props.params.task_name,
-            search: props.params.search,
-            statuses: props.params.statuses,
-            job_id: props.params.job_id,
-            start_date: props.params.start_date,
-            end_date: props.params.end_date,
-        })
-    }
 
     const handleOnChange = (pagination: any, filters: any, sorter: any) => {
         const { current, pageSize } = pagination;
@@ -348,17 +302,23 @@ const TableComponent = (props: TableProps) => {
                 pagination={false}
                 scroll={{ x: 1300 }}
             />
-            {totalPage > 0 ?
-                <Row justify="end" style={{ marginTop: "15px" }}>
-                    <Space>
-                        <span>Total <b>{props?.meta?.total_records}</b> jobs </span>
-                        <Button icon={<LeftOutlined />} onClick={() => onChangePage(-1)} disabled={props?.meta?.page === 1} />
-                        <span>page <b>{props?.meta?.page}</b> of <b>{totalPage}</b></span>
-                        <Button icon={<RightOutlined />} onClick={() => onChangePage(1)} disabled={props?.meta?.page === totalPage} />
-                    </Space>
-                </Row>
-                : ""
-            }
+            <PaginationComponent
+                page={props?.meta?.page}
+                limit={props?.params?.limit}
+                totalRecord={props?.meta?.total_records}
+                detail={"jobs"}
+                onChangePage={(incrPage: number) => {
+                    props.setParam({
+                        page: props?.meta?.page + incrPage,
+                        limit: 10,
+                        task_name: props.params.task_name,
+                        search: props.params.search,
+                        statuses: props.params.statuses,
+                        job_id: props.params.job_id,
+                        start_date: props.params.start_date,
+                        end_date: props.params.end_date,
+                    })
+                }} />
         </div>
     );
 };

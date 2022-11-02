@@ -1,27 +1,32 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Modal, Button, Divider, Spin, Tooltip, Tag, Layout, Space, BackTop } from 'antd';
-import { IFilterJobHistoryParam, IJobComponentProps } from './interface';
+import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton } from 'antd';
+import { DetailDataProps, IFilterJobHistoryParam, IJobComponentProps } from './interface';
 import { SubscribeJobDetail } from './graphql';
 import { RetryJobGraphQL, StopJobGraphQL } from '../task/graphql';
 import { Row, Col } from 'antd';
 import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
-import { StatusLayout, StatusLayoutProps, toPrettyJSON } from 'src/utils/helper';
+import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
-import { LeftOutlined, StopOutlined, SyncOutlined, UpOutlined } from '@ant-design/icons';
+import { LeftOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import moment from 'moment';
 import { Content } from 'antd/lib/layout/layout';
+import DetailData from 'src/components/job/DetailData';
+import PaginationComponent from 'src/components/shared/PaginationComponent';
+import { GetDetailConfiguration } from 'src/components/menu/graphql';
+import CopyComponent from 'src/components/shared/CopyComponent';
 
 const JobComponent = (props: IJobComponentProps) => {
     const router = useRouter();
 
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
+    const traceURLConfig = GetDetailConfiguration("trace_detail_url");
 
     let jobId = props.id;
     if (!jobId) {
@@ -30,7 +35,7 @@ const JobComponent = (props: IJobComponentProps) => {
 
     const divRef = useRef(null);
     const [paramJobHistory, setParamJobHistory] = useState<IFilterJobHistoryParam>({
-        page: 1, limit: 10
+        page: 1, limit: 5
     });
 
     const { data, loading, error } = SubscribeJobDetail(jobId, paramJobHistory);
@@ -102,9 +107,10 @@ const JobComponent = (props: IJobComponentProps) => {
             title: 'Trace URL',
             dataIndex: 'trace_id',
             key: 'trace_id',
-            render: (text: string) => {
+            render: (trace_id: string) => {
+                const traceURL = traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + trace_id;
                 return (
-                    <a href={text} target="blank">{text}</a>
+                    <a href={traceURL} target="blank">{traceURL}</a>
                 );
             },
         },
@@ -125,7 +131,7 @@ const JobComponent = (props: IJobComponentProps) => {
                                 onOk() { },
                                 maskClosable: true,
                                 width: 1000
-                            })}>{text.length > 70 ? `${text.slice(0, 70)} ...(more)` : text}
+                            })}>{text.length > 70 ? (<>{text.slice(0, 70)}<b>...(more)</b></>) : text}
                             </pre>
                         </Paragraph>
                         {row.error_stack ? (
@@ -147,6 +153,42 @@ const JobComponent = (props: IJobComponentProps) => {
 
     const propsFooter: IFooterComponentProps = null;
 
+    const showDetailData = (propsDetailData: DetailDataProps) => {
+        return (
+            <DetailData {...propsDetailData} />
+        );
+    }
+
+    if (!detailJob?.id && !loading) {
+        return (
+            <Layout>
+                <Content style={{ minHeight: "87vh", padding: '10px 50px' }}>
+                    <Row>
+                        <Col span={24}>
+                            <div className="text-center">
+                                <h2><b>Job Detail</b></h2>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Divider orientation="left" />
+                        <Col span={24}>
+                            <Button icon={<LeftOutlined />} size="middle" onClick={() => {
+                                router.push({
+                                    pathname: "/"
+                                })
+                            }}>Back to dashboard</Button>
+                        </Col>
+                    </Row>
+                    <Row justify="center">
+                        <Divider orientation="left" />
+                        <p>job not found</p>
+                    </Row>
+                </Content>
+            </Layout>
+        )
+    }
+
     return (
         <Layout>
             <Content style={{ minHeight: "87vh", padding: '10px 50px' }}>
@@ -157,212 +199,189 @@ const JobComponent = (props: IJobComponentProps) => {
                         </div>
                     </Col>
                 </Row>
-                {loading ? (
-                    <Row justify="center"><Spin size="large" tip="Loading..." /></Row>
-                ) : detailJob?.id ? (
-                    <>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={14}>
-                                <Button icon={<LeftOutlined />} size="middle" onClick={() => {
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={14}>
+                        <Button icon={<LeftOutlined />} size="middle" onClick={() => {
+                            router.push({
+                                pathname: "/task",
+                                query: { task_name: detailJob?.task_name }
+                            })
+                        }}>Back to {detailJob?.task_name}</Button>
+                    </Col>
+                    <Col span={9}>
+                        <Row justify="end">
+                            {
+                                (detailJob?.status == "RETRYING" || detailJob?.status == "QUEUEING") ?
+                                    <Button icon={<StopOutlined />} type="primary" danger size="middle" onClick={() => {
+                                        stopJob({ variables: { job_id: detailJob?.id } })
+                                    }}>STOP<span>&nbsp;&nbsp;</span></Button>
+                                    :
+                                    <Button icon={<SyncOutlined />} type="primary" size="middle" onClick={() => {
+                                        retryJob({ variables: { job_id: detailJob?.id } });
+                                    }}>RETRY<span>&nbsp;</span></Button>
+                            }
+                        </Row>
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>ID</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <Space>
+                                <b>{detailJob?.id}</b>
+                                <CopyComponent value={detailJob?.id} />
+                            </Space>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Task Name</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <b><Tooltip title={`View all ${detailJob?.task_name}`}>
+                                <a onClick={() => {
                                     router.push({
                                         pathname: "/task",
                                         query: { task_name: detailJob?.task_name }
                                     })
-                                }}>Back to {detailJob?.task_name}</Button>
-                            </Col>
-                            <Col span={9}>
-                                <Row justify="end">
-                                    {
-                                        (detailJob?.status == "RETRYING" || detailJob?.status == "QUEUEING") ?
-                                            <Button icon={<StopOutlined />} type="primary" danger size="middle" onClick={() => {
-                                                stopJob({ variables: { job_id: detailJob?.id } })
-                                            }}>STOP<span>&nbsp;&nbsp;</span></Button>
-                                            :
-                                            <Button icon={<SyncOutlined />} type="primary" size="middle" onClick={() => {
-                                                retryJob({ variables: { job_id: detailJob?.id } });
-                                            }}>RETRY<span>&nbsp;</span></Button>
-
-                                    }
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>ID</b></Col>
-                            <Col span={18}>
-                                <Space>
-                                    <b>{detailJob?.id}</b>
-                                    <Tooltip title="copy full link url to clipboard">
-                                        <Tag style={{
-                                            cursor: 'pointer'
-                                        }} color="geekblue" onClick={() => {
-                                            const el = document.createElement('textarea');
-                                            el.value = window.location.href;
-                                            document.body.appendChild(el);
-                                            el.select();
-                                            document.execCommand('copy');
-                                            document.body.removeChild(el);
-                                        }}>
-                                            copy link url
-                                        </Tag>
-                                    </Tooltip>
-                                </Space>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Task Name</b></Col>
-                            <Col span={18}>
-                                <b><Tooltip title={`View all ${detailJob?.task_name}`}>
-                                    <a onClick={() => {
-                                        router.push({
-                                            pathname: "/task",
-                                            query: { task_name: detailJob?.task_name }
-                                        })
-                                    }}>{detailJob?.task_name}</a>
-                                </Tooltip></b>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Retry</b></Col>
-                            <Col span={18}>{detailJob?.retries}</Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Max Retry</b></Col>
-                            <Col span={18}>{detailJob?.max_retry}</Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Status</b></Col>
-                            <Col span={15}>
-                                <StatusLayout {...statusProps} />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Retry Interval</b></Col>
-                            <Col span={18}>{detailJob?.interval}</Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Created At</b></Col>
-                            <Col span={18}>
-                                <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.created_at}</Moment>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Finished At</b></Col>
-                            <Col span={18}>
-                                <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.finished_at}</Moment>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Next Retry At</b></Col>
-                            <Col span={18}>
-                                {detailJob?.next_retry_at ? (<Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.next_retry_at}</Moment>) : "-"}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Last Trace URL</b></Col>
-                            <Col span={18}><a href={detailJob?.trace_id} target="blank">{detailJob?.trace_id}</a></Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Last Error</b></Col>
-                            <Col span={18}>
-                                {
-                                    detailJob?.error ? (
-                                        <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(detailJob?.error) }}>
-                                            <pre onClick={() => Modal.info({
-                                                title: 'Error:',
-                                                content: (
-                                                    <Paragraph copyable={{ text: detailJob?.error }}><JSONPretty id="json-pretty" data={detailJob?.error} /></Paragraph>
-                                                ),
-                                                onOk() { },
-                                                maskClosable: true,
-                                                width: 1000
-                                            })}>{detailJob?.error?.length > 400 ? `${detailJob?.error?.slice(0, 400)} ...(more)` : detailJob?.error}
-                                            </pre>
-                                        </Paragraph>
-                                    ) : ""
-                                }
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={6}><b>Arguments</b></Col>
-                            <Col span={18}>
-                                <pre>
-                                    <Paragraph style={{ cursor: 'pointer' }} copyable={{ text: toPrettyJSON(detailJob?.arguments) }}>
-                                        <pre onClick={() => Modal.info({
-                                            title: 'Arguments:',
-                                            content: (
-                                                <Paragraph copyable={{ text: detailJob?.arguments }}><JSONPretty id="json-pretty" data={detailJob?.arguments} /></Paragraph>
-                                            ),
-                                            onOk() { },
-                                            maskClosable: true,
-                                            width: 1000
-                                        })}>{detailJob?.arguments?.length > 400 ? `${detailJob?.arguments?.slice(0, 400)} ...(more)` : detailJob?.arguments}
-                                        </pre>
-                                    </Paragraph>
-                                </pre>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col><b>Retry Histories (Total: {detailJob?.meta?.total_history})</b></Col>
-                        </Row>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={24}>
-                                <div className="ic-table" ref={divRef}>
-                                    <Table
-                                        columns={columns}
-                                        dataSource={detailJob?.retry_histories}
-                                        onChange={(pagination: TablePaginationConfig) => {
-                                            const { current, pageSize } = pagination;
-                                            setParamJobHistory({
-                                                page: current, limit: pageSize
-                                            });
-                                            divRef.current.scrollIntoView({ behavior: 'smooth' });
-                                        }}
-                                        pagination={{
-                                            current: detailJob?.meta?.page,
-                                            total: detailJob?.meta?.total_history,
-                                            defaultPageSize: 10,
-                                            showSizeChanger: false,
-                                            showTotal: (total, range) => { return (<>{range[0]}-{range[1]} of <b>{total}</b> histories</>) }
-                                        }}
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
-                    </>) : (
-                    <>
-                        <Row>
-                            <Divider orientation="left" />
-                            <Col span={24}>
-                                <Button icon={<LeftOutlined />} size="middle" onClick={() => {
-                                    router.push({
-                                        pathname: "/"
-                                    })
-                                }}>Back to dashboard</Button>
-                            </Col>
-                        </Row>
-                        <Row justify="center">
-                            <Divider orientation="left" />
-                            <p>job not found</p>
-                        </Row>
-                    </>
-                )}
+                                }}>{detailJob?.task_name}</a>
+                            </Tooltip></b>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Retry</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.retries}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Max Retry</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.max_retry}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Status</b></Col>
+                    <Col span={15}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <StatusLayout {...statusProps} />
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Retry Interval</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.interval}</Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Created At</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.created_at}</Moment>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Finished At</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.finished_at}</Moment>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Next Retry At</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) :
+                            detailJob?.next_retry_at ?
+                                (<Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.next_retry_at}</Moment>) :
+                                "-"
+                        }
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Last Trace URL</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <a href={traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + detailJob?.trace_id} target="blank">
+                                {traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + detailJob?.trace_id}
+                            </a>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Arguments</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : showDetailData({
+                            title: "Arguments:",
+                            jobId: detailJob?.id,
+                            initialValue: detailJob?.arguments,
+                            search: "",
+                            keyData: "arguments",
+                            isShowMore: detailJob?.meta?.is_show_more_args
+                        })}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={6}><b>Last Error</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.error ? showDetailData({
+                            title: "Error:",
+                            jobId: detailJob?.id,
+                            initialValue: detailJob?.error,
+                            search: "",
+                            keyData: "error",
+                            isShowMore: detailJob?.meta?.is_show_more_error
+                        }) : ""}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col><b>Retry Histories (Total: {loading ?
+                        (<LoadingOutlined spin={true} />) :
+                        detailJob?.meta?.total_history})</b></Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
+                    <Col span={24}>
+                        <div className="ic-table" ref={divRef}>
+                            <Table
+                                loading={loading}
+                                columns={columns}
+                                dataSource={detailJob?.retry_histories}
+                                onChange={(pagination: TablePaginationConfig) => { }}
+                                pagination={false}
+                            />
+                            <PaginationComponent
+                                page={detailJob?.meta?.page}
+                                limit={paramJobHistory.limit}
+                                totalRecord={detailJob?.meta?.total_history}
+                                detail={"histories"}
+                                onChangePage={(incrPage: number) => {
+                                    setParamJobHistory({
+                                        page: detailJob?.meta?.page + incrPage, limit: paramJobHistory.limit
+                                    });
+                                    divRef.current.scrollIntoView({ behavior: 'smooth' });
+                                }} />
+                        </div>
+                    </Col>
+                </Row>
             </Content>
-            <BackTop>
+            {/* <BackTop>
                 <UpOutlined style={{
                     height: 40,
                     width: 40,
@@ -373,7 +392,7 @@ const JobComponent = (props: IJobComponentProps) => {
                     textAlign: 'center',
                     fontSize: 17,
                 }} />
-            </BackTop>
+            </BackTop> */}
             <FooterComponent {...propsFooter} />
         </Layout>
     );

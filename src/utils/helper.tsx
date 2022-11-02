@@ -79,3 +79,39 @@ export const getWindowDimensions = () => {
         height
     };
 }
+
+export const copyToClipboard = (val) => {
+    const el = document.createElement('textarea');
+    el.value = val;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+}
+
+export const getSize = (val): string => {
+    const size = new Blob([val]).size
+    return convertToByteSize(size);
+}
+
+export const convertToByteSize = (size: number): string => {
+    const b = 1;
+    const k = b * 1024;
+    const m = k * 1024;
+    const g = m * 1024;
+    const t = g * 1024;
+
+    if (size > t) {
+        return `${Math.round((size / g) * 100) / 100} TB`
+    }
+    if (size > g) {
+        return `${Math.round((size / g) * 100) / 100} GB`
+    }
+    if (size > m) {
+        return `${Math.round((size / m) * 100) / 100} MB`
+    }
+    if (size > k) {
+        return `${Math.round((size / k) * 100) / 100} KB`
+    }
+    return `${size} Byte`
+}

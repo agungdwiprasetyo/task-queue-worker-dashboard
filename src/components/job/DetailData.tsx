@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import { Col, Modal, Row } from 'antd';
+import { DetailDataProps } from './interface';
+import { toPrettyJSON, toMinifyJSON, getSize } from '../../utils/helper';
+import Paragraph from 'antd/lib/typography/Paragraph';
+import Highlighter from 'react-highlight-words';
+import { GetDetailJob } from 'src/components/job/graphql';
+import { LoadingOutlined } from '@ant-design/icons';
+import CopyComponent from 'src/components/shared/CopyComponent';
+import { IPropsCopy } from 'src/components/shared/interface';
+
+const DetailData = (props: DetailDataProps) => {
+    const [getDetailJob, { data, called, loading }] = GetDetailJob();
+    const [visible, setVisible] = useState(false);
+
+    if (called && loading) return (
+        <Row justify='center'>
+            <LoadingOutlined spin={true} />
+        </Row>
+    );
+
+    if (!called) {
+        return (
+            <Paragraph style={{ cursor: 'pointer' }} >
+                <pre onClick={() => {
+                    getDetailJob({ variables: { job_id: props.jobId } });
+                    setVisible(true);
+                }}>
+                    {toMinifyJSON(props.initialValue)}{props.isShowMore ? <b>... (more)</b> : <></>}
+                </pre>
+            </Paragraph>
+        )
+    }
+
+    const propsCopy: IPropsCopy = {
+        value: toPrettyJSON(data?.get_detail_job[props.keyData])
+    }
+
+    return (
+        <>
+            <Paragraph style={{ cursor: 'pointer' }}>
+                <pre onClick={() => {
+                    getDetailJob({ variables: { job_id: props.jobId } });
+                    setVisible(true);
+                }}>
+                    {toMinifyJSON(props.initialValue)}{props.isShowMore ? <b>... (more)</b> : <></>}
+                </pre>
+            </Paragraph>
+            <Modal
+                title={props.title}
+                visible={visible}
+                onOk={() => { setVisible(false) }}
+                onCancel={() => { setVisible(false) }}
+                footer={null}
+                maskClosable={true}
+                width={1000}
+            >
+                <Row >
+                    <Col span={20}>Size: <b>{getSize(data?.get_detail_job[props.keyData])}</b></Col>
+                    <Col span={4}>
+                        <Row justify="end" gutter={10}>
+                            <CopyComponent value={toPrettyJSON(data?.get_detail_job[props.keyData])} />
+                        </Row>
+                    </Col>
+                </Row>
+                <Paragraph>
+                    <pre>
+                        <Highlighter
+                            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                            searchWords={[props.search]}
+                            autoEscape
+                            textToHighlight={toPrettyJSON(data?.get_detail_job[props.keyData])}
+                        />
+                    </pre>
+                </Paragraph>
+            </Modal>
+        </>
+    );
+}
+
+export default DetailData;

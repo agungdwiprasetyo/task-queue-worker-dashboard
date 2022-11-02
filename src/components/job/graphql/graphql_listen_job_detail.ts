@@ -19,6 +19,8 @@ subscription ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
             is_close_session
             page
             total_history
+            is_show_more_args
+            is_show_more_error
         }
         retry_histories {
             status
