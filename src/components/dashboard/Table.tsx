@@ -187,11 +187,6 @@ export const TableComponent = (props: TableProps) => {
                                                 }}>Clear Job</Button>
                                         </Tooltip>
                                     </Menu.Item>
-                                    <Menu.Item>
-                                        <Button icon={<ClockCircleOutlined />} size="middle"
-                                            onClick={() => {
-                                            }}>Requeueing</Button>
-                                    </Menu.Item>
                                 </Menu>
                             )}>
                             {row?.is_loading ? row?.loading_message : "View Jobs"}
