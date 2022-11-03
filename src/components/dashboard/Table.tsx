@@ -172,7 +172,7 @@ export const TableComponent = (props: TableProps) => {
                                                         name,
                                                         "STOP"
                                                     );
-                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;&nbsp;</span></Button>
+                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                         </Tooltip>
                                     </Menu.Item>
                                     <Menu.Item>
@@ -186,6 +186,11 @@ export const TableComponent = (props: TableProps) => {
                                                     );
                                                 }}>Clear Job</Button>
                                         </Tooltip>
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Button icon={<ClockCircleOutlined />} size="middle"
+                                            onClick={() => {
+                                            }}>Requeueing</Button>
                                     </Menu.Item>
                                 </Menu>
                             )}>

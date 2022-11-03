@@ -172,6 +172,9 @@ const TableComponent = (props: TableProps) => {
             title: 'Trace URL',
             width: 100,
             render: (trace_id: string) => {
+                if (trace_id == "") {
+                    return (<></>);
+                }
                 const traceURL = traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + trace_id;
                 return (
                     <a href={traceURL} target="blank">{traceURL}</a>

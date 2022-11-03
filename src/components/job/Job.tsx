@@ -314,11 +314,11 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Divider orientation="left" />
                     <Col span={6}><b>Last Trace URL</b></Col>
                     <Col span={18}>
-                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.trace_id ? (
                             <a href={traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + detailJob?.trace_id} target="blank">
                                 {traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + detailJob?.trace_id}
                             </a>
-                        )}
+                        ) : ""}
                     </Col>
                 </Row>
                 <Row>
