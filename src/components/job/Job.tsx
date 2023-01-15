@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton } from 'antd';
+import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton, Progress } from 'antd';
 import { DetailDataProps, IFilterJobHistoryParam, IJobComponentProps } from './interface';
 import { SubscribeJobDetail } from './graphql';
 import { RetryJobGraphQL, StopJobGraphQL } from '../task/graphql';
@@ -8,7 +8,7 @@ import { Row, Col } from 'antd';
 import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
-import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { roundN, StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
 import { LeftOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
@@ -321,6 +321,23 @@ const JobComponent = (props: IJobComponentProps) => {
                         ) : ""}
                     </Col>
                 </Row>
+                {detailJob?.max_progress > 0 ? (
+                    <Row>
+                        <Divider orientation="left" />
+                        <Col span={6}><b>Progress</b></Col>
+                        <Col span={18}>
+                            {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                                <>
+                                    <Progress
+                                        percent={roundN((detailJob?.current_progress / detailJob?.max_progress) * 100, 2)}
+                                        status={detailJob?.current_progress < detailJob?.max_progress ? "active" : "success"}
+                                    />
+                                    <Row justify="end">{detailJob?.current_progress}/{detailJob?.max_progress}</Row>
+                                </>
+                            )}
+                        </Col>
+                    </Row>
+                ) : ""}
                 <Row>
                     <Divider orientation="left" />
                     <Col span={6}><b>Arguments</b></Col>

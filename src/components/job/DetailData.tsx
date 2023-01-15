@@ -7,7 +7,6 @@ import Highlighter from 'react-highlight-words';
 import { GetDetailJob } from 'src/components/job/graphql';
 import { LoadingOutlined } from '@ant-design/icons';
 import CopyComponent from 'src/components/shared/CopyComponent';
-import { IPropsCopy } from 'src/components/shared/interface';
 
 const DetailData = (props: DetailDataProps) => {
     const [getDetailJob, { data, called, loading }] = GetDetailJob();
@@ -30,10 +29,6 @@ const DetailData = (props: DetailDataProps) => {
                 </pre>
             </Paragraph>
         )
-    }
-
-    const propsCopy: IPropsCopy = {
-        value: toPrettyJSON(data?.get_detail_job[props.keyData])
     }
 
     return (

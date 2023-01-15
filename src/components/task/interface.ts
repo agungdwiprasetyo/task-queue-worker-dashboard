@@ -65,3 +65,19 @@ export interface IFormFilterProps {
     setParam?: any;
     setLoadData?: Dispatch<SetStateAction<ITaskListParam>>;
 }
+
+export interface IActionComponentProps {
+    is_loading_subscribe: boolean;
+    is_loading: boolean;
+    task_list_param: ITaskListParam;
+    total_job: number;
+}
+
+export interface IModalMutateJobProps {
+    action: string;
+    task_list_param: ITaskListParam;
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
+    action_func: any;
+    count_job: number;
+}

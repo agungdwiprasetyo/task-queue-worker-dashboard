@@ -15,6 +15,8 @@ subscription ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
         created_at
         finished_at
         next_retry_at
+        current_progress
+        max_progress
         meta {
             is_close_session
             page

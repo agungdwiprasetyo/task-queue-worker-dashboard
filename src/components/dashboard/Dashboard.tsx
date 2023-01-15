@@ -15,8 +15,12 @@ import MenuOption from 'src/components/menu/MenuOption';
 const DashboardComponent = (props: any) => {
     const router = useRouter();
 
+    const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
+    const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
+    const search = getQueryVariable("search") || "";
+
     const [searchTask, setSearchTask] = useState(null);
-    const { data, loading, error } = SubscribeTaskList(1, 10, searchTask);
+    const { data, loading, error } = SubscribeTaskList(page, limit, searchTask);
     if (error) {
         Modal.error({
             title: 'Error:',
@@ -30,10 +34,6 @@ const DashboardComponent = (props: any) => {
     const { retryAllJob } = RetryAllJob();
     const { cleanJob } = CleanJobGraphQL();
     const { stopAllJob } = StopAllJob();
-
-    const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
-    const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
-    const search = getQueryVariable("search") || "";
 
     const dashboardData = GetDashboard({ pollInterval: 15000 });
     const dataDashboard = dashboardData?.data;

@@ -95,14 +95,22 @@ export const getSize = (val): string => {
 }
 
 export const convertToByteSize = (size: number): string => {
+
+    if (!size) {
+        size = 0;
+    }
     const b = 1;
     const k = b * 1024;
     const m = k * 1024;
     const g = m * 1024;
     const t = g * 1024;
+    const p = t * 1024;
 
+    if (size > p) {
+        return `${Math.round((size / p) * 100) / 100} PB`
+    }
     if (size > t) {
-        return `${Math.round((size / g) * 100) / 100} TB`
+        return `${Math.round((size / t) * 100) / 100} TB`
     }
     if (size > g) {
         return `${Math.round((size / g) * 100) / 100} GB`
@@ -114,4 +122,17 @@ export const convertToByteSize = (size: number): string => {
         return `${Math.round((size / k) * 100) / 100} KB`
     }
     return `${size} Byte`
+}
+
+export const removeElement = (arr, value) => {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+        arr = arr.splice(index, 1);
+    }
+    return arr;
+}
+
+export const roundN = (num: number, precision: number): number => {
+    var factor = Math.pow(10, precision);
+    return Math.round(num * factor) / factor;
 }

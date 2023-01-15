@@ -1,7 +1,7 @@
 import Table, { ColumnProps } from 'antd/lib/table';
 import React, { useState } from 'react';
 import { Task, TableProps } from './interface';
-import { Button, Col, Dropdown, Input, Menu, Modal, Row, Tooltip } from 'antd';
+import { Button, Col, Dropdown, Input, Menu, Modal, Row, Skeleton, Tooltip } from 'antd';
 import { useRouter } from 'next/router';
 import { Tag, Space } from 'antd';
 import Highlighter from 'react-highlight-words';
@@ -17,16 +17,12 @@ import {
     LoadingOutlined
 } from '@ant-design/icons';
 import { FilterPagination } from '../../utils/helper';
-
-const { confirm } = Modal;
+import { ModalMutateJob } from 'src/components/task/ActionModal';
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
 
-    let searchFilterValue = [];
-    if (props.search != "") {
-        searchFilterValue = [props.search]
-    }
+    let searchFilterValue = props.search != "" ? [props.search] : [];
     const [filterValueState, setFilterValueState] = useState(searchFilterValue);
     const [filterModuleState, setFilterModuleState] = useState([]);
     const [searchState, setSearchState] = useState(searchFilterValue.length > 0);
@@ -34,23 +30,14 @@ export const TableComponent = (props: TableProps) => {
         page: props.page, limit: props.limit, search: props.search,
     });
 
-    const showAlertConfirm = (title: string, task_name: string, action: string) => {
-        confirm({
-            title: title,
-            icon: <ExclamationCircleOutlined />,
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk() {
-                if (action === "CLEAN") {
-                    props.cleanJob({ variables: { task_name: task_name } });
-                } else if (action === "STOP") {
-                    props.stopAllJob({ variables: { task_name: task_name } });
-                }
-            },
-            onCancel() {
-            },
-        });
+    const [modalMutateVisible, setModalMutateVisible] = useState(false);
+    const [modalMutateJobParam, setModalMutateJobParam] = useState({
+        action: "", totalJob: 0, taskName: ""
+    });
+
+    const showMutateJobConfirm = (taskName: string, action: string, totalJob: number) => {
+        setModalMutateJobParam({ action: action, totalJob: totalJob, taskName: taskName });
+        setModalMutateVisible(true);
     }
 
     const getFilterValues = (source, key) => {
@@ -159,7 +146,11 @@ export const TableComponent = (props: TableProps) => {
                                         <Tooltip title="Retry all failure and stopped job" placement="left">
                                             <Button icon={<SyncOutlined />} size="middle"
                                                 onClick={() => {
-                                                    props.retryAllJob({ variables: { task_name: name } });
+                                                    showMutateJobConfirm(
+                                                        name,
+                                                        "RETRY",
+                                                        row?.detail?.failure + row?.detail?.stopped
+                                                    );
                                                 }}>Retry All<span>&nbsp;&nbsp;</span></Button>
                                         </Tooltip>
                                     </Menu.Item>
@@ -167,11 +158,15 @@ export const TableComponent = (props: TableProps) => {
                                         <Tooltip title="Stop all running and queued job" placement="left">
                                             <Button icon={<StopOutlined />} danger size="middle"
                                                 onClick={() => {
-                                                    showAlertConfirm(
-                                                        `Are you sure stop all running and queued job in task "${name}"?`,
-                                                        name,
-                                                        "STOP"
-                                                    );
+                                                    Modal.confirm({
+                                                        title: `Are you sure stop all running and queued job in task ${name}?`,
+                                                        icon: <ExclamationCircleOutlined />,
+                                                        okText: 'Yes',
+                                                        okType: 'danger',
+                                                        cancelText: 'No',
+                                                        onOk() { props.stopAllJob({ variables: { task_name: name } }) },
+                                                        onCancel() { },
+                                                    });
                                                 }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
                                         </Tooltip>
                                     </Menu.Item>
@@ -179,10 +174,10 @@ export const TableComponent = (props: TableProps) => {
                                         <Tooltip title="Clear all success, failure, and stopped job" placement="left">
                                             <Button icon={<ClearOutlined />} danger size="middle"
                                                 onClick={() => {
-                                                    showAlertConfirm(
-                                                        `Are you sure clear all success, failure, and stopped job in task "${name}"?`,
+                                                    showMutateJobConfirm(
                                                         name,
-                                                        "CLEAN"
+                                                        "CLEAN",
+                                                        row?.detail?.failure + row?.detail?.stopped
                                                     );
                                                 }}>Clear Job</Button>
                                         </Tooltip>
@@ -237,25 +232,29 @@ export const TableComponent = (props: TableProps) => {
     return (
         <>
             <Row justify="end">
-                <Input.Search allowClear
-                    placeholder={`Search Task...`}
-                    defaultValue={filterPagination.search}
-                    onSearch={value => {
-                        if (value != "") {
-                            setSearchState(true)
-                            setFilterValueState([value])
-                        } else {
-                            setSearchState(false)
-                            setFilterValueState([])
-                        }
-                        changeFilterPagination({
-                            page: filterPagination.page,
-                            limit: filterPagination.limit,
-                            search: value
-                        })
-                    }}
-                    style={{ width: 250, marginBottom: 8, display: 'block' }}
-                />
+                {props.loading ? (
+                    <Skeleton.Input />
+                ) : (
+                    <Input.Search allowClear
+                        placeholder={`Search Task...`}
+                        defaultValue={filterPagination.search}
+                        onSearch={value => {
+                            if (value != "") {
+                                setSearchState(true)
+                                setFilterValueState([value])
+                            } else {
+                                setSearchState(false)
+                                setFilterValueState([])
+                            }
+                            changeFilterPagination({
+                                page: filterPagination.page,
+                                limit: filterPagination.limit,
+                                search: value
+                            })
+                        }}
+                        style={{ width: 250, marginBottom: 8, display: 'block' }}
+                    />
+                )}
             </Row>
             <Row>
                 <Col span={24}>
@@ -281,6 +280,24 @@ export const TableComponent = (props: TableProps) => {
                     </div>
                 </Col>
             </Row>
+
+            <ModalMutateJob
+                visible={modalMutateVisible}
+                action={modalMutateJobParam.action}
+                setVisible={setModalMutateVisible}
+                task_list_param={{
+                    page: 1,
+                    limit: 10,
+                    task_name: modalMutateJobParam.taskName,
+                    search: "",
+                    statuses: ["FAILURE", "STOPPED"],
+                    start_date: "",
+                    end_date: "",
+                    job_id: ""
+                }}
+                action_func={null}
+                count_job={modalMutateJobParam.totalJob}
+            />
         </>
     );
 };

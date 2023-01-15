@@ -52,7 +52,13 @@ const FormFilter = (props: IFormFilterProps) => {
 
     return (
         <Space direction='vertical'>
-            <Form form={form} layout="inline" name="formFilterJob" >
+            <Form form={form} layout="inline" name="formFilterJob" initialValues={{
+                "search": props.params?.search,
+                "status": props.params?.statuses,
+                'dateRange': props.params?.start_date && props.params?.end_date ? [
+                    moment(new Date(props.params?.start_date)), moment(new Date(props.params?.end_date))
+                ] : []
+            }}>
                 <Form.Item name="search" label="Search:">
                     <Input.Search allowClear
                         placeholder="Search args/error..."
@@ -67,11 +73,11 @@ const FormFilter = (props: IFormFilterProps) => {
                         placeholder="Select status"
                         onClear={onApplyFilter}
                     >
-                        <Select.Option key='SUCCESS' value='SUCCESS'>Success</Select.Option>
-                        <Select.Option key='RETRYING' value='RETRYING'>Running</Select.Option>
-                        <Select.Option key='QUEUEING' value='QUEUEING'>Queueing</Select.Option>
-                        <Select.Option key='FAILURE' value='FAILURE'>Failure</Select.Option>
-                        <Select.Option key='STOPPED' value='STOPPED'>Stopped</Select.Option>
+                        <Select.Option key='SUCCESS' value='SUCCESS'>SUCCESS</Select.Option>
+                        <Select.Option key='RETRYING' value='RETRYING'>RUNNING</Select.Option>
+                        <Select.Option key='QUEUEING' value='QUEUEING'>QUEUEING</Select.Option>
+                        <Select.Option key='FAILURE' value='FAILURE'>FAILURE</Select.Option>
+                        <Select.Option key='STOPPED' value='STOPPED'>STOPPED</Select.Option>
                     </Select>
                 </Form.Item>
                 <Form.Item name="dateRange" label="Created At:">
@@ -108,7 +114,17 @@ const FormFilter = (props: IFormFilterProps) => {
                     <Col span={3} offset={3} className="text-center">
                         <Button type="link" size="middle" onClick={() => {
                             form.resetFields();
-                            onApplyFilter();
+                            const param: ITaskListParam = {
+                                page: 1,
+                                limit: props.params.limit,
+                                task_name: props.params.task_name,
+                                search: null,
+                                job_id: null,
+                                statuses: [],
+                                start_date: null,
+                                end_date: null
+                            }
+                            props.setParam(param)
                         }}>
                             Clear Filter
                         </Button>

@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Row, Col, Button, Divider, Space, Modal, Tooltip, Layout } from 'antd';
-import { LeftOutlined, PlusOutlined, ClearOutlined, StopOutlined, SyncOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Divider, Modal, Layout } from 'antd';
+import { LeftOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
-import ModalAddJob from './AddJob';
-import { SubscribeTaskJobList, StopAllJob, RetryAllJob } from './graphql';
-import { CleanJobGraphQL } from '../dashboard/graphql';
-import { TableProps, ITaskListParam, ModalProps, MetaProps, ITaskComponentProps, IFormFilterProps } from './interface';
+import { SubscribeTaskJobList } from './graphql';
+import { ITaskListParam, ITaskComponentProps } from './interface';
 import Meta from './Meta';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
 import { getQueryVariable, setQueryVariable } from '../../utils/helper';
 import FormFilter from 'src/components/task/FormFilter';
 import { Content } from 'antd/lib/layout/layout';
+import ActionComponent from 'src/components/task/Action';
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
@@ -25,7 +24,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const end_date = getQueryVariable("end_date") || "";
     const job_id = getQueryVariable("job_id") || null;
 
-    const [modalAddJobVisible, setModalAddJobVisible] = useState(false);
     const [paramsTaskList, setParamsTaskList] = useState<ITaskListParam>({
         page: page,
         limit: 10,
@@ -37,9 +35,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
         end_date: end_date != "" ? end_date : null
     });
 
-    const { cleanJob } = CleanJobGraphQL();
-    const { stopAllJob } = StopAllJob();
-    const { retryAllJob } = RetryAllJob();
     const { data, loading, error } = SubscribeTaskJobList(paramsTaskList);
     if (error) {
         Modal.error({
@@ -56,23 +51,6 @@ const TaskComponent = (props: ITaskComponentProps) => {
         router.push({
             pathname: "/expired"
         })
-    }
-
-    const showAlertConfirm = (title: string, task_name: string, action: string) => {
-        const actionMap = {
-            CLEAN: cleanJob,
-            STOP: stopAllJob
-        }
-        Modal.confirm({
-            title: title,
-            icon: <ExclamationCircleOutlined />,
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk() { actionMap[action]({ variables: { task_name: task_name } }) },
-            onCancel() {
-            },
-        });
     }
 
     const onChangeParam = (param: ITaskListParam) => {
@@ -99,36 +77,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
         window.history.replaceState(null, "", `task?${setQueryVariable(queryParam)}`);
     }
 
-    const propsMeta: MetaProps = {
-        loading: loading,
-        params: paramsTaskList,
-        meta: meta,
-        setParam: onChangeParam,
-    }
-
-    const propsTable: TableProps = {
-        data: data?.listen_all_job?.data,
-        meta: meta,
-        loading: loading,
-        params: paramsTaskList,
-        show_job_id: getQueryVariable("job_id"),
-        task_name_param: props.task_name,
-        setParam: onChangeParam,
-    };
-
-    const propsModal: ModalProps = {
-        task_name: paramsTaskList.task_name,
-        visible: modalAddJobVisible,
-        setVisible: setModalAddJobVisible,
-    }
-
     const propsFooter: IFooterComponentProps = null;
-
-    const propsFormFilter: IFormFilterProps = {
-        totalRecords: meta?.total_records,
-        params: paramsTaskList,
-        setParam: onChangeParam,
-    }
 
     return (
         <Layout>
@@ -148,7 +97,12 @@ const TaskComponent = (props: ITaskComponentProps) => {
                 <Row>
                     <Divider orientation="left" />
                     <Col span={24}>
-                        <Meta {...propsMeta} />
+                        <Meta
+                            loading={loading}
+                            params={paramsTaskList}
+                            meta={meta}
+                            setParam={onChangeParam}
+                        />
                     </Col>
                 </Row>
 
@@ -169,58 +123,12 @@ const TaskComponent = (props: ITaskComponentProps) => {
                     </Col>
                     {props.task_name ?
                         <Col span={8}>
-                            <Row justify="end" gutter={[48, 16]}>
-                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                    <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                        disabled={loading || meta?.is_loading}
-                                        icon={<PlusOutlined />}
-                                        size="middle"
-                                        type="primary"
-                                        onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                                    <Tooltip title="Retry all failure and stopped job">
-                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                            disabled={loading || meta?.is_loading}
-                                            icon={<SyncOutlined />}
-                                            size="middle"
-                                            type="primary"
-                                            onClick={() => {
-                                                retryAllJob({ variables: { task_name: paramsTaskList.task_name } });
-                                            }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Space>
-                            </Row>
-                            <Row justify="end" gutter={48}>
-                                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                                    <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
-                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                            disabled={loading || meta?.is_loading}
-                                            icon={<ClearOutlined />}
-                                            danger
-                                            size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    "Are you sure clear all success, failure, and stopped job in this task?",
-                                                    paramsTaskList.task_name,
-                                                    "CLEAN"
-                                                );
-                                            }}>Clear Job</Button>
-                                    </Tooltip>
-                                    <Tooltip title="Stop all running and queued job" placement="bottom">
-                                        <Button style={{ marginBottom: "2px", marginTop: "2px" }}
-                                            disabled={loading || meta?.is_loading}
-                                            icon={<StopOutlined />}
-                                            danger
-                                            size="middle"
-                                            onClick={() => {
-                                                showAlertConfirm(
-                                                    "Are you sure stop all running and queued job in this task?",
-                                                    paramsTaskList.task_name,
-                                                    "STOP"
-                                                );
-                                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
-                                    </Tooltip>
-                                </Space>
-                            </Row>
+                            <ActionComponent
+                                task_list_param={paramsTaskList}
+                                is_loading_subscribe={loading}
+                                is_loading={meta?.is_loading}
+                                total_job={meta?.total_records}
+                            />
                         </Col>
                         : ""
                     }
@@ -228,14 +136,27 @@ const TaskComponent = (props: ITaskComponentProps) => {
 
                 <Row justify="center">
                     <Divider orientation="left" />
-                    <ModalAddJob {...propsModal} />
-                    <FormFilter {...propsFormFilter} />
+                    {loading ? <></> : (
+                        <FormFilter
+                            totalRecords={meta?.total_records}
+                            params={paramsTaskList}
+                            setParam={onChangeParam}
+                        />
+                    )}
                 </Row>
 
                 <Row justify="center">
                     <Divider orientation="left" />
                     <Col span={24}>
-                        <TableComponent {...propsTable} />
+                        <TableComponent
+                            data={data?.listen_all_job?.data}
+                            meta={meta}
+                            loading={loading}
+                            params={paramsTaskList}
+                            show_job_id={getQueryVariable("job_id")}
+                            task_name_param={props.task_name}
+                            setParam={onChangeParam}
+                        />
                     </Col>
                 </Row>
             </Content>

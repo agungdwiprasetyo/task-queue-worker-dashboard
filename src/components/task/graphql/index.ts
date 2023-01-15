@@ -7,6 +7,7 @@ import STOP_ALL_JOB from './graphql_stop_all';
 import RETRY_ALL_JOB from './graphql_retry_all_job';
 import { ITaskListParam } from '../interface';
 import DELETE_JOB from 'src/components/task/graphql/graphql_delete_job';
+import GET_COUNT_JOB from 'src/components/task/graphql/graphql_get_count_job';
 
 export const RetryJobGraphQL = () => {
     try {
@@ -74,6 +75,17 @@ export const DeleteJobGraphQL = () => {
     try {
         const [deleteJob, { loading, error }] = useMutation(DELETE_JOB);
         return { deleteJob, loading, error };
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+export const GetCountJob = (filter: ITaskListParam) => {
+    try {
+        const { loading, data, error } = useQuery(GET_COUNT_JOB, { variables: { filter: filter } });
+        const countJob = data?.get_count_job;
+        return { loading, countJob, error };
     }
     catch (error) {
         console.log(error);
