@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, InputNumber, Select, DatePicker } from 'antd';
+import { Modal, Form, Input, InputNumber, Select, DatePicker, Row } from 'antd';
 import { IModalMutateJobProps, ModalProps } from './interface';
-import { AddJob, RetryAllJob } from './graphql';
+import { AddJob, GetCountJob, RetryAllJob } from './graphql';
 import { toMinifyJSON } from '../../utils/helper';
 import { CleanJobGraphQL } from 'src/components/dashboard/graphql';
 import moment from 'moment';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export const ModalAddJob = (props: ModalProps) => {
     const { addJob } = AddJob();
@@ -64,6 +65,8 @@ export const ModalMutateJob = (props: IModalMutateJobProps) => {
         return (<></>);
     }
 
+    const [getCountJob, countJob] = GetCountJob(props.task_list_param);
+
     const { cleanJob } = CleanJobGraphQL();
     const { retryAllJob } = RetryAllJob();
 
@@ -104,7 +107,25 @@ export const ModalMutateJob = (props: IModalMutateJobProps) => {
         });
     }
 
-    const [okText, setOkText] = useState<string>(`${props.action} ${props.count_job} jobs`);
+    const onChangeForm = () => {
+        let filter = { ...props.task_list_param }
+        filter.search = form.getFieldValue("search");
+        filter.statuses = form.getFieldValue("status") ? form.getFieldValue("status") : ["FAILURE", "STOPPED"];
+        if (form.getFieldValue("date_range")?.length == 2) {
+            filter.start_date = form.getFieldValue("date_range")[0].format("YYYY-MM-DDTHH:mm:ssZ");
+            filter.end_date = form.getFieldValue("date_range")[1].format("YYYY-MM-DDTHH:mm:ssZ")
+        }
+        getCountJob({ variables: { filter: filter } })
+    }
+
+    if (!countJob.called) {
+        let filter = { ...props.task_list_param }
+        filter.statuses = props.task_list_param.statuses?.length > 0 ? props.task_list_param.statuses : ["FAILURE", "STOPPED"];
+        getCountJob({ variables: { filter: filter } })
+    }
+
+    let searchTimer;
+    const [countLoading, setCountLoading] = useState<boolean>(countJob.loading);
 
     return (
         <Modal
@@ -112,46 +133,64 @@ export const ModalMutateJob = (props: IModalMutateJobProps) => {
             visible={props.visible}
             onCancel={handleCancel}
             width={700}
-            okText={okText}
+            okText={props.action}
             onOk={handleSubmit}
+            okButtonProps={{ disabled: countLoading || countJob?.data?.get_count_job == 0 }}
         >
-            <Form form={form} layout="vertical" name="formAddJob"
-                initialValues={{
-                    'search': props.task_list_param.search,
-                    'status': props.task_list_param.statuses?.length > 0 ? props.task_list_param.statuses : ["FAILURE", "STOPPED"],
-                    'date_range': props.task_list_param.start_date && props.task_list_param.end_date ? [
-                        moment(new Date(props.task_list_param.start_date)), moment(new Date(props.task_list_param.end_date))
-                    ] : []
-                }}
-                onChange={() => { setOkText(props.action) }}
-            >
-                <Form.Item name="search" label="Search:" initialValue={props.task_list_param.search}>
-                    <Input />
-                </Form.Item>
-                <Form.Item name="status" label="Status:" rules={[{ required: true }]}>
-                    <Select
-                        mode="multiple"
-                        allowClear
-                        placeholder="Select status"
-                        onChange={() => { setOkText(props.action) }}
-                    >
-                        <Select.Option key='SUCCESS' value='SUCCESS'>SUCCESS</Select.Option>
-                        <Select.Option key='FAILURE' value='FAILURE'>FAILURE</Select.Option>
-                        <Select.Option key='STOPPED' value='STOPPED'>STOPPED</Select.Option>
-                    </Select>
-                </Form.Item>
-                <Form.Item name="date_range" label="Created At:">
-                    <DatePicker.RangePicker
-                        style={{ minWidth: 650, maxWidth: 650 }}
-                        showTime={{
-                            format: 'HH:mm:ss',
-                            defaultValue: [moment().startOf('day'), moment().endOf('day')],
-                        }}
-                        format="YYYY-MM-DDTHH:mm:ssZ"
-                        onChange={() => { setOkText(props.action) }}
-                    />
-                </Form.Item>
-            </Form>
+            <Row>
+                <Form form={form} layout="vertical" name="formAddJob"
+                    initialValues={{
+                        'search': props.task_list_param.search,
+                        'status': props.task_list_param.statuses?.length > 0 ? props.task_list_param.statuses : ["FAILURE", "STOPPED"],
+                        'date_range': props.task_list_param.start_date && props.task_list_param.end_date ? [
+                            moment(new Date(props.task_list_param.start_date)), moment(new Date(props.task_list_param.end_date))
+                        ] : []
+                    }}
+                >
+                    <Form.Item name="search" label="Search:" initialValue={props.task_list_param.search}>
+                        <Input.Search allowClear
+                            onChange={() => {
+                                setCountLoading(true);
+                                clearTimeout(searchTimer);
+                                searchTimer = setTimeout(() => {
+                                    onChangeForm();
+                                    setCountLoading(false);
+                                }, 1500)
+                            }}
+                        />
+                    </Form.Item>
+                    <Form.Item name="status" label="Status:" rules={[{ required: true }]}>
+                        <Select
+                            mode="multiple"
+                            allowClear
+                            placeholder="Select status"
+                            onChange={onChangeForm}
+                        >
+                            <Select.Option key='SUCCESS' value='SUCCESS'>SUCCESS</Select.Option>
+                            <Select.Option key='FAILURE' value='FAILURE'>FAILURE</Select.Option>
+                            <Select.Option key='STOPPED' value='STOPPED'>STOPPED</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="date_range" label="Created At:">
+                        <DatePicker.RangePicker
+                            style={{ minWidth: 650, maxWidth: 650 }}
+                            showTime={{
+                                format: 'HH:mm:ss',
+                                defaultValue: [moment().startOf('day'), moment().endOf('day')],
+                            }}
+                            format="YYYY-MM-DDTHH:mm:ssZ"
+                            onChange={onChangeForm}
+                        />
+                    </Form.Item>
+                </Form>
+            </Row>
+            <Row justify='end'>
+                {countLoading ?
+                    (<><LoadingOutlined spin={true} /> </>)
+                    :
+                    (<b>Found {countJob?.data?.get_count_job} jobs</b>)
+                }
+            </Row>
         </Modal>
     );
 }

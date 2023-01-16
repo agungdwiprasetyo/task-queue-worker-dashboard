@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
+import { useLazyQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import LISTEN_ALL_JOB from './graphql_listen_all_job';
 import RETRY_JOB from './graphql_retry_job';
 import STOP_JOB from './graphql_stop_job';
@@ -83,9 +83,7 @@ export const DeleteJobGraphQL = () => {
 
 export const GetCountJob = (filter: ITaskListParam) => {
     try {
-        const { loading, data, error } = useQuery(GET_COUNT_JOB, { variables: { filter: filter } });
-        const countJob = data?.get_count_job;
-        return { loading, countJob, error };
+        return useLazyQuery(GET_COUNT_JOB, { variables: { filter: filter } });
     }
     catch (error) {
         console.log(error);

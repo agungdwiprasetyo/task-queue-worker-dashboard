@@ -12,7 +12,6 @@ const ActionComponent = (props: IActionComponentProps) => {
     const [action, setAction] = useState<string>("");
 
     const { stopAllJob } = StopAllJob();
-    const { countJob } = GetCountJob(props.task_list_param);
 
     const showModalMutateJob = (action: string) => {
         setAction(action);
@@ -81,8 +80,6 @@ const ActionComponent = (props: IActionComponentProps) => {
                 action={action}
                 setVisible={setModalMutateVisible}
                 task_list_param={props.task_list_param}
-                action_func={null}
-                count_job={countJob}
             />
         </>
     );

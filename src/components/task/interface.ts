@@ -78,6 +78,4 @@ export interface IModalMutateJobProps {
     task_list_param: ITaskListParam;
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
-    action_func: any;
-    count_job: number;
 }

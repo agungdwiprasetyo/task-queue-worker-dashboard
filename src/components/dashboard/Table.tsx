@@ -295,8 +295,6 @@ export const TableComponent = (props: TableProps) => {
                     end_date: "",
                     job_id: ""
                 }}
-                action_func={null}
-                count_job={modalMutateJobParam.totalJob}
             />
         </>
     );
