@@ -15,6 +15,7 @@ export interface DetailDataProps {
     jobId: string;
     isShowMore: boolean;
     initialValue: string;
-    search: string;
-    keyData: string
+    search?: string;
+    keyData: string;
+    isError?: boolean;
 }

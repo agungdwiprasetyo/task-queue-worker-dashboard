@@ -10,6 +10,7 @@ query ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
     max_retry
     interval
     error
+    result
     trace_id
     status
     created_at
@@ -24,6 +25,7 @@ query ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
         status
         trace_id
         error
+        result
         start_at
         end_at
         error_stack

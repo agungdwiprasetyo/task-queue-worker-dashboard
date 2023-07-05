@@ -147,21 +147,36 @@ const TableComponent = (props: TableProps) => {
             }
         },
         {
-            dataIndex: 'error',
-            key: 'error',
-            title: 'Error',
+            dataIndex: 'result',
+            key: 'result',
+            title: 'Result',
             width: 120,
             ellipsis: true,
-            render: (error: string, row: any) => {
-                if (!error) { return "" };
+            render: (result: string, row: any) => {
+                if (row?.error) {
+                    return (
+                        <DetailData
+                            title={"Error:"}
+                            jobId={row?.id}
+                            initialValue={row?.error}
+                            search={props?.params?.search}
+                            keyData={"error"}
+                            isShowMore={row?.meta?.is_show_more_error}
+                            isError={row?.error}
+                        />
+                    );
+                }
+
+                if (!result) { return "" };
                 return (
                     <DetailData
-                        title={"Error:"}
+                        title={"Result:"}
                         jobId={row?.id}
-                        initialValue={error}
+                        initialValue={result}
                         search={props?.params?.search}
-                        keyData={"error"}
-                        isShowMore={row?.meta?.is_show_more_error}
+                        keyData={"result"}
+                        isShowMore={row?.meta?.is_show_more_result}
+                        isError={row?.error}
                     />
                 );
             }

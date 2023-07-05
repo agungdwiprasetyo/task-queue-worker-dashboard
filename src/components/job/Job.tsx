@@ -115,30 +115,34 @@ const JobComponent = (props: IJobComponentProps) => {
             },
         },
         {
-            title: 'Error',
-            dataIndex: 'error',
-            key: 'error',
-            render: (text: string, row: any) => {
-                if (!text) { return (<></>) };
+            title: 'Result',
+            dataIndex: 'result',
+            key: 'result',
+            render: (result: string, row: any) => {
+                const resp = row?.error ? row?.error : result;
+
+                if (!resp) { return (<></>) };
                 return (
                     <>
                         <Paragraph style={{ cursor: 'pointer' }}>
-                            <pre onClick={() => Modal.info({
-                                title: 'Error:',
+                            <pre style={row?.error ? { color: "#f5222d", fontWeight: "bold" } : {}} onClick={() => Modal.info({
+                                title: row?.error ? 'Error:' : 'Result:',
                                 content: (
-                                    <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={text} /></Paragraph>
+                                    <Paragraph copyable={{ text: resp }} style={row?.error ? { color: "#f5222d", fontWeight: "bold" } : {}}>
+                                        <JSONPretty id="json-pretty" data={resp} />
+                                    </Paragraph>
                                 ),
                                 onOk() { },
                                 maskClosable: true,
                                 width: 1000
-                            })}>{text.length > 70 ? (<>{text.slice(0, 70)}<b>...(more)</b></>) : text}
+                            })}>{resp.length > 70 ? (<>{resp.slice(0, 70)}<b>...(more)</b></>) : resp}
                             </pre>
                         </Paragraph>
                         {row.error_stack ? (
                             <a onClick={() => Modal.info({
                                 title: 'Error Line:',
                                 content: (
-                                    <Paragraph copyable={{ text: text }}><JSONPretty id="json-pretty" data={row.error_stack} /></Paragraph>
+                                    <Paragraph copyable={{ text: resp }}><JSONPretty id="json-pretty" data={row.error_stack} /></Paragraph>
                                 ),
                                 onOk() { },
                                 maskClosable: true,
@@ -354,6 +358,20 @@ const JobComponent = (props: IJobComponentProps) => {
                 </Row>
                 <Row>
                     <Divider orientation="left" />
+                    <Col span={6}><b>Result</b></Col>
+                    <Col span={18}>
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.result ? showDetailData({
+                            title: "Result:",
+                            jobId: detailJob?.id,
+                            initialValue: detailJob?.result,
+                            search: "",
+                            keyData: "result",
+                            isShowMore: detailJob?.meta?.is_show_more_result
+                        }) : ""}
+                    </Col>
+                </Row>
+                <Row>
+                    <Divider orientation="left" />
                     <Col span={6}><b>Last Error</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.error ? showDetailData({
@@ -362,7 +380,8 @@ const JobComponent = (props: IJobComponentProps) => {
                             initialValue: detailJob?.error,
                             search: "",
                             keyData: "error",
-                            isShowMore: detailJob?.meta?.is_show_more_error
+                            isShowMore: detailJob?.meta?.is_show_more_error,
+                            isError: detailJob?.error
                         }) : ""}
                     </Col>
                 </Row>

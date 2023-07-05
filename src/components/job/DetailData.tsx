@@ -21,7 +21,7 @@ const DetailData = (props: DetailDataProps) => {
     if (!called) {
         return (
             <Paragraph style={{ cursor: 'pointer' }} >
-                <pre onClick={() => {
+                <pre style={props?.isError ? { color: "#f5222d", fontWeight: "bold" } : {}} onClick={() => {
                     getDetailJob({ variables: { job_id: props.jobId } });
                     setVisible(true);
                 }}>
@@ -34,7 +34,7 @@ const DetailData = (props: DetailDataProps) => {
     return (
         <>
             <Paragraph style={{ cursor: 'pointer' }}>
-                <pre onClick={() => {
+                <pre style={props?.isError ? { color: "#f5222d", fontWeight: "bold" } : {}} onClick={() => {
                     getDetailJob({ variables: { job_id: props.jobId } });
                     setVisible(true);
                 }}>
@@ -59,7 +59,7 @@ const DetailData = (props: DetailDataProps) => {
                     </Col>
                 </Row>
                 <Paragraph>
-                    <pre>
+                    <pre style={data?.get_detail_job?.error ? { color: "#f5222d", fontWeight: "bold" } : {}}>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[props.search]}

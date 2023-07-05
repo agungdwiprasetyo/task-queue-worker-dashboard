@@ -16,6 +16,7 @@ subscription ($filter: GetAllJobInputResolver) {
             max_retry
             interval
             error
+            result
             status
             created_at
             finished_at
@@ -24,6 +25,7 @@ subscription ($filter: GetAllJobInputResolver) {
             meta {
                 is_show_more_args
                 is_show_more_error
+                is_show_more_result
             }
         }
     }
