@@ -59,7 +59,7 @@ const DetailData = (props: DetailDataProps) => {
                     </Col>
                 </Row>
                 <Paragraph>
-                    <pre style={data?.get_detail_job?.error ? { color: "#f5222d", fontWeight: "bold" } : {}}>
+                    <pre style={props?.isError ? { color: "#f5222d", fontWeight: "bold" } : {}}>
                         <Highlighter
                             highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                             searchWords={[props.search]}
