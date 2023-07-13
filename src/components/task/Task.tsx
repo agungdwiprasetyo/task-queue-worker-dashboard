@@ -8,13 +8,14 @@ import { ITaskListParam, ITaskComponentProps } from './interface';
 import Meta from './Meta';
 import { IFooterComponentProps } from 'src/components/footer/interface';
 import FooterComponent from 'src/components/footer/Footer';
-import { getQueryVariable, setQueryVariable } from '../../utils/helper';
+import { getURLRootPath, getQueryVariable, setQueryVariable } from '../../utils/helper';
 import FormFilter from 'src/components/task/FormFilter';
 import { Content } from 'antd/lib/layout/layout';
 import ActionComponent from 'src/components/task/Action';
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
+    const pathRoot = getURLRootPath();
 
     const task_name = getQueryVariable("task_name");
     const page = 1;
@@ -49,6 +50,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
     const meta = data?.listen_all_job?.meta;
     if (meta?.is_close_session) {
         router.push({
+            host: pathRoot,
             pathname: "/expired"
         })
     }
@@ -111,6 +113,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                     <Col span={9}>
                         <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                             router.push({
+                                host: pathRoot,
                                 pathname: "/",
                             })
                         }}>Back to dashboard</Button>

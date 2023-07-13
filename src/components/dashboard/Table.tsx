@@ -16,11 +16,12 @@ import {
     MoreOutlined,
     LoadingOutlined
 } from '@ant-design/icons';
-import { FilterPagination } from '../../utils/helper';
+import { FilterPagination, getURLRootPath } from '../../utils/helper';
 import { ModalMutateJob } from 'src/components/task/ActionModal';
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
+    const pathRoot = getURLRootPath();
 
     let searchFilterValue = props.search != "" ? [props.search] : [];
     const [filterValueState, setFilterValueState] = useState(searchFilterValue);
@@ -55,6 +56,7 @@ export const TableComponent = (props: TableProps) => {
         setFlterPagination(filter)
 
         router.push({
+            host: pathRoot,
             pathname: "",
             query: { page: filter.page, limit: filter.limit, search: encodeURIComponent(filter.search) }
         },
@@ -137,7 +139,8 @@ export const TableComponent = (props: TableProps) => {
                             disabled={row?.is_loading || !props.metaTagline?.config?.with_persistent}
                             onClick={() => {
                                 router.push({
-                                    pathname: "/task",
+                                    host: pathRoot,
+                                    pathname: "task",
                                     query: { task_name: name }
                                 })
                             }} overlay={(

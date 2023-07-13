@@ -4,9 +4,12 @@
 package main
 
 import (
+	"bytes"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/shurcooL/vfsgen"
@@ -29,6 +32,20 @@ import (
 // /static and assets_vfsdata.go.
 
 func main() {
+	filepath.Walk("out", func(path string, info fs.FileInfo, err error) error {
+		if filepath.Ext(path) != ".html" {
+			return nil
+		}
+		file, err := os.ReadFile(path)
+		if err != nil {
+			panic(err)
+		}
+		file = bytes.ReplaceAll(file, []byte(`href="/`), []byte(`href="`))
+		file = bytes.ReplaceAll(file, []byte(`src="/`), []byte(`src="`))
+		os.WriteFile(path, file, 0644)
+		return nil
+	})
+
 	filename := "assets_dashboard_build.go"
 	err := vfsgen.Generate(http.Dir("out"), vfsgen.Options{
 		PackageName:  "dashboard",

@@ -40,7 +40,8 @@ const getHost = (isWebsocket: boolean) => {
   let path = window.location.pathname.replace("/task", "");
   path = path.replace("/job", "");
   if (path == "/") path = "";
-  return `${protocol}//${host}${path}`;
+  const url = `${protocol}//${host}${path}`;
+  return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
 const httpLink = new HttpLink({

@@ -8,7 +8,7 @@ import { Row, Col } from 'antd';
 import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
-import { roundN, StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { getURLRootPath, roundN, StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
 import { LeftOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
@@ -23,6 +23,7 @@ import CopyComponent from 'src/components/shared/CopyComponent';
 
 const JobComponent = (props: IJobComponentProps) => {
     const router = useRouter();
+    const pathRoot = getURLRootPath();
 
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
@@ -51,6 +52,7 @@ const JobComponent = (props: IJobComponentProps) => {
     const detailJob = data?.listen_detail_job;
     if (detailJob?.meta?.is_close_session) {
         router.push({
+            host: pathRoot,
             pathname: "/expired"
         })
     }
@@ -179,6 +181,7 @@ const JobComponent = (props: IJobComponentProps) => {
                         <Col span={24}>
                             <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                                 router.push({
+                                    host: pathRoot,
                                     pathname: "/"
                                 })
                             }}>Back to dashboard</Button>
@@ -208,6 +211,7 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Col span={14}>
                         <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                             router.push({
+                                host: pathRoot,
                                 pathname: "/task",
                                 query: { task_name: detailJob?.task_name }
                             })
@@ -248,6 +252,7 @@ const JobComponent = (props: IJobComponentProps) => {
                             <b><Tooltip title={`View all ${detailJob?.task_name}`}>
                                 <a onClick={() => {
                                     router.push({
+                                        host: pathRoot,
                                         pathname: "/task",
                                         query: { task_name: detailJob?.task_name }
                                     })

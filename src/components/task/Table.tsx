@@ -8,7 +8,7 @@ import {
 import { TableProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
 import Moment from 'react-moment';
-import { StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { StatusLayout, StatusLayoutProps, getURLRootPath } from 'src/utils/helper';
 import { useRouter } from 'next/router';
 import DetailData from 'src/components/job/DetailData';
 import PaginationComponent from 'src/components/shared/PaginationComponent';
@@ -16,6 +16,7 @@ import { GetDetailConfiguration } from 'src/components/menu/graphql';
 
 const TableComponent = (props: TableProps) => {
     const router = useRouter();
+    const pathRoot = getURLRootPath();
 
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
@@ -96,6 +97,7 @@ const TableComponent = (props: TableProps) => {
                         <Tooltip title="View job detail">
                             <a onClick={() => {
                                 router.push({
+                                    host: pathRoot,
                                     pathname: "/job",
                                     query: { id: id }
                                 })
@@ -226,6 +228,7 @@ const TableComponent = (props: TableProps) => {
                                     stopJob({ variables: { job_id: row?.id } })
                                     if (props.meta?.is_freeze_broadcast) {
                                         router.push({
+                                            host: pathRoot,
                                             pathname: "/job",
                                             query: { id: row.id }
                                         })
@@ -236,6 +239,7 @@ const TableComponent = (props: TableProps) => {
                                     retryJob({ variables: { job_id: row?.id } });
                                     if (props.meta?.is_freeze_broadcast) {
                                         router.push({
+                                            host: pathRoot,
                                             pathname: "/job",
                                             query: { id: row.id }
                                         })
@@ -266,6 +270,7 @@ const TableComponent = (props: TableProps) => {
                     return (
                         <a onClick={() => {
                             router.push({
+                                host: pathRoot,
                                 pathname: "/task",
                                 query: { task_name: task_name }
                             })

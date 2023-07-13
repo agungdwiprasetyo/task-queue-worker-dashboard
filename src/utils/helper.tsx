@@ -34,6 +34,21 @@ export const StatusLayout = (props: StatusLayoutProps) => {
     );
 }
 
+export const getURLRootPath = (): string => {
+    if (typeof window === "undefined") {
+        return "";
+    }
+    const pathname = window.location.pathname.split("/");
+    let res = [];
+    for (let i = 0; i < pathname.length; i++) {
+        if (pathname[i] != "") {
+            res.push(pathname[i])
+        }
+    }
+    res.splice(-1);
+    return res.join("/");
+}
+
 export const getQueryVariable = (variable) => {
     if (typeof window === "undefined") {
         return "";

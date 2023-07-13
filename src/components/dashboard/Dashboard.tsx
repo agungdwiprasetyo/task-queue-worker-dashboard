@@ -7,13 +7,14 @@ import { TableProps } from './interface';
 import { Modal, Layout, Tag, Space, Row, Col, notification, Skeleton } from 'antd';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
-import { convertToByteSize, getQueryVariable } from '../../utils/helper';
+import { convertToByteSize, getQueryVariable, getURLRootPath } from '../../utils/helper';
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import MenuOption from 'src/components/menu/MenuOption';
 
 const DashboardComponent = (props: any) => {
     const router = useRouter();
+    const pathRoot = getURLRootPath();
 
     const page = parseInt(getQueryVariable("page")) > 0 ? parseInt(getQueryVariable("page")) : 1;
     const limit = parseInt(getQueryVariable("limit")) > 0 ? parseInt(getQueryVariable("limit")) : 7;
@@ -52,6 +53,7 @@ const DashboardComponent = (props: any) => {
     const meta = data?.listen_task_dashboard?.meta;
     if (meta?.is_close_session) {
         router.push({
+            host: pathRoot,
             pathname: "/expired"
         })
     }
@@ -89,6 +91,7 @@ const DashboardComponent = (props: any) => {
 
     const onTagClicked = (status: string) => {
         router.push({
+            host: pathRoot,
             pathname: "/task",
             query: { statuses: status }
         })
