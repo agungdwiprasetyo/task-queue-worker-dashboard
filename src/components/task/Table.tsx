@@ -16,7 +16,7 @@ import { GetDetailConfiguration } from 'src/components/menu/graphql';
 
 const TableComponent = (props: TableProps) => {
     const router = useRouter();
-    const pathRoot = getURLRootPath();
+    const pathRoot = getURLRootPath(false);
 
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();

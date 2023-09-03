@@ -34,9 +34,12 @@ export const StatusLayout = (props: StatusLayoutProps) => {
     );
 }
 
-export const getURLRootPath = (): string => {
+export const getURLRootPath = (isRoot: boolean): string => {
     if (typeof window === "undefined") {
         return "";
+    }
+    if (isRoot) {
+        return window.location.pathname;
     }
     const pathname = window.location.pathname.split("/");
     let res = [];

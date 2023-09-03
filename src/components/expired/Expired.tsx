@@ -1,12 +1,12 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { LeftOutlined } from "@ant-design/icons";
-import { Button, Col, Divider, Layout, Row, Space } from "antd";
+import { Button, Layout, Row, Space } from "antd";
 import { getURLRootPath } from 'src/utils/helper';
 
 const ExpiredPage = () => {
     const router = useRouter();
-    const pathRoot = getURLRootPath();
+    const pathRoot = getURLRootPath(false);
 
     return (
         <Layout >

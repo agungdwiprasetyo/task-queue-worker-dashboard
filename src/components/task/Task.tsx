@@ -15,7 +15,7 @@ import ActionComponent from 'src/components/task/Action';
 
 const TaskComponent = (props: ITaskComponentProps) => {
     const router = useRouter();
-    const pathRoot = getURLRootPath();
+    const pathRoot = getURLRootPath(false);
 
     const task_name = getQueryVariable("task_name");
     const page = 1;

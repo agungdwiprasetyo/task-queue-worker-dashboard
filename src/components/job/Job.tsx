@@ -23,7 +23,7 @@ import CopyComponent from 'src/components/shared/CopyComponent';
 
 const JobComponent = (props: IJobComponentProps) => {
     const router = useRouter();
-    const pathRoot = getURLRootPath();
+    const pathRoot = getURLRootPath(false);
 
     const { retryJob } = RetryJobGraphQL();
     const { stopJob } = StopJobGraphQL();
