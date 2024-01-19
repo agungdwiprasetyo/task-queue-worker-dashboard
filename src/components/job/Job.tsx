@@ -110,7 +110,7 @@ const JobComponent = (props: IJobComponentProps) => {
             dataIndex: 'trace_id',
             key: 'trace_id',
             render: (trace_id: string) => {
-                const traceURL = traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + trace_id;
+                const traceURL = trace_id !== "" ? traceURLConfig?.value?.replace(/\/?(\?|#|$)/, '/$1') + trace_id : "";
                 return (
                     <a href={traceURL} target="blank">{traceURL}</a>
                 );
