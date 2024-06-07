@@ -2,13 +2,11 @@ import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton, Progress } from 'antd';
 import { DetailDataProps, IFilterJobHistoryParam, IJobComponentProps } from './interface';
-import { SubscribeJobDetail } from './graphql';
-import { RetryJobGraphQL, StopJobGraphQL } from '../task/graphql';
+import { RetryJobGraphQL, StopJobGraphQL } from 'src/graphql';
 import { Row, Col } from 'antd';
-import Moment from 'react-moment';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import JSONPretty from 'react-json-pretty';
-import { getURLRootPath, roundN, StatusLayout, StatusLayoutProps } from 'src/utils/helper';
+import { DateComponent, getURLRootPath, roundN, StatusLayout, StatusLayoutProps } from 'src/utils/helper';
 import Table, { ColumnProps, TablePaginationConfig } from 'antd/lib/table';
 import { LeftOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { getQueryVariable } from '../../utils/helper';
@@ -20,6 +18,7 @@ import DetailData from 'src/components/job/DetailData';
 import PaginationComponent from 'src/components/shared/PaginationComponent';
 import { GetDetailConfiguration } from 'src/components/menu/graphql';
 import CopyComponent from 'src/components/shared/CopyComponent';
+import { SubscribeJobDetail } from 'src/graphql';
 
 const JobComponent = (props: IJobComponentProps) => {
     const router = useRouter();
@@ -69,7 +68,7 @@ const JobComponent = (props: IJobComponentProps) => {
             key: 'start_at',
             render: (text: string) => {
                 return (
-                    <Moment format="DD MMMM YYYY, HH:mm:ssZ">{text}</Moment>
+                    <DateComponent date={text} />
                 );
             },
         },
@@ -79,7 +78,7 @@ const JobComponent = (props: IJobComponentProps) => {
             key: 'end_at',
             render: (text: string) => {
                 return (
-                    <Moment format="DD MMMM YYYY, HH:mm:ssZ">{text}</Moment>
+                    <DateComponent date={text} />
                 );
             },
         },
@@ -90,6 +89,7 @@ const JobComponent = (props: IJobComponentProps) => {
             render: (text: string, row: any) => {
                 const start = moment(new Date(row?.start_at));
                 const end = moment(new Date(row?.end_at));
+                if (start.isSame(end)) { return "0" };
                 return moment.duration(end.diff(start)).toISOString().replace(".", ",").replace("PT", "").toLowerCase();
             },
         },
@@ -295,7 +295,7 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Col span={6}><b>Created At</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
-                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.created_at}</Moment>
+                            <DateComponent date={detailJob?.created_at} />
                         )}
                     </Col>
                 </Row>
@@ -304,7 +304,7 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Col span={6}><b>Finished At</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
-                            <Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.finished_at}</Moment>
+                            <DateComponent date={detailJob?.finished_at} />
                         )}
                     </Col>
                 </Row>
@@ -312,11 +312,9 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Divider orientation="left" />
                     <Col span={6}><b>Next Retry At</b></Col>
                     <Col span={18}>
-                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) :
-                            detailJob?.next_retry_at ?
-                                (<Moment format="DD MMMM YYYY, HH:mm:ssZ">{detailJob?.next_retry_at}</Moment>) :
-                                "-"
-                        }
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            <DateComponent date={detailJob?.next_retry_at} />
+                        )}
                     </Col>
                 </Row>
                 <Row>

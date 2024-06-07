@@ -6,7 +6,7 @@ import {
     StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { TableProps } from './interface';
-import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from './graphql';
+import { RetryJobGraphQL, StopJobGraphQL, DeleteJobGraphQL } from 'src/graphql';
 import Moment from 'react-moment';
 import { StatusLayout, StatusLayoutProps, getURLRootPath } from 'src/utils/helper';
 import { useRouter } from 'next/router';

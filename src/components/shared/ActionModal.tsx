@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Modal, Form, Input, InputNumber, Select, DatePicker, Row } from 'antd';
-import { IModalMutateJobProps, ModalProps } from './interface';
-import { AddJob, GetCountJob, RetryAllJob } from './graphql';
+import { ITaskListParam } from '../task/interface';
+import { AddJob, GetCountJob, RetryAllJob } from 'src/graphql';
 import { toMinifyJSON } from '../../utils/helper';
-import { CleanJobGraphQL } from 'src/components/dashboard/graphql';
+import { CleanJobGraphQL } from 'src/graphql';
 import moment from 'moment';
 import { LoadingOutlined } from '@ant-design/icons';
+
+export interface ModalProps {
+    task_name: string;
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
+}
 
 export const ModalAddJob = (props: ModalProps) => {
     const { addJob } = AddJob();
@@ -59,8 +65,14 @@ export const ModalAddJob = (props: ModalProps) => {
     );
 }
 
-export const ModalMutateJob = (props: IModalMutateJobProps) => {
+export interface IModalMutateJobProps {
+    action: string;
+    task_list_param: ITaskListParam;
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
+}
 
+export const ModalMutateJob = (props: IModalMutateJobProps) => {
     if (!props.visible) {
         return (<></>);
     }
@@ -169,6 +181,7 @@ export const ModalMutateJob = (props: IModalMutateJobProps) => {
                             <Select.Option key='SUCCESS' value='SUCCESS'>SUCCESS</Select.Option>
                             <Select.Option key='FAILURE' value='FAILURE'>FAILURE</Select.Option>
                             <Select.Option key='STOPPED' value='STOPPED'>STOPPED</Select.Option>
+                            <Select.Option key='HOLD' value='HOLD'>HOLD</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item name="date_range" label="Created At:">

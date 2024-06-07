@@ -4,9 +4,9 @@ import { DetailDataProps } from './interface';
 import { toPrettyJSON, toMinifyJSON, getSize } from '../../utils/helper';
 import Paragraph from 'antd/lib/typography/Paragraph';
 import Highlighter from 'react-highlight-words';
-import { GetDetailJob } from 'src/components/job/graphql';
 import { LoadingOutlined } from '@ant-design/icons';
 import CopyComponent from 'src/components/shared/CopyComponent';
+import { GetDetailJob } from 'src/graphql';
 
 const DetailData = (props: DetailDataProps) => {
     const [getDetailJob, { data, called, loading }] = GetDetailJob();

@@ -223,6 +223,10 @@ body {
   box-shadow: 0px -2px 15px 8px rgba(232, 159, 56, 0.3);
 }
 
+.shadow-hold {
+  box-shadow: 0px -2px 15px 8px rgba(211, 173, 247, 0.3);
+}
+
 .fade-out {
   transition: all 2s normal;
   box-shadow: none;
@@ -272,4 +276,17 @@ body {
 .scrollHorizontal {
   overflow-x: "scroll";
   max-width: 300px;
+}
+
+.hold-button {
+  margin-bottom: "3px";
+  margin-top: "3px";
+  background: "#f9f0ff";
+  color: "#531dab";
+  border-color: "#d3adf7"
+}
+
+.hold-button-disable {
+  margin-bottom: "3px";
+  margin-top: "3px";
 }

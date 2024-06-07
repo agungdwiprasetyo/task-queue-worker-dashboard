@@ -1,7 +1,7 @@
 import { Row, Skeleton } from "antd";
 import { Footer } from "antd/lib/layout/layout";
 import { IFooterComponentProps } from "src/components/footer/interface";
-import { GetDashboard } from "../dashboard/graphql";
+import { GetDashboard } from "../../graphql";
 
 const FooterComponent = (props: IFooterComponentProps) => {
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Row, Col, Button, Divider, Modal, Layout } from 'antd';
+import { Row, Col, Button, Divider, Modal, Layout, Switch, Space, Tooltip } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import TableComponent from './Table';
-import { SubscribeTaskJobList } from './graphql';
+import { SubscribeTaskJobList } from 'src/graphql';
 import { ITaskListParam, ITaskComponentProps } from './interface';
 import Meta from './Meta';
 import { IFooterComponentProps } from 'src/components/footer/interface';
@@ -108,7 +108,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                     </Col>
                 </Row>
 
-                <Row>
+                <Row justify="center">
                     <Divider orientation="left" />
                     <Col span={9}>
                         <Button icon={<LeftOutlined />} size="middle" onClick={() => {
@@ -118,19 +118,26 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             })
                         }}>Back to dashboard</Button>
                     </Col>
-                    <Col span={6}>
-                        {meta?.is_freeze_broadcast ? (
-                            <div className="text-center" style={{ color: "#f5222d" }}>Freeze Mode</div>
-                        ) : (<></>)
-                        }
+                    <Col span={5}>
+                        <div className="text-center" style={{ fontSize: "25px" }}>
+                            {meta?.is_freeze_broadcast ? (
+                                <div className="text-center" style={{ color: "#f5222d" }}>Freeze Mode</div>
+                            ) : meta?.is_hold ? (
+                                <div className="text-center" style={meta?.is_hold ? { color: "#531dab", fontSize: "25px" } : {}}>
+                                    <Tooltip title="When hold mode is activated, incoming jobs will be held until switch to unholded" placement="bottom">Hold Mode</Tooltip>
+                                </div>
+                            ) : meta?.message !== "" ? meta?.message : (<></>)}
+                        </div>
                     </Col>
+                    <Col span={5}></Col>
                     {props.task_name ?
-                        <Col span={8}>
+                        <Col span={4}>
                             <ActionComponent
                                 task_list_param={paramsTaskList}
                                 is_loading_subscribe={loading}
                                 is_loading={meta?.is_loading}
                                 total_job={meta?.total_records}
+                                is_hold={meta?.is_hold}
                             />
                         </Col>
                         : ""

@@ -1,5 +1,7 @@
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, StopOutlined, SyncOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PauseOutlined, StopOutlined, SyncOutlined } from "@ant-design/icons";
 import { Space, Tag } from "antd";
+import Moment from "react-moment";
+import moment from 'moment';
 
 export interface StatusLayoutProps {
     status: string;
@@ -27,11 +29,21 @@ export const StatusLayout = (props: StatusLayoutProps) => {
     else if (props.status == "QUEUEING") tag = (<Tag icon={<ClockCircleOutlined />} color="default">{props.status}...</Tag>);
     else if (props.status == "FAILURE") tag = (<Tag icon={<CloseCircleOutlined />} color="error">{props.status} </Tag>);
     else if (props.status == "STOPPED") tag = (<Tag icon={<StopOutlined />} color="warning">{props.status} </Tag>);
+    else if (props.status == "HOLD") tag = (<Tag icon={<PauseOutlined />} color="purple">{props.status} </Tag>);
     return (
         <Space>
             {tag}
         </Space>
     );
+}
+
+export const DateComponent = ({ date }) => {
+    if (date === "") { return (<div>-</div>) };
+    const dt = moment(new Date(date));
+    console.log(dt);
+    return (
+        <Moment format="DD MMMM YYYY, HH:mm:ssZ">{date}</Moment>
+    )
 }
 
 export const getURLRootPath = (isRoot: boolean): string => {

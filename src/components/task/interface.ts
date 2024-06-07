@@ -14,12 +14,6 @@ export interface TableProps {
     setParam?: Dispatch<SetStateAction<ITaskListParam>>;
 }
 
-export interface ModalProps {
-    task_name: string;
-    visible: boolean;
-    setVisible: Dispatch<SetStateAction<boolean>>;
-}
-
 export interface MetaProps {
     loading: boolean;
     params: ITaskListParam;
@@ -69,13 +63,7 @@ export interface IFormFilterProps {
 export interface IActionComponentProps {
     is_loading_subscribe: boolean;
     is_loading: boolean;
+    is_hold: boolean;
     task_list_param: ITaskListParam;
     total_job: number;
-}
-
-export interface IModalMutateJobProps {
-    action: string;
-    task_list_param: ITaskListParam;
-    visible: boolean;
-    setVisible: Dispatch<SetStateAction<boolean>>;
 }

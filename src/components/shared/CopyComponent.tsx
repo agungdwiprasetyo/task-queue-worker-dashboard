@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { CheckCircleOutlined, CopyOutlined } from "@ant-design/icons";
 import { Tag } from "antd";
 import { copyToClipboard } from 'src/utils/helper';
-import { IPropsCopy } from 'src/components/shared/interface';
+
+export interface IPropsCopy {
+    value: string;
+    title?: string;
+}
 
 const CopyComponent = (props: IPropsCopy) => {
-
     const [copyWording, setCopyWording] = useState({ title: props.title ? props.title : "copy", color: "geekblue", icon: (<CopyOutlined />) });
 
     return (

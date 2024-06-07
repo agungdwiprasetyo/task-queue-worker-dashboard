@@ -1,14 +1,14 @@
 import { useRouter } from 'next/router';
-import { SubscribeTaskList, GetDashboard } from './graphql';
-import { StopAllJob, RetryAllJob } from '../task/graphql';
-import { CleanJobGraphQL } from '../dashboard/graphql';
+import { SubscribeTaskList, GetDashboard } from '../../graphql';
+import { StopAllJob, RetryAllJob } from 'src/graphql';
+import { CleanJobGraphQL } from '../../graphql';
 import TableComponent from './Table';
 import { TableProps } from './interface';
 import { Modal, Layout, Tag, Space, Row, Col, notification, Skeleton } from 'antd';
 import FooterComponent from 'src/components/footer/Footer';
 import { Content } from 'antd/lib/layout/layout';
 import { convertToByteSize, getQueryVariable } from '../../utils/helper';
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, LoadingOutlined, PauseOutlined, StopOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import MenuOption from 'src/components/menu/MenuOption';
 
@@ -163,6 +163,11 @@ const DashboardComponent = (props: any) => {
                                     onClick={() => { onTagClicked("STOPPED") }}>
                                     All Stopped:  {props.loading ? <LoadingOutlined spin={true} /> :
                                         data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.stopped, 0)}
+                                </Tag>
+                                <Tag style={{ cursor: 'pointer' }} key={"hold"} icon={<PauseOutlined />} color="purple"
+                                    onClick={() => { onTagClicked("HOLD") }}>
+                                    All Hold:  {props.loading ? <PauseOutlined spin={true} /> :
+                                        data?.listen_task_dashboard?.data?.reduce((n, { detail }) => n + detail?.hold, 0)}
                                 </Tag>
                             </Space>
                         </div>

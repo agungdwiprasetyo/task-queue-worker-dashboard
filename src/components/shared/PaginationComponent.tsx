@@ -1,10 +1,16 @@
 import React from 'react';
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Row, Space } from "antd";
-import { IPropsPagination } from 'src/components/shared/interface';
+
+export interface IPropsPagination {
+    page: number;
+    limit: number;
+    totalRecord: number;
+    detail: string;
+    onChangePage: (incr: number) => void;
+}
 
 const PaginationComponent = (props: IPropsPagination) => {
-
     const totalPage = Math.ceil((props.totalRecord > 0 ? props.totalRecord : 0) / props.limit);
 
     if (totalPage == 0) {

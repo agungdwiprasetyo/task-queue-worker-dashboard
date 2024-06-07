@@ -6,7 +6,7 @@ import { setTokenInRequest } from './configureClient';
 const getDisplayName = Component =>
   Component.displayName || Component.name || 'Component';
 
-export const auth = ctx => {
+export const auth = (ctx) => {
   const { token, userId } = nextCookie(ctx);
 
   if (ctx.req && !token) {
@@ -22,7 +22,7 @@ export const auth = ctx => {
   return { token, userId };
 };
 
-export const withAuthSync = WrappedComponent =>
+export const withAuthSync = (WrappedComponent: any) =>
   class extends React.Component {
     static displayName = `withAuthSync(${getDisplayName(WrappedComponent)})`;
 

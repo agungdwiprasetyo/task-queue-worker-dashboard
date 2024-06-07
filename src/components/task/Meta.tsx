@@ -6,7 +6,8 @@ import {
     CloseCircleOutlined,
     ClockCircleOutlined,
     StopOutlined,
-    LoadingOutlined
+    LoadingOutlined,
+    PauseOutlined
 } from '@ant-design/icons';
 import { MetaProps } from './interface';
 
@@ -69,6 +70,13 @@ const Meta = (props: MetaProps) => {
                 icon={<StopOutlined />} color="warning"
                 onClick={() => { onTagClicked('STOPPED') }}>
                 <b>Stopped: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.stopped}</b>
+            </Tag>
+            <Tag style={pointerHover}
+                className={props.params?.statuses?.includes("HOLD") && !props.loading ? "shadow-hold" : ""}
+                key={"hold"}
+                icon={<PauseOutlined />} color="purple"
+                onClick={() => { onTagClicked('HOLD') }}>
+                <b>Hold: {props.loading ? <LoadingOutlined spin={true} /> : props?.meta?.detail?.hold}</b>
             </Tag>
         </div>
     )

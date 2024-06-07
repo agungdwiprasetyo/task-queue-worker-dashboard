@@ -14,10 +14,13 @@ import {
     ClearOutlined,
     ExclamationCircleOutlined,
     MoreOutlined,
-    LoadingOutlined
+    LoadingOutlined,
+    PauseOutlined,
+    CaretRightOutlined
 } from '@ant-design/icons';
 import { FilterPagination, getURLRootPath } from '../../utils/helper';
-import { ModalMutateJob } from 'src/components/task/ActionModal';
+import { ModalMutateJob } from 'src/components/shared/ActionModal';
+import { HoldUnholdComponent, IHoldUnholdProps } from 'src/components/shared/HoldUnholdComponent';
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
@@ -40,6 +43,8 @@ export const TableComponent = (props: TableProps) => {
         setModalMutateJobParam({ action: action, totalJob: totalJob, taskName: taskName });
         setModalMutateVisible(true);
     }
+
+    const [holdModalMutateState, setHoldModalMutateState] = useState<IHoldUnholdProps>({ visible: false, taskName: "", isHold: false });
 
     const getFilterValues = (source, key) => {
         let res = [];
@@ -105,6 +110,7 @@ export const TableComponent = (props: TableProps) => {
             dataIndex: 'total_jobs',
             key: 'total_jobs',
             title: 'Total Jobs',
+            align: 'center' as 'center',
             sorter: (a: any, b: any) => b?.total_jobs - a?.total_jobs,
             render: (total_jobs: number) => {
                 return (
@@ -115,6 +121,7 @@ export const TableComponent = (props: TableProps) => {
         {
             dataIndex: 'total_jobs',
             key: 'total_jobs',
+            align: 'center' as 'center',
             render: (total_jobs: number, row: any) => {
                 return (
                     <Space>
@@ -123,6 +130,7 @@ export const TableComponent = (props: TableProps) => {
                         <Tag icon={<CheckCircleOutlined />} color="green">Success: <b>{row?.detail?.success}</b></Tag>
                         <Tag className={row?.detail?.failure > 0 ? "fade-in-failure" : "fade-out"} icon={<CloseCircleOutlined />} color="error">Failure: <b>{row?.detail?.failure}</b></Tag>
                         <Tag icon={<StopOutlined />} color="warning">Stopped: <b>{row?.detail?.stopped}</b></Tag>
+                        {row?.detail?.hold ? (<Tag icon={<PauseOutlined />} color="purple">Hold: <b>{row?.detail?.hold}</b></Tag>) : (<></>)}
                     </Space>
                 )
             },
@@ -131,9 +139,11 @@ export const TableComponent = (props: TableProps) => {
             dataIndex: 'name',
             key: 'action',
             title: '',
+            align: 'right' as 'right',
             render: (name: string, row: any) => {
                 return (
                     <Space>
+                        <div style={row?.is_hold ? { color: "#531dab" } : {}}>{row?.loading_message && !row?.is_loading ? row?.loading_message : ""}</div>
                         <Dropdown.Button type="primary" size="large"
                             icon={row?.is_loading ? <LoadingOutlined spin={row?.is_loading} /> : <MoreOutlined />}
                             disabled={row?.is_loading || !props.metaTagline?.config?.with_persistent}
@@ -147,19 +157,29 @@ export const TableComponent = (props: TableProps) => {
                                 <Menu>
                                     <Menu.Item>
                                         <Tooltip title="Retry all failure and stopped job" placement="left">
-                                            <Button icon={<SyncOutlined />} size="middle"
+                                            <Button icon={<SyncOutlined />} size="middle" type="text"
                                                 onClick={() => {
                                                     showMutateJobConfirm(
                                                         name,
                                                         "RETRY",
                                                         row?.detail?.failure + row?.detail?.stopped
                                                     );
-                                                }}>Retry All<span>&nbsp;&nbsp;</span></Button>
+                                                }}>Retry All</Button>
+                                        </Tooltip>
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Tooltip title="Hold/unhold incoming job" placement="left">
+                                            <Button icon={
+                                                row?.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)
+                                            } size="middle" type="text"
+                                                onClick={() => {
+                                                    setHoldModalMutateState({ visible: true, taskName: name, isHold: row?.is_hold });
+                                                }}>{row?.is_hold ? "Unhold" : "Hold"}</Button>
                                         </Tooltip>
                                     </Menu.Item>
                                     <Menu.Item>
                                         <Tooltip title="Stop all running and queued job" placement="left">
-                                            <Button icon={<StopOutlined />} danger size="middle"
+                                            <Button icon={<StopOutlined />} danger size="middle" type="text"
                                                 onClick={() => {
                                                     Modal.confirm({
                                                         title: `Are you sure stop all running and queued job in task ${name}?`,
@@ -170,12 +190,12 @@ export const TableComponent = (props: TableProps) => {
                                                         onOk() { props.stopAllJob({ variables: { task_name: name } }) },
                                                         onCancel() { },
                                                     });
-                                                }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
+                                                }}>Stop All</Button>
                                         </Tooltip>
                                     </Menu.Item>
                                     <Menu.Item>
                                         <Tooltip title="Clear all success, failure, and stopped job" placement="left">
-                                            <Button icon={<ClearOutlined />} danger size="middle"
+                                            <Button icon={<ClearOutlined />} danger size="middle" type="text"
                                                 onClick={() => {
                                                     showMutateJobConfirm(
                                                         name,
@@ -298,6 +318,11 @@ export const TableComponent = (props: TableProps) => {
                     end_date: "",
                     job_id: ""
                 }}
+            />
+
+            <HoldUnholdComponent
+                setState={setHoldModalMutateState}
+                state={holdModalMutateState}
             />
         </>
     );

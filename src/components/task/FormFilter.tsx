@@ -78,20 +78,20 @@ const FormFilter = (props: IFormFilterProps) => {
                         <Select.Option key='QUEUEING' value='QUEUEING'>QUEUEING</Select.Option>
                         <Select.Option key='FAILURE' value='FAILURE'>FAILURE</Select.Option>
                         <Select.Option key='STOPPED' value='STOPPED'>STOPPED</Select.Option>
+                        <Select.Option key='HOLD' value='HOLD'>HOLD</Select.Option>
                     </Select>
                 </Form.Item>
                 <Form.Item name="dateRange" label="Created At:">
                     <DatePicker.RangePicker
                         showTime={{
-                            format: 'HH:mm:ss',
-                            defaultValue: [moment().startOf('day'), moment().endOf('day')],
+                            format: 'HH:mm:ss'
                         }}
                         format="YYYY-MM-DDTHH:mm:ssZ"
                         style={{ minWidth: 330, maxWidth: 330 }}
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="ghost" size="middle" onClick={() => { onApplyFilter() }}>
+                    <Button size="middle" onClick={() => { onApplyFilter() }}>
                         Apply Filter
                     </Button>
                 </Form.Item>
