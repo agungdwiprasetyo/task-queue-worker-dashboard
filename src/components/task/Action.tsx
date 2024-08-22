@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     CaretRightOutlined, ClearOutlined, ExclamationCircleOutlined, PauseOutlined, PlusOutlined, StopOutlined, SyncOutlined
 } from '@ant-design/icons';
-import { Button, Row, Space, Tooltip, Modal } from 'antd';
+import { Button, Row, Space, Tooltip, Modal, Col } from 'antd';
 import { IActionComponentProps } from 'src/components/task/interface';
 import { StopAllJob, HoldJobTask } from 'src/graphql';
 import { ModalAddJob, ModalMutateJob } from 'src/components/shared/ActionModal';
@@ -26,36 +26,37 @@ const ActionComponent = (props: IActionComponentProps) => {
 
     return (
         <>
-            <Row justify="center">
-                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
-                    <Button style={{ marginBottom: "3px", marginTop: "3px" }}
+            <Row gutter={[8, 8]} justify="center">
+                <Col span={12}>
+                    <Button
                         disabled={isButtonDisable}
                         icon={<PlusOutlined />}
                         size="middle"
                         type="primary"
                         onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                    <Tooltip title="Retry all job">
-                        <Button style={{ marginBottom: "3px", marginTop: "3px" }}
-                            disabled={isButtonDisable}
-                            icon={<SyncOutlined />}
-                            size="middle"
-                            type="primary"
-                            onClick={() => { showModalMutateJob("RETRY") }}>Retry All<span>&nbsp;&nbsp;</span></Button>
-                    </Tooltip>
-                </Space>
-            </Row>
-            <Row justify="center">
-                <Space style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap" }} align="baseline">
+                </Col>
+                <Col span={12}>
+                    <Button
+                        disabled={isButtonDisable}
+                        icon={<SyncOutlined />}
+                        size="middle"
+                        type="primary"
+                        onClick={() => { showModalMutateJob("RETRY") }}>Retry All</Button>
+                </Col>
+
+                <Col span={12}>
                     <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
-                        <Button style={{ marginBottom: "3px", marginTop: "3px" }}
+                        <Button
                             disabled={isButtonDisable}
                             icon={<ClearOutlined />}
                             danger
                             size="middle"
                             onClick={() => { showModalMutateJob("CLEAN") }}>Clear Job</Button>
                     </Tooltip>
+                </Col>
+                <Col span={12}>
                     <Tooltip title="Stop all running and queued job" placement="bottom">
-                        <Button style={{ marginBottom: "3px", marginTop: "3px" }}
+                        <Button
                             disabled={isButtonDisable}
                             icon={<StopOutlined />}
                             danger
@@ -70,18 +71,34 @@ const ActionComponent = (props: IActionComponentProps) => {
                                     onOk() { stopAllJob({ variables: { task_name: props.task_list_param.task_name } }) },
                                     onCancel() { },
                                 });
-                            }}>Stop All<span>&nbsp;&nbsp;&nbsp;</span></Button>
+                            }}>Stop All<span>&nbsp;</span></Button>
                     </Tooltip>
-                </Space>
+                </Col>
             </Row>
-            <Row justify="center">
-                <Button type="ghost" size="large" style={{ marginBottom: "3px", marginTop: "3px" }}
+            <Row gutter={[8, 8]} justify="center">
+                <Button type="ghost" size="large" style={{ marginTop: "4px" }}
                     disabled={isButtonDisable}
-                    icon={
-                        props.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)
-                    } onClick={() => {
-                        setHoldModalMutateState({ visible: true, taskName: props?.task_list_param?.task_name, isHold: props?.is_hold });
-                    }}>
+                    icon={props.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)}
+                    // onClick={() => {
+                    //     setHoldModalMutateState({ visible: true, taskName: props?.task_list_param?.task_name, isHold: props?.is_hold });
+                    // }}
+                    onClick={() => {
+                        Modal.confirm({
+                            title: `Are you sure to ${props.is_hold ? "unhold" : "hold incoming job"}?`,
+                            okText: 'Yes',
+                            okType: 'danger',
+                            cancelText: 'No',
+                            onOk: () => {
+                                holdJobTask({
+                                    variables: {
+                                        task_name: props?.task_list_param?.task_name,
+                                        is_auto_switch: false,
+                                    }
+                                })
+                            }
+                        });
+                    }}
+                >
                     {props.is_hold ? "Unhold" : "Hold"}
                 </Button>
             </Row>

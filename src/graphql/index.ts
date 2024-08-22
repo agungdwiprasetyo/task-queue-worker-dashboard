@@ -134,7 +134,7 @@ export const GetCountJob = (filter: ITaskListParam) => {
 
 export const HoldJobTask = () => {
 	try {
-		const [holdJobTask, { loading, error }] = useMutation(HOLD_JOB_TASK);
+		const [holdJobTask] = useMutation(HOLD_JOB_TASK);
 		return { holdJobTask };
 	}
 	catch (error) {

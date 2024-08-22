@@ -85,7 +85,6 @@ func main() {
 
 	flStr = flStr[:idx] + `	fs["/task"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
 		fs["/404.html"].(os.FileInfo),
-		fs["/404.html.html"].(os.FileInfo),
 		fs["/_next"].(os.FileInfo),
 		fs["/icon-192.png"].(os.FileInfo),
 		fs["/icon-512.png"].(os.FileInfo),
@@ -97,7 +96,6 @@ func main() {
 	}
 	fs["/job"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
 		fs["/404.html"].(os.FileInfo),
-		fs["/404.html.html"].(os.FileInfo),
 		fs["/_next"].(os.FileInfo),
 		fs["/icon-192.png"].(os.FileInfo),
 		fs["/icon-512.png"].(os.FileInfo),
@@ -109,7 +107,6 @@ func main() {
 	}
 	fs["/expired"].(*vfsgen۰DirInfo).entries = []os.FileInfo{
 		fs["/404.html"].(os.FileInfo),
-		fs["/404.html.html"].(os.FileInfo),
 		fs["/_next"].(os.FileInfo),
 		fs["/icon-192.png"].(os.FileInfo),
 		fs["/icon-512.png"].(os.FileInfo),

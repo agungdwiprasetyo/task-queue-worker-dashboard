@@ -32,7 +32,7 @@ const FooterComponent = (props: IFooterComponentProps) => {
                     <Skeleton.Button active={true} />
                 </div>
             ) : (
-                <>
+                <div>
                     {build_number ? (
                         <Row justify='center'>
                             <span>&nbsp;</span>build number:<span>&nbsp;</span><b>{build_number}</b>
@@ -42,13 +42,13 @@ const FooterComponent = (props: IFooterComponentProps) => {
                         server started at <span>&nbsp;</span><b>{server_started_at}</b>
                     </Row>
                     <Row justify='center'>
-                        candi version<span>&nbsp;</span><b>{version}</b><span>&nbsp;</span><h4>|</h4><span>&nbsp;</span>runtime version<span>&nbsp;</span><b>{go_version}</b>
+                        candi version<span>&nbsp;</span><b>{version}</b><span>&nbsp;</span><span>|</span><span>&nbsp;</span>runtime version<span>&nbsp;</span><b>{go_version}</b>
                     </Row>
-                    <Row justify='center' style={{ fontSize: "80%" }}>
-                        <span className="colored-circle" style={{ backgroundColor: queueStatusColor }} /><pre>{`${queue} | `}</pre>
-                        <span className="colored-circle" style={{ backgroundColor: persistentStatusColor }} /><pre>{persistent}</pre>
+                    <Row justify='center' style={{ fontSize: "80%", marginTop: "2px" }}>
+                        <span className="colored-circle" style={{ backgroundColor: queueStatusColor }} /><div style={{ "fontFamily": "Consolas,monospace" }}>{`${queue} | `}</div>
+                        <span className="colored-circle" style={{ backgroundColor: persistentStatusColor }} /><div style={{ "fontFamily": "Consolas,monospace" }}>{persistent}</div>
                     </Row>
-                </>
+                </div>
             )}
         </Footer>
     );

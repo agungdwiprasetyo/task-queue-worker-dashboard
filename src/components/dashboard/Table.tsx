@@ -21,6 +21,7 @@ import {
 import { FilterPagination, getURLRootPath } from '../../utils/helper';
 import { ModalMutateJob } from 'src/components/shared/ActionModal';
 import { HoldUnholdComponent, IHoldUnholdProps } from 'src/components/shared/HoldUnholdComponent';
+import { HoldJobTask } from 'src/graphql';
 
 export const TableComponent = (props: TableProps) => {
     const router = useRouter();
@@ -38,6 +39,8 @@ export const TableComponent = (props: TableProps) => {
     const [modalMutateJobParam, setModalMutateJobParam] = useState({
         action: "", totalJob: 0, taskName: ""
     });
+
+    const { holdJobTask } = HoldJobTask();
 
     const showMutateJobConfirm = (taskName: string, action: string, totalJob: number) => {
         setModalMutateJobParam({ action: action, totalJob: totalJob, taskName: taskName });
@@ -172,9 +175,26 @@ export const TableComponent = (props: TableProps) => {
                                             <Button icon={
                                                 row?.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)
                                             } size="middle" type="text"
+                                                // onClick={() => {
+                                                //     setHoldModalMutateState({ visible: true, taskName: name, isHold: row?.is_hold });
+                                                // }}
                                                 onClick={() => {
-                                                    setHoldModalMutateState({ visible: true, taskName: name, isHold: row?.is_hold });
-                                                }}>{row?.is_hold ? "Unhold" : "Hold"}</Button>
+                                                    Modal.confirm({
+                                                        title: `Are you sure to ${row?.is_hold ? "unhold" : "hold incoming job"}?`,
+                                                        okText: 'Yes',
+                                                        okType: 'danger',
+                                                        cancelText: 'No',
+                                                        onOk: () => {
+                                                            holdJobTask({
+                                                                variables: {
+                                                                    task_name: name,
+                                                                    is_auto_switch: false,
+                                                                }
+                                                            })
+                                                        }
+                                                    });
+                                                }}
+                                            >{row?.is_hold ? "Unhold" : "Hold"}</Button>
                                         </Tooltip>
                                     </Menu.Item>
                                     <Menu.Item>
