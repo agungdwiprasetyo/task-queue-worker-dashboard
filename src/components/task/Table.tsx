@@ -1,6 +1,6 @@
 import Table, { ColumnsType } from 'antd/lib/table';
 import React from 'react';
-import { Space, Button, Input, Modal, Tooltip, } from 'antd';
+import { Space, Button, Input, Modal, Tooltip, Tag, } from 'antd';
 import {
     SyncOutlined,
     StopOutlined, SearchOutlined, DeleteOutlined, ExclamationCircleOutlined
@@ -136,6 +136,13 @@ const TableComponent = (props: TableProps) => {
             key: 'max_retry',
             title: 'Max Retry',
             width: 70,
+            render: (max_retry: any, row: any) => {
+                return max_retry ? max_retry : (<Tag color="warning">
+                    <Tooltip title={row?.interval} placement="top">
+                        cron
+                    </Tooltip>
+                </Tag>)
+            }
         },
         {
             dataIndex: 'created_at',

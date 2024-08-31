@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton, Progress } from 'antd';
+import { Modal, Button, Divider, Tooltip, Layout, Space, Skeleton, Progress, Tag } from 'antd';
 import { DetailDataProps, IFilterJobHistoryParam, IJobComponentProps } from './interface';
 import { RetryJobGraphQL, StopJobGraphQL } from 'src/graphql';
 import { Row, Col } from 'antd';
@@ -272,7 +272,7 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Divider orientation="left" />
                     <Col span={6}><b>Max Retry</b></Col>
                     <Col span={18}>
-                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : detailJob?.max_retry}
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (detailJob?.max_retry ? detailJob?.max_retry : (<Tag color="warning">cron mode</Tag>))}
                     </Col>
                 </Row>
                 <Row>

@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { Modal, Form, Input, InputNumber, Select, DatePicker, Row } from 'antd';
+import { Modal, Form, Input, InputNumber, Select, DatePicker, Row, Switch } from 'antd';
 import { ITaskListParam } from '../task/interface';
 import { AddJob, GetCountJob, RetryAllJob } from 'src/graphql';
 import { toMinifyJSON } from '../../utils/helper';
@@ -16,16 +16,21 @@ export interface ModalProps {
 export const ModalAddJob = (props: ModalProps) => {
     const { addJob } = AddJob();
     const [form] = Form.useForm();
+    const [cronMode, setCronMode] = useState(false);
 
     const handleCancel = () => {
         form.resetFields();
+        setCronMode(false);
         props.setVisible(false);
     };
     const onCreate = (values: any) => {
         addJob({
             variables: {
                 param: {
-                    task_name: props.task_name, max_retry: values?.max_retry, args: toMinifyJSON(values?.args)
+                    task_name: props.task_name,
+                    max_retry: values?.max_retry ? values?.max_retry : 0,
+                    args: values?.args ? toMinifyJSON(values?.args) : "",
+                    cron_expression: values?.cron_expression
                 }
             }
         });
@@ -50,14 +55,21 @@ export const ModalAddJob = (props: ModalProps) => {
                     });
             }}
         >
-            <Form form={form} layout="vertical" name="formAddJob"
-                initialValues={{
-                    'max_retry': 1,
-                }} >
-                <Form.Item name="max_retry" label="Max Retry:" rules={[{ required: true }]}>
-                    <InputNumber min={1} />
+            <Form form={form} labelCol={{ span: 4 }}
+                layout="horizontal" name="formAddJob"
+                initialValues={{ 'max_retry': 1 }} >
+                <Form.Item name="cron" label="Cron">
+                    <Switch onChange={(checked: boolean) => { setCronMode(checked) }} />
                 </Form.Item>
-                <Form.Item name="args" label="Argument / Message:" rules={[{ required: true }]}>
+                {cronMode ?
+                    (<Form.Item name="cron_expression" label="Cron Expression:" rules={[{ required: true && cronMode }]}>
+                        <Input />
+                    </Form.Item>)
+                    : (<Form.Item name="max_retry" label="Max Retry:" rules={[{ required: true && !cronMode }]}>
+                        <InputNumber min={1} />
+                    </Form.Item>)
+                }
+                <Form.Item name="args" label="Argument / Message:" rules={[{ required: true && !cronMode }]}>
                     <Input.TextArea rows={15} />
                 </Form.Item>
             </Form>
