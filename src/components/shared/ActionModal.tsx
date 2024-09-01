@@ -1,5 +1,5 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import { Modal, Form, Input, InputNumber, Select, DatePicker, Row, Switch } from 'antd';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Modal, Form, Input, InputNumber, Select, DatePicker, Row, Switch, notification } from 'antd';
 import { ITaskListParam } from '../task/interface';
 import { AddJob, GetCountJob, RetryAllJob } from 'src/graphql';
 import { toMinifyJSON } from '../../utils/helper';
@@ -14,7 +14,15 @@ export interface ModalProps {
 }
 
 export const ModalAddJob = (props: ModalProps) => {
-    const { addJob } = AddJob();
+    const addJobGql = AddJob();
+    useEffect(() => {
+        if (addJobGql.error && addJobGql.error?.message != "") {
+            notification.error({
+                message: "Cannot Add Job",
+                description: addJobGql.error.message.replace("GraphQL error: ", "")
+            })
+        }
+    }, [addJobGql.error]);
     const [form] = Form.useForm();
     const [cronMode, setCronMode] = useState(false);
 
@@ -24,7 +32,7 @@ export const ModalAddJob = (props: ModalProps) => {
         props.setVisible(false);
     };
     const onCreate = (values: any) => {
-        addJob({
+        addJobGql.addJob({
             variables: {
                 param: {
                     task_name: props.task_name,
@@ -34,6 +42,7 @@ export const ModalAddJob = (props: ModalProps) => {
                 }
             }
         });
+        setCronMode(false);
         props.setVisible(false);
     }
 

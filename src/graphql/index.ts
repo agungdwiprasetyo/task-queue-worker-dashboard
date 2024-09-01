@@ -86,7 +86,7 @@ export const StopJobGraphQL = () => {
 export const AddJob = () => {
 	try {
 		const [addJob, { loading, error }] = useMutation(ADD_JOB);
-		return { addJob };
+		return { addJob, error };
 	}
 	catch (error) {
 		console.log(error);
