@@ -6,6 +6,7 @@ import { toMinifyJSON } from '../../utils/helper';
 import { CleanJobGraphQL } from 'src/graphql';
 import moment from 'moment';
 import { LoadingOutlined } from '@ant-design/icons';
+import Text from 'antd/lib/typography/Text';
 
 export interface ModalProps {
     task_name: string;
@@ -53,11 +54,10 @@ export const ModalAddJob = (props: ModalProps) => {
             onCancel={handleCancel}
             width={1000}
             onOk={() => {
-                form
-                    .validateFields()
+                form.validateFields()
                     .then(values => {
-                        form.resetFields();
                         onCreate(values);
+                        form.resetFields();
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);
@@ -66,19 +66,26 @@ export const ModalAddJob = (props: ModalProps) => {
         >
             <Form form={form} labelCol={{ span: 4 }}
                 layout="horizontal" name="formAddJob"
-                initialValues={{ 'max_retry': 1 }} >
+                initialValues={{ 'max_retry': cronMode ? 0 : 1 }}
+            >
                 <Form.Item name="cron" label="Cron">
-                    <Switch onChange={(checked: boolean) => { setCronMode(checked) }} />
+                    <Switch onChange={(checked: boolean) => {
+                        setCronMode(checked)
+                        form.setFieldsValue({ 'max_retry': checked ? 0 : 1 })
+                    }} />
                 </Form.Item>
                 {cronMode ?
-                    (<Form.Item name="cron_expression" label="Cron Expression:" rules={[{ required: true && cronMode }]}>
+                    (<Form.Item name="cron_expression" label="Cron Expression:" rules={[{ required: cronMode }]}>
                         <Input />
                     </Form.Item>)
-                    : (<Form.Item name="max_retry" label="Max Retry:" rules={[{ required: true && !cronMode }]}>
-                        <InputNumber min={1} />
-                    </Form.Item>)
+                    : (<></>)
                 }
-                <Form.Item name="args" label="Argument / Message:" rules={[{ required: true && !cronMode }]}>
+                <Form.Item name="max_retry" label="Max Retry:"
+                    rules={[{ required: !cronMode }]}
+                    extra={cronMode ? "in cron mode, set this value to empty or zero to run continuously" : ""}>
+                    <InputNumber min={cronMode ? 0 : 1} />
+                </Form.Item>
+                <Form.Item name="args" label="Argument / Message:" rules={[{ required: !cronMode }]}>
                     <Input.TextArea rows={15} />
                 </Form.Item>
             </Form>

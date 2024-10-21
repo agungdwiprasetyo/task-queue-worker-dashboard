@@ -20,7 +20,8 @@ subscription ($filter: GetAllJobInputResolver) {
             status
             created_at
             finished_at
-            next_retry_at
+            next_running_at
+            is_cron_mode
             trace_id
             meta {
                 is_show_more_args

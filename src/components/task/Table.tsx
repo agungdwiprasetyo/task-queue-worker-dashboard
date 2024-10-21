@@ -129,7 +129,7 @@ const TableComponent = (props: TableProps) => {
             dataIndex: 'retries',
             key: 'retries',
             title: 'Retries',
-            width: 70,
+            width: 60,
         },
         {
             dataIndex: 'max_retry',
@@ -137,11 +137,14 @@ const TableComponent = (props: TableProps) => {
             title: 'Max Retry',
             width: 70,
             render: (max_retry: any, row: any) => {
-                return max_retry ? max_retry : (<Tag color="warning">
-                    <Tooltip title={row?.interval} placement="top">
-                        cron
-                    </Tooltip>
-                </Tag>)
+                return (
+                    row.is_cron_mode ? (<>
+                        <Space>
+                            {max_retry > 0 ? (<div>{max_retry}</div>) : "∞"}
+                            <Tag color="warning">cron</Tag>
+                        </Space>
+                    </>) : max_retry
+                )
             }
         },
         {

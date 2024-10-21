@@ -1,7 +1,6 @@
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PauseOutlined, StopOutlined, SyncOutlined } from "@ant-design/icons";
 import { Space, Tag } from "antd";
 import Moment from "react-moment";
-import moment from 'moment';
 
 export interface StatusLayoutProps {
     status: string;
@@ -39,8 +38,6 @@ export const StatusLayout = (props: StatusLayoutProps) => {
 
 export const DateComponent = ({ date }) => {
     if (date === "") { return (<div>-</div>) };
-    const dt = moment(new Date(date));
-    console.log(dt);
     return (
         <Moment format="DD MMMM YYYY, HH:mm:ssZ">{date}</Moment>
     )
@@ -125,7 +122,6 @@ export const getSize = (val): string => {
 }
 
 export const convertToByteSize = (size: number): string => {
-
     if (!size) {
         size = 0;
     }

@@ -15,7 +15,8 @@ subscription ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
         status
         created_at
         finished_at
-        next_retry_at
+        next_running_at
+        is_cron_mode
         current_progress
         max_progress
         meta {

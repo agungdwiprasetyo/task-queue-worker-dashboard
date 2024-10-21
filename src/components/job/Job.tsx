@@ -272,7 +272,14 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Divider orientation="left" />
                     <Col span={6}><b>Max Retry</b></Col>
                     <Col span={18}>
-                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (detailJob?.max_retry ? detailJob?.max_retry : (<Tag color="warning">cron mode</Tag>))}
+                        {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
+                            detailJob.is_cron_mode ? (<>
+                                <Space>
+                                    {detailJob?.max_retry > 0 ? (<div>{detailJob?.max_retry}</div>) : "∞"}
+                                    <Tag color="warning">cron mode</Tag>
+                                </Space>
+                            </>) : detailJob?.max_retry
+                        )}
                     </Col>
                 </Row>
                 <Row>
@@ -280,7 +287,10 @@ const JobComponent = (props: IJobComponentProps) => {
                     <Col span={6}><b>Status</b></Col>
                     <Col span={15}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
-                            <StatusLayout {...statusProps} />
+                            <Space>
+                                <StatusLayout {...statusProps} />
+                                {detailJob?.is_cron_mode && detailJob?.status == "QUEUEING" ? (<Tag color="magenta">ACTIVE</Tag>) : ""}
+                            </Space>
                         )}
                     </Col>
                 </Row>
@@ -292,16 +302,16 @@ const JobComponent = (props: IJobComponentProps) => {
                 </Row>
                 <Row>
                     <Divider orientation="left" />
-                    <Col span={6}><b>Created At</b></Col>
+                    <Col span={6}><b>Next Running At</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
-                            <DateComponent date={detailJob?.created_at} />
+                            <DateComponent date={detailJob?.next_running_at} />
                         )}
                     </Col>
                 </Row>
                 <Row>
                     <Divider orientation="left" />
-                    <Col span={6}><b>Finished At</b></Col>
+                    <Col span={6}><b>Last Finished At</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
                             <DateComponent date={detailJob?.finished_at} />
@@ -310,10 +320,10 @@ const JobComponent = (props: IJobComponentProps) => {
                 </Row>
                 <Row>
                     <Divider orientation="left" />
-                    <Col span={6}><b>Next Retry At</b></Col>
+                    <Col span={6}><b>Created At</b></Col>
                     <Col span={18}>
                         {loading ? (<Skeleton.Button active={true} style={{ width: "500px" }} />) : (
-                            <DateComponent date={detailJob?.next_retry_at} />
+                            <DateComponent date={detailJob?.created_at} />
                         )}
                     </Col>
                 </Row>

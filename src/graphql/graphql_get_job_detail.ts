@@ -15,7 +15,7 @@ query ($job_id: String!, $filter: GetAllJobHistoryInputResolver) {
     status
     created_at
     finished_at
-    next_retry_at
+    next_running_at
     meta {
         is_close_session
         page
