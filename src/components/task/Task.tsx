@@ -108,9 +108,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
                     </Col>
                 </Row>
 
-                <Row justify="center">
-                    <Divider orientation="left" />
-                    <Col span={9}>
+                <Divider orientation="left" />
+                <Row>
+                    <Col span={8}>
                         <Button icon={<LeftOutlined />} size="middle" onClick={() => {
                             router.push({
                                 host: pathRoot,
@@ -118,7 +118,7 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             })
                         }}>Back to dashboard</Button>
                     </Col>
-                    <Col span={5}>
+                    <Col span={8}>
                         <div className="text-center" style={{ fontSize: "25px" }}>
                             {meta?.is_freeze_broadcast ? (
                                 <div className="text-center" style={{ color: "#f5222d" }}>Freeze Mode</div>
@@ -129,9 +129,8 @@ const TaskComponent = (props: ITaskComponentProps) => {
                             ) : meta?.message !== "" ? meta?.message : (<></>)}
                         </div>
                     </Col>
-                    <Col span={5}></Col>
-                    {props.task_name ?
-                        <Col span={4}>
+                    <Col span={8}>
+                        {props.task_name ?
                             <ActionComponent
                                 task_list_param={paramsTaskList}
                                 is_loading_subscribe={loading}
@@ -139,9 +138,9 @@ const TaskComponent = (props: ITaskComponentProps) => {
                                 total_job={meta?.total_records}
                                 is_hold={meta?.is_hold}
                             />
-                        </Col>
-                        : ""
-                    }
+                            : ""
+                        }
+                    </Col>
                 </Row>
 
                 <Row justify="center">

@@ -25,82 +25,90 @@ const ActionComponent = (props: IActionComponentProps) => {
     const [holdModalMutateState, setHoldModalMutateState] = useState<IHoldUnholdProps>({ visible: false, taskName: "", isHold: false });
 
     return (
-        <>
-            <Row gutter={[8, 8]} justify="center">
-                <Col span={12}>
-                    <Button
-                        disabled={isButtonDisable}
-                        icon={<PlusOutlined />}
-                        size="middle"
-                        type="primary"
-                        onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span></Button>
-                </Col>
-                <Col span={12}>
-                    <Button
-                        disabled={isButtonDisable}
-                        icon={<SyncOutlined />}
-                        size="middle"
-                        type="primary"
-                        onClick={() => { showModalMutateJob("RETRY") }}>Retry All</Button>
-                </Col>
+        <Row justify="end">
+            <Row gutter={[8, 8]} justify="end">
+                <Col className="gutter-row" span={12} offset={6}>
+                    <div className="text-center">
+                        <Space>
+                            <Button
+                                disabled={isButtonDisable}
+                                icon={<PlusOutlined />}
+                                size="middle"
+                                type="primary"
+                                onClick={() => { setModalAddJobVisible(true) }}>Add Job<span>&nbsp;&nbsp;</span>
+                            </Button>
 
-                <Col span={12}>
-                    <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
-                        <Button
-                            disabled={isButtonDisable}
-                            icon={<ClearOutlined />}
-                            danger
-                            size="middle"
-                            onClick={() => { showModalMutateJob("CLEAN") }}>Clear Job</Button>
-                    </Tooltip>
+                            <Button
+                                disabled={isButtonDisable}
+                                icon={<SyncOutlined />}
+                                size="middle"
+                                type="primary"
+                                onClick={() => { showModalMutateJob("RETRY") }}>Retry All</Button>
+                        </Space>
+                    </div>
+                </Col>
+                <Col className="gutter-row" span={12} offset={6}>
+                    <div className="text-center">
+                        <Space>
+                            <Tooltip title="Clear all success, failure, and stopped job" placement="bottom">
+                                <Button
+                                    disabled={isButtonDisable}
+                                    icon={<ClearOutlined />}
+                                    danger
+                                    size="middle"
+                                    onClick={() => { showModalMutateJob("CLEAN") }}>Clear Job</Button>
+                            </Tooltip>
+
+                            <Tooltip title="Stop all running and queued job" placement="bottom">
+                                <Button
+                                    disabled={isButtonDisable}
+                                    icon={<StopOutlined />}
+                                    danger
+                                    size="middle"
+                                    onClick={() => {
+                                        Modal.confirm({
+                                            title: "Are you sure stop all running and queued job in this task?",
+                                            icon: <ExclamationCircleOutlined />,
+                                            okText: 'Yes',
+                                            okType: 'danger',
+                                            cancelText: 'No',
+                                            onOk() { stopAllJob({ variables: { task_name: props.task_list_param.task_name } }) },
+                                            onCancel() { },
+                                        });
+                                    }}>Stop All<span>&nbsp;</span></Button>
+                            </Tooltip>
+                        </Space>
+                    </div>
                 </Col>
                 <Col span={12}>
-                    <Tooltip title="Stop all running and queued job" placement="bottom">
-                        <Button
+                    <div className="text-center">
+                        <Button type="ghost" size="large" style={{ marginTop: "4px" }}
                             disabled={isButtonDisable}
-                            icon={<StopOutlined />}
-                            danger
-                            size="middle"
+                            icon={props.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)}
+                            // onClick={() => {
+                            //     setHoldModalMutateState({ visible: true, taskName: props?.task_list_param?.task_name, isHold: props?.is_hold });
+                            // }}
                             onClick={() => {
                                 Modal.confirm({
-                                    title: "Are you sure stop all running and queued job in this task?",
-                                    icon: <ExclamationCircleOutlined />,
+                                    title: `Are you sure to ${props.is_hold ? "unhold" : "hold incoming job"}?`,
                                     okText: 'Yes',
                                     okType: 'danger',
                                     cancelText: 'No',
-                                    onOk() { stopAllJob({ variables: { task_name: props.task_list_param.task_name } }) },
-                                    onCancel() { },
-                                });
-                            }}>Stop All<span>&nbsp;</span></Button>
-                    </Tooltip>
-                </Col>
-            </Row>
-            <Row gutter={[8, 8]} justify="center">
-                <Button type="ghost" size="large" style={{ marginTop: "4px" }}
-                    disabled={isButtonDisable}
-                    icon={props.is_hold ? (<CaretRightOutlined />) : (<PauseOutlined />)}
-                    // onClick={() => {
-                    //     setHoldModalMutateState({ visible: true, taskName: props?.task_list_param?.task_name, isHold: props?.is_hold });
-                    // }}
-                    onClick={() => {
-                        Modal.confirm({
-                            title: `Are you sure to ${props.is_hold ? "unhold" : "hold incoming job"}?`,
-                            okText: 'Yes',
-                            okType: 'danger',
-                            cancelText: 'No',
-                            onOk: () => {
-                                holdJobTask({
-                                    variables: {
-                                        task_name: props?.task_list_param?.task_name,
-                                        is_auto_switch: false,
+                                    onOk: () => {
+                                        holdJobTask({
+                                            variables: {
+                                                task_name: props?.task_list_param?.task_name,
+                                                is_auto_switch: false,
+                                            }
+                                        })
                                     }
-                                })
-                            }
-                        });
-                    }}
-                >
-                    {props.is_hold ? "Unhold" : "Hold"}
-                </Button>
+                                });
+                            }}
+                        >
+                            {props.is_hold ? "Unhold" : "Hold"}
+                        </Button>
+                    </div>
+                </Col>
             </Row>
 
             <ModalAddJob
@@ -120,7 +128,7 @@ const ActionComponent = (props: IActionComponentProps) => {
                 setState={setHoldModalMutateState}
                 state={holdModalMutateState}
             />
-        </>
+        </Row>
     );
 }
 
